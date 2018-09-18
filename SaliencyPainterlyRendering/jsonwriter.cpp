@@ -30,7 +30,7 @@ void get_f_name(string & file_name) {
 	 file_name = "deploy_s" + to_string(thresh[th]) + "_d" + to_string(depth[de]) +
 		"_g" + to_string(_grid[gr]) + "_b" + to_string(_br[br]) + "_N" + to_string(QT_N[qt])
 		+ "_ps" + to_string(_ps[ps])
-		+ "_" + _re[re] + "_" + saliency_method[sm]
+		+ "_r" + _re[re] + "_s" + saliency_method[sm]
 		+ "_m" + _str_mm[mm] + "_gs" + to_string(_gs[gs]) + "_copy.json";
 	
 }
@@ -54,62 +54,64 @@ int  json_write_method(string path) {
 	int n_gs= sizeof(_gs) / sizeof(int);
 	int howmany = n_br  *n_th * n_de * n_gr*n_sm*n_qt*n_re*n_mm*n_ps*n_gs;
 	int f_count = 0;
-	for ( br = 0; br < n_br; br++) {
-	for ( th = 0; th < n_th; th++) {
-		for ( de = 0; de < n_de; de++) {
-			for ( gr = 0; gr< n_gr; gr++) {
-				for( sm=0;sm<n_sm ; sm++){
-					for (qt = 0; qt < n_qt; qt++) {
-						for (re = 0; re < n_re; re++) 
-							for ( mm = 0; mm< n_mm; mm++)
-								for ( ps = 0; ps<n_ps; ps++)
-								for ( gs = 0; gs<n_gs; gs++){
-									
-							//root.append("revision","1");
-							root["root_path"] = "/rst";
-							root["root_path_win"] = "\\rst";
-							root["g_paint_method"] = "copy";//copy alpha
-							root["g_BrushMinSize"] = _br[br]; //5,10
-							root["g_Ts"] = 230;
-							root["end"] = "end";
-							root["g_paint_grid_scale"] = _ps[ps];//
-							root["g_merge_method"] = _str_mm[mm];
-							root["g_merge_skip_count"] = _gs[gs];
-							root["QT_avgSThreshold"] = thresh[th];//15, 25
-							root["g_depth_Threshhold"] = depth[de]; //5,7
-							root["g_gridsize"] = _grid[gr];	//5,10
-
-							root["g_saliency_method"] = saliency_method[sm];//wo saliency pregraph 
-
-							root["g_QT_method_N"] = QT_N[qt]; //1,2,3,4...6
-							root["g_Render_method"] = _re[re];// Union or Only
-
-						//	cout << "path" << path << " = " << root << endl;
+	for (re = 0; re < n_re; re++) {
+		for (br = 0; br < n_br; br++) {
+			for (th = 0; th < n_th; th++) {
+				for (de = 0; de < n_de; de++) {
+					for (gr = 0; gr < n_gr; gr++) {
+						for (sm = 0; sm < n_sm; sm++) {
+							for (qt = 0; qt < n_qt; qt++) {
 							
-							if (saliency_method[sm] == "Sobel" &&  _re[re] == "Saliency") { continue; }
-							if (saliency_method[sm] == "Sobel" &&  _re[re] == "Twopass") { continue; }
-							get_f_name(file_name);
-							// Make a new JSON document for the configuration. Preserve original comments.
-								//std::string outputConfig = writer.write(root);
-							std::string outputConfig = Json::writeString(wbuilder, root);
-							//	cout << "outputConfig " << outputConfig << endl;
+									for (mm = 0; mm < n_mm; mm++)
+										for (ps = 0; ps < n_ps; ps++)
+											for (gs = 0; gs < n_gs; gs++) {
 
-							f_name = path + "\\" + file_name;
-							std::ofstream file_id;
-							file_id.open(f_name.c_str());
-							file_id << outputConfig;
-							f_count++;
-							if (!(f_count % 100)) {
-								std::cout << "method " << f_count<<" / "<< howmany <<" : " << f_count/howmany*100. <<endl;
+												//root.append("revision","1");
+												root["root_path"] = "/rst";
+												root["root_path_win"] = "\\rst";
+												root["g_paint_method"] = "copy";//copy alpha
+												root["g_BrushMinSize"] = _br[br]; //5,10
+												root["g_Ts"] = 230;
+												root["end"] = "end";
+												root["g_paint_grid_scale"] = _ps[ps];//
+												root["g_merge_method"] = _str_mm[mm];
+												root["g_merge_skip_count"] = _gs[gs];
+												root["QT_avgSThreshold"] = thresh[th];//15, 25
+												root["g_depth_Threshhold"] = depth[de]; //5,7
+												root["g_gridsize"] = _grid[gr];	//5,10
+
+												root["g_saliency_method"] = saliency_method[sm];//wo saliency pregraph 
+
+												root["g_QT_method_N"] = QT_N[qt]; //1,2,3,4...6
+												root["g_Render_method"] = _re[re];// Union or Only
+
+											//	cout << "path" << path << " = " << root << endl;
+
+												if (saliency_method[sm] == "Sobel" &&  _re[re] == "Saliency") { continue; }
+												if (saliency_method[sm] == "Sobel" &&  _re[re] == "Twopass") { continue; }
+												get_f_name(file_name);
+												// Make a new JSON document for the configuration. Preserve original comments.
+													//std::string outputConfig = writer.write(root);
+												std::string outputConfig = Json::writeString(wbuilder, root);
+												//	cout << "outputConfig " << outputConfig << endl;
+
+												f_name = path + "\\" + file_name;
+												std::ofstream file_id;
+												file_id.open(f_name.c_str());
+												file_id << outputConfig;
+												f_count++;
+												if (!(f_count % 100)) {
+													std::cout << "method " << f_count << " / " << howmany << " : " << f_count / howmany*100. << endl;
+												}
+												file_id.close();
+											}
 							}
-							file_id.close();
 						}
 					}
+				}
 			}
 		}
-	}
-}
-	}
+	}//re
 // You can also use streams.  This will put the contents of any JSON
 // stream at a particular sub-value, if you'd like.
 //std::cin >> root["subtree"];
