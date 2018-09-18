@@ -2,7 +2,7 @@
 #include "opencv2\opencv.hpp"
 #include "opencv2\core.hpp"
 #include "saliency_itti.h"
-#include "..\debug_image.h"
+#include "debug_image.h"
 
 SaliencyMap::SaliencyMap(int height, int width)
 {

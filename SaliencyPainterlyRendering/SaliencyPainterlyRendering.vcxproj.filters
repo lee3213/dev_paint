@@ -84,9 +84,6 @@
     <ClInclude Include="pregraph\SLIC.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="itti\saliency_itti.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="pregraph\saliency_PreGraph.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -115,6 +112,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="debug_image_compare.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="saliency_itti.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -176,12 +176,6 @@
     <ClCompile Include="pregraph\saliency_PreGraph.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="itti\saliency_itti_main.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="itti\saliency_itti.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="pregraph\saliency_pregraph_main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -204,6 +198,12 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="debug_image_compare.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="saliency_itti_main.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="saliency_itti.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

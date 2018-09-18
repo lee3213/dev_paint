@@ -171,7 +171,6 @@
     <ClInclude Include="g_setup.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="image_util.h" />
-    <ClInclude Include="itti\saliency_itti.h" />
     <ClInclude Include="json\json-forwards.h" />
     <ClInclude Include="json\json.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -188,6 +187,7 @@
     <ClInclude Include="rgb2hsv.h" />
     <ClInclude Include="SaliencyPainterlyRendering.h" />
     <ClInclude Include="saliency_blackandwhite.h" />
+    <ClInclude Include="saliency_itti.h" />
     <ClInclude Include="saliency_main.h" />
     <ClInclude Include="set_result_path.h" />
     <ClInclude Include="stdafx.h" />
@@ -206,8 +206,6 @@
     <ClCompile Include="formatstring.cpp" />
     <ClCompile Include="g_setup.cpp" />
     <ClCompile Include="image_util.cpp" />
-    <ClCompile Include="itti\saliency_itti.cpp" />
-    <ClCompile Include="itti\saliency_itti_main.cpp" />
     <ClCompile Include="jsoncpp.cpp" />
     <ClCompile Include="jsonwriter.cpp" />
     <ClCompile Include="json_read.cpp" />
@@ -222,6 +220,8 @@
     <ClCompile Include="saliencyPainter.cpp" />
     <ClCompile Include="SaliencyPainterlyRendering.cpp" />
     <ClCompile Include="saliency_blackandwhite.cpp" />
+    <ClCompile Include="saliency_itti.cpp" />
+    <ClCompile Include="saliency_itti_main.cpp" />
     <ClCompile Include="set_result_path.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
