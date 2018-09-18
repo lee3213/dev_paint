@@ -1,0 +1,255 @@
+#include "stdafx.h"
+#include "opencv2\opencv.hpp"
+#include "opencv2\core.hpp"
+#include "bsShowImage.h"
+using namespace cv;
+
+#include "extern.h"
+#include <iostream>
+std::string type2str(int type) {
+	std::string r;
+
+	uchar depth = type & CV_MAT_DEPTH_MASK;
+	uchar chans = 1 + (type >> CV_CN_SHIFT);
+
+	switch (depth) {
+	case CV_8U:  r = "8U"; break;
+	case CV_8S:  r = "8S"; break;
+	case CV_16U: r = "16U"; break;
+	case CV_16S: r = "16S"; break;
+	case CV_32S: r = "32S"; break;
+	case CV_32F: r = "32F"; break;
+	case CV_64F: r = "64F"; break;
+	default:     r = "User"; break;
+	}
+
+	r += "C";
+	r += (chans + '0');
+
+	return r;
+}
+
+cv::Rect safe_Rect(Point s, Point e, int i_width, int i_height) {
+	Rect rr;
+	if (s.x < 0) s.x = 0;
+		if (s.x >= i_width) s.x = i_width - 1;
+	if (e.x < 0) e.x = 0;
+	if (e.x >= i_width) e.x = i_width - 1;
+
+	if (s.y < 0) s.y = 0;
+	if (s.y >= i_height) s.y = i_height - 1;
+		if (e.y < 0) e.y = 0;
+	if (e.y >= i_height) e.y = i_height - 1;
+	rr = Rect(s, e);
+	return rr;
+}
+void mat_copyTo(unsigned char *s, unsigned char * d, Rect s_rect, Rect d_rect, int width) {
+	int s_p, d_p;
+	for (int y = 0; y<s_rect.height; y++)
+		for (int x = 0; x < s_rect.width; x++) {
+
+			s_p = (s_rect.y + y)*width + (x + s_rect.x);
+			d_p = (d_rect.y + y)*width + (x + d_rect.x);
+			*(d + d_p) = *(s + s_p);
+
+		}
+
+}
+
+void rectangle_canvas(cv::Mat mat, cv::Rect  rect, Scalar s) {
+
+	rect.x = rect.x + g_canvas_size_bezel_size;
+	rect.y = rect.y + g_canvas_size_bezel_size;
+	cv::rectangle(mat, rect, s);
+}
+void p_poke_canvas(unsigned char * p, int p_x, int p_y, int p_0, int p_1, int p_2) {
+	int index = ((p_x + g_canvas_size_bezel_size) + (p_y + g_canvas_size_bezel_size) * g_canvas_size_width)* 3;
+	p[index] = p_0;
+	p[index + 1] = p_1;
+	p[index + 2] = p_2;
+}
+void p_peek_canvas(unsigned char * p, int p_x, int p_y, int &p_0, int &p_1, int &p_2) {
+	int index = ((p_x + g_canvas_size_bezel_size) + (p_y + g_canvas_size_bezel_size) * g_canvas_size_width) * 3;
+
+	p_0 = p[index];
+	p_1 = p[index + 1];
+	p_2 = p[index + 2];
+}
+void p_poke(unsigned char * p, int index, int p_0) {
+	p[index] = p_0;
+
+
+}
+void p_poke(unsigned char * p, int index, int p_0, int p_1, int p_2) {
+	p[index] = p_0;
+	p[index + 1] = p_1;
+	p[index + 2] = p_2;
+}
+void p_peek(unsigned char * p, int index, int &p_0, int &p_1, int &p_2) {
+	p_0 = p[index];
+	p_1 = p[index + 1];
+	p_2 = p[index + 2];
+}
+void p_peek(unsigned char * p, int index, int &p_0) {
+	p_0 = p[index];
+}
+void file_redirection_cout(string f_path) {
+	cout << f_path;
+	fstream file;
+	file.open(f_path.c_str(), ios::out);
+	// Get the streambuffer of the file
+	streambuf* stream_buffer_file = file.rdbuf();
+
+	// Redirect cout to file
+	cout.rdbuf(stream_buffer_file);
+
+}
+
+void file_redirection_clog(string f_path) {
+	fstream file;
+	file.open(f_path.c_str(), ios::out);
+	// Get the streambuffer of the file
+	streambuf* stream_buffer_file = file.rdbuf();
+
+	// Redirect cout to file
+	clog.rdbuf(stream_buffer_file);
+
+}
+bool depth_check(int depth)
+
+{
+static int called_cnt = 0;
+static int saved_depth = -1;
+if (saved_depth != depth) {
+	saved_depth = depth;
+	called_cnt = 0;
+}
+called_cnt++;
+if (called_cnt > 100) return false;
+//if ((called_cnt % g_painting_count[depth])) return false;
+
+//elsereturn false;
+else return true;
+};
+
+void mat_print(cv::Mat &amat, cv::String matname, int d) {
+	cout << matname << endl;
+	unsigned char * p;
+
+	char buf[30];
+	if (amat.cols == 0 || amat.rows == 0) {
+		cout << "Empty Matrix, "<<d
+			<< endl;
+		cout << "-----------------------------------------------------------------------" << endl;
+		return;
+	}
+	p = &(amat.data[0]);
+	sprintf_s(buf, "%p", p);
+	cout << "Data " << buf << ", "<<d;
+
+	cout << "   ref :" << amat.u->refcount << endl;
+	cout << "channels: " << amat.channels() << endl;
+	cout << "ref :" << amat.u->refcount << endl;
+	cout << "width :" << amat.size().width << endl;
+	cout << "height :" << amat.size().height << endl;
+	cout << "step1() : " << amat.step1() << endl;
+	cout << "size() :" << amat.size() << endl;
+	cout << "type() :" << amat.type() << ", " <<
+		type2str(amat.type())
+		<< endl;
+	cout << "elem " << amat.elemSize() << ", " << amat.elemSize1() << endl;
+	cout << "total " << amat.total() << endl;
+	cout << "-----------------------------------------------------------------------" << endl;
+}
+void mat_print(cv::Mat &amat, cv::String matname ) {
+	cout << matname << endl;
+	unsigned char * p;
+
+	 char buf[30];
+	 if (amat.cols == 0 || amat.rows == 0) {
+		 cout << "Empty Matrix"
+			 << endl;
+		 cout << "-----------------------------------------------------------------------" << endl;
+		 return;
+	 }
+	p =&(amat.data[0]);
+	sprintf_s(buf, "%p", p);
+	cout << "Data " << buf;
+
+	cout << "   ref :" << amat.u->refcount << endl;
+	cout << "channels: " << amat.channels() << endl;
+	cout << "ref :" << amat.u->refcount << endl;
+	cout << "width :" << amat.size().width << endl;
+	cout << "height :" << amat.size().height << endl;
+	cout << "step1() : " << amat.step1() << endl;
+	cout << "size() :" << amat.size() << endl;
+	cout << "type() :" << amat.type() << ", " <<
+		type2str(amat.type())
+		<< endl;
+	cout << "elem " << amat.elemSize() << ", " << amat.elemSize1()<<endl;
+	cout << "total " << amat.total() << endl;
+	cout << "-----------------------------------------------------------------------" << endl;
+}
+void mat_print(cv::Mat *amat, cv::String matname, int d) {
+	cout << matname << endl;
+	unsigned char * p;
+	char buf[30];
+	if (amat->cols == 0 || amat->rows == 0) {
+		cout << "Empty Matrix, "<<d
+			<< endl;
+		return;
+	}
+	p = &(amat->data[0]);
+	sprintf_s(buf, "%p", p);
+	cout << "Data " << buf<<",d "<<d;
+	cout << "   ref :" << amat->u->refcount << endl;
+	/*cout << "channels: " << amat->channels() << endl;
+
+	cout << "width :" << amat->size().width << endl;
+	cout << "height :" << amat->size().height << endl;
+	cout << "step1() : " << amat->step1() << endl;
+	cout << "size() :" << amat->size() << endl;
+	cout << "type() :" << amat->type() << ", " <<
+	type2str(amat->type())
+	<< endl;
+	cout << "elem " << amat->elemSize() << ", " << amat->elemSize1() << endl;
+	cout << "total " << amat->total() << endl;
+	;
+	*/
+	cout << "-----------------------------------------------------------------------" << endl;
+}
+void mat_print(cv::Mat *amat, cv::String matname ) {
+	cout << matname << endl;
+	unsigned char * p;
+	 char buf[30];
+	 if (amat->cols == 0 || amat->rows == 0) {
+		 cout << "Empty Matrix"
+			 << endl;
+		 return;
+	 }
+	p = &(amat->data[0]);
+	sprintf_s(buf, "%p", p);
+	cout << "Data " << buf;
+	cout << "   ref :" << amat->u->refcount << endl;
+	/*cout << "channels: " << amat->channels() << endl;
+
+	cout << "width :" << amat->size().width << endl;
+	cout << "height :" << amat->size().height << endl;
+	cout << "step1() : " << amat->step1() << endl;
+	cout << "size() :" << amat->size() << endl;
+	cout << "type() :" << amat->type() << ", " <<
+		type2str(amat->type())
+		<< endl;
+	cout << "elem " << amat->elemSize() << ", " << amat->elemSize1() << endl;
+	cout << "total " << amat->total() << endl;
+	;
+	*/
+	cout << "-----------------------------------------------------------------------" << endl;
+}
+void Point_2p_debug(cv::Point p1, cv::String p1_tag, cv::Point p2, cv::String p2_tag) {
+	cout << p1_tag.c_str() << " " << setw(5) << p1.x << "," << setw(5) << p1.y << ":";
+		cout<< p2_tag.c_str()<< setw(5) << p2.x << "," << setw(5) << p2.y << endl;
+};
+void Point_1p_debug(cv::Point p1, cv::String p1_tag) {
+		cout << p1_tag.c_str() << " "<<setw(5) << p1.x << "," << setw(5)<<p1.y << ":"<<endl;
+};

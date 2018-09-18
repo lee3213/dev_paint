@@ -1,0 +1,9 @@
+mkdir \rst
+mkdir \rst\ing
+mkdir \rst\cv_
+mkdir \rst\br
+mkdir \rst\org
+mkdir \rst\sa
+mkdir \rst\saliency_only
+mkdir \rst\st
+mkdir \rst\

@@ -1,0 +1,10 @@
+#pragma once
+//#define DEBUG_COLORED_BRUSH YES
+//#define  DEBUG_ING YES
+//#define DEBUG_ASTROKE_REGION YES
+#define DEBUG_GRID YES
+#define DEBUG_ING YES
+//#define DEBUG_SELECTED_BRUSH YES
+//#define  DEBUG_IMAGE_GRID
+//#define DEBUG_BRUSH_IMAGE YES
+//#define  DEBUG_JUDGE_BRUSH YES
