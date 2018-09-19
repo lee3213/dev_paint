@@ -6,6 +6,27 @@
 #include <fstream>
 #include "dir.h"
 using namespace std;
+void file_redirection_clog(string f_path) {
+	fstream file;
+	file.open(f_path.c_str(), ios::out);
+	// Get the streambuffer of the file
+	streambuf* stream_buffer_file = file.rdbuf();
+
+	// Redirect cout to file
+	clog.rdbuf(stream_buffer_file);
+
+}
+void file_redirection_cout(string f_path) {
+	cout << f_path;
+	fstream file;
+	file.open(f_path.c_str(), ios::out);
+	// Get the streambuffer of the file
+	streambuf* stream_buffer_file = file.rdbuf();
+
+	// Redirect cout to file
+	cout.rdbuf(stream_buffer_file);
+
+}
 bool dirExists(const std::string& dirName_in)
 {
 	DWORD ftyp = GetFileAttributesA(dirName_in.c_str());

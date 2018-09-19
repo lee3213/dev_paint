@@ -160,10 +160,11 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 	unsigned char* rstData = (unsigned char*)rstImg.data;
 	unsigned char* srcData = (unsigned char*)srcImg.data;
 	cv::Mat St_painting_area_canvas;
-	unsigned char * St_painting_area_data;
+	//unsigned char * St_painting_area_data;
 	St_painting_area_canvas.create(g_canvas_size_height, g_canvas_size_width, CV_8UC3);
-	St_painting_area_data = St_painting_area_canvas.data;
-	PaintBackGround(St_painting_area_data, g_canvas_size_width, g_canvas_size_height, 255, 255, 255);
+	//St_painting_area_data = St_painting_area_canvas.data;
+	St_painting_area_canvas.setTo(255);
+	//PaintBackGround(St_painting_area_data, g_canvas_size_width, g_canvas_size_height, 255, 255, 255);
 
 	cv::Mat Canvas;
 	unsigned char * Canvas_data;
@@ -294,10 +295,10 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 				debug_image("ing/ing_" + to_string(saved_depth) + "_" + tag, ing_canvas);
 				debug_image("ing/accu_" + to_string(saved_depth) + "_" + tag, rstImg);
 				debug_image("ing/try_map_" + to_string(saved_depth) + "f_" + tag,  try_map_1c[saved_depth]);
-			
-				PaintBackGround(St_painting_area_data, g_canvas_size_width, g_canvas_size_height, 255, 255, 255);
-				PaintBackGround(ing_canvas, 255, 255, 255);
-	
+				St_painting_area_canvas.setTo(255);
+				//PaintBackGround(St_painting_area_data, g_canvas_size_width, g_canvas_size_height, 255, 255, 255);
+				//PaintBackGround(ing_canvas, 255, 255, 255);
+				ing_canvas.setTo(255);
 				int ret = draw_grid_2(rstImg.clone(), aStroke_set,"rst_"+ tag, _depth,saved_depth,255);
 				ret = draw_grid_2(try_map_1c[saved_depth], aStroke_set, "try_"+tag, _depth, saved_depth,255);
 		}
@@ -389,7 +390,7 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 			 int color_BGR_B, color_BGR_G, color_BGR_R;
 			 p_peek(srcData, fetch_Index, color_BGR_B, color_BGR_G, color_BGR_R);
 
-			 p_poke(current_try_map_data_1c, fetch_Index_1c, 255);
+			 p_poke(current_try_map_data_1c, fetch_Index_1c, 0);
 			
 			
 			 centered_SrtPoint.x = fetch_color_Point.x - paint_grid_w_size_half; 

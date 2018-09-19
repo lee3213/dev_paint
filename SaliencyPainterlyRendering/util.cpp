@@ -56,19 +56,19 @@ void mat_copyTo(unsigned char *s, unsigned char * d, Rect s_rect, Rect d_rect, i
 
 }
 
-void rectangle_canvas(cv::Mat mat, cv::Rect  rect, Scalar s) {
+ void rectangle_canvas(cv::Mat mat, cv::Rect  rect, Scalar s) {
 
 	rect.x = rect.x + g_canvas_size_bezel_size;
 	rect.y = rect.y + g_canvas_size_bezel_size;
 	cv::rectangle(mat, rect, s);
 }
-void p_poke_canvas(unsigned char * p, int p_x, int p_y, int p_0, int p_1, int p_2) {
+ void p_poke_canvas(unsigned char * p, int p_x, int p_y, int p_0, int p_1, int p_2) {
 	int index = ((p_x + g_canvas_size_bezel_size) + (p_y + g_canvas_size_bezel_size) * g_canvas_size_width)* 3;
 	p[index] = p_0;
 	p[index + 1] = p_1;
 	p[index + 2] = p_2;
 }
-void p_peek_canvas(unsigned char * p, int p_x, int p_y, int &p_0, int &p_1, int &p_2) {
+ void p_peek_canvas(unsigned char * p, int p_x, int p_y, int &p_0, int &p_1, int &p_2) {
 	int index = ((p_x + g_canvas_size_bezel_size) + (p_y + g_canvas_size_bezel_size) * g_canvas_size_width) * 3;
 
 	p_0 = p[index];
@@ -77,10 +77,8 @@ void p_peek_canvas(unsigned char * p, int p_x, int p_y, int &p_0, int &p_1, int 
 }
 void p_poke(unsigned char * p, int index, int p_0) {
 	p[index] = p_0;
-
-
 }
-void p_poke(unsigned char * p, int index, int p_0, int p_1, int p_2) {
+ void p_poke(unsigned char * p, int index, int p_0, int p_1, int p_2) {
 	p[index] = p_0;
 	p[index + 1] = p_1;
 	p[index + 2] = p_2;
@@ -90,47 +88,13 @@ void p_peek(unsigned char * p, int index, int &p_0, int &p_1, int &p_2) {
 	p_1 = p[index + 1];
 	p_2 = p[index + 2];
 }
-void p_peek(unsigned char * p, int index, int &p_0) {
+ void p_peek(unsigned char * p, int index, int &p_0) {
 	p_0 = p[index];
 }
-void file_redirection_cout(string f_path) {
-	cout << f_path;
-	fstream file;
-	file.open(f_path.c_str(), ios::out);
-	// Get the streambuffer of the file
-	streambuf* stream_buffer_file = file.rdbuf();
 
-	// Redirect cout to file
-	cout.rdbuf(stream_buffer_file);
 
-}
 
-void file_redirection_clog(string f_path) {
-	fstream file;
-	file.open(f_path.c_str(), ios::out);
-	// Get the streambuffer of the file
-	streambuf* stream_buffer_file = file.rdbuf();
 
-	// Redirect cout to file
-	clog.rdbuf(stream_buffer_file);
-
-}
-bool depth_check(int depth)
-
-{
-static int called_cnt = 0;
-static int saved_depth = -1;
-if (saved_depth != depth) {
-	saved_depth = depth;
-	called_cnt = 0;
-}
-called_cnt++;
-if (called_cnt > 100) return false;
-//if ((called_cnt % g_painting_count[depth])) return false;
-
-//elsereturn false;
-else return true;
-};
 
 void mat_print(cv::Mat &amat, cv::String matname, int d) {
 	cout << matname << endl;

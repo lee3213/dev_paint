@@ -21,16 +21,16 @@ void mat_print(cv::Mat &amat, cv::String matname , int d);
 void mat_print(cv::Mat *amat, cv::String matname, int d);
 void Point_2p_debug(cv::Point p1, cv::String p1_tag, cv::Point p2, cv::String p2_tag);
 void Point_1p_debug(cv::Point p1, cv::String p1_tag);
-void p_poke(unsigned char * p, int index, int r, int g, int b);
-void p_peek(unsigned char * p, int index, int &r, int &g, int &b);
-void p_poke_canvas(unsigned char * p, int index, int ,int r, int g, int b);
-void p_peek_canvas(unsigned char * p, int index, int &r, int &g, int &b);
-void p_poke(unsigned char * p, int index, int r);
-void p_peek(unsigned char * p, int index, int &r);
+inline void p_poke(unsigned char * p, int index, int r, int g, int b);
+inline void p_peek(unsigned char * p, int index, int &r, int &g, int &b);
+inline void p_poke_canvas(unsigned char * p, int index, int ,int r, int g, int b);
+inline void p_peek_canvas(unsigned char * p, int index, int y,int &r, int &g, int &b);
+inline void p_poke(unsigned char * p, int index, int r);
+inline void p_peek(unsigned char * p, int index, int &r);
 
-void rectangle_canvas(cv::Mat mat, cv::Rect  rect, Scalar s);
+inline void rectangle_canvas(cv::Mat mat, cv::Rect  rect, Scalar s);
 //
-bool depth_check(int depth);
+//bool depth_check(int depth);
 /*
 {
 	static int called_cnt = 0;
@@ -40,6 +40,3 @@ bool depth_check(int depth);
 	else return false;
 };
 */
-
-void file_redirection_cout(string f_path);
-void file_redirection_clog(string f_path);
