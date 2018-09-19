@@ -51,7 +51,7 @@ int BrushInitialization(list<Brush> &_brush_set,int _brush_depth,int brush_size[
 	for (; nth < g_BrushNumber; nth++)	{
 		
 
-		fname = cv::format("../brush/mask/%02d.jpg", nth + 1);
+		fname = cv::format("/render/brush/mask/%02d.jpg", nth + 1);
 		temp_brush = imread(fname.c_str(), IMREAD_COLOR);
 
 		unsigned char * temp_brush_data = temp_brush.data;
@@ -92,7 +92,7 @@ int BrushInitialization(list<Brush> &_brush_set,int _brush_depth,int brush_size[
 		//fname = cv::format("/rst/br/i_%d.ppm", nth + 1);
 	//	cv::imwrite(fname, temp_index_brush);
 
-		fname = cv::format("../brush/mask-thumbnail/%02d.jpg", nth + 1);
+		fname = cv::format("/render/brush/mask-thumbnail/%02d.jpg", nth + 1);
 		temp_thumbnail = imread(fname.c_str(), IMREAD_GRAYSCALE);
 		if (temp_thumbnail.size().width == 0 ||
 			temp_thumbnail.size().height == 0) {
@@ -103,7 +103,7 @@ int BrushInitialization(list<Brush> &_brush_set,int _brush_depth,int brush_size[
 		int t_size=g_brush_thumbnail_size= temp_thumbnail.size().width;
 	
 
-		fname = cv::format("../brush/bump/%02d.jpg", nth + 1);
+		fname = cv::format("/render/brush/bump/%02d.jpg", nth + 1);
 		temp_bump = imread(fname.c_str(), IMREAD_GRAYSCALE);
 		if (temp_bump.size().width == 0 ||
 			temp_bump.size().height == 0) {
