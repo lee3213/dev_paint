@@ -17,13 +17,13 @@ using namespace std;
 //	root["indent"]["use_space"] = getCurrentIndentUseSpace();
 int thresh[] = { 10,15,25 };
 int depth[] = { 5,7 };
-int _grid[] = { 10 };
+int _grid[] = { 5,10 };
 
 int QT_N[] = { 1 };
 //int _mm[] = { 1,2 };// "attach", tag_union
 ;
 int _ps[] = { 6 };//"g_paint_grid_scale"
-int _br[] = { 10 }; //g_BrushMinSize
+int _br[] = { 5,10 }; //g_BrushMinSize
 int _gs[] = { 1 };//grid skip 
 int br, th, de, gr, sm, qt, re, mm, gs, ps;
 void get_f_name(string & file_name) {
