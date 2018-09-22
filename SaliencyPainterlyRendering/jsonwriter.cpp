@@ -49,7 +49,7 @@ int  json_write_method(string path) {
 	int n_sm = saliency_method_cnt;;
 	int n_qt = sizeof(QT_N) / sizeof(int);
 	int n_re = _re_cnt;
-	int n_mm = 1//_str_mm_cnt;
+	int n_mm = 1;//_str_mm_cnt;
 	int n_ps = sizeof(_ps) / sizeof(int);
 	int n_gs= sizeof(_gs) / sizeof(int);
 	int howmany = n_br  *n_th * n_de * n_gr*n_sm*n_qt*n_re*n_mm*n_ps*n_gs;
