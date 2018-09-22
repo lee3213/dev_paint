@@ -171,13 +171,13 @@ cv::Mat bsShowImage::TakeGradient(cv::Mat srcImg)
 			rstData[apixel_index] = abs(dx) + abs(dy);//approximate magnitude
 		}
 	}
-	debug_image("sobel/org_sobel_x", sobel_x);
-	debug_image("sobel/org_sobel_y", sobel_y);
-	debug_image("sobel/org_abs_x_+_abs_y", rstImg);
+	debug_image("sobel/take_gradient_x", sobel_x);
+	debug_image("sobel/take_gradient_y", sobel_y);
+	debug_image("sobel/take_gradient_abs__x_+_abs_y", rstImg);
 	return rstImg;
 }
 
-cv::Mat bsShowImage::TakeSaliencyMap(cv::Mat saliImg, cv::Mat gradImg)
+cv::Mat bsShowImage::TakeSaliencyUnionMap(cv::Mat saliImg, cv::Mat gradImg)
 {
 	cv::Mat rstImg = gradImg.clone();
 	unsigned char* rstData = (unsigned char*)rstImg.data;

@@ -14,7 +14,7 @@ public:
 	static cv::Mat TakeGaussianBlurImg(cv::Mat srcImg);
 	static cv::Mat RGB2GRAY(cv::Mat srcImg);
 	static cv::Mat TakeGradient(cv::Mat srcImg);
-	static cv::Mat TakeSaliencyMap(cv::Mat saliImg, cv::Mat gradImg);
+	static cv::Mat TakeSaliencyUnionMap(cv::Mat saliImg, cv::Mat gradImg);
 protected:
 	static char key;
 };

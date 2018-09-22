@@ -4,7 +4,7 @@
 #include "p_rendering.h"
 #include "util.h"
 #include "rgb2hsv.h"
-
+#include "render_.h"
 void proof_box(Point &s, int i_width, int i_height) {
 	Rect rr;
 	if (s.x < 0)
@@ -70,17 +70,17 @@ Mat brush_at_brush_gray(list<Brush> & _brush_set, int no) {
 
 
 
-int   P_Rendering(//cv::Mat srcImg,
-	unsigned char * srcData,
+int   render_::P_Rendering(//cv::Mat srcImg,
+//	unsigned char * srcData,
 	unsigned char * changedData,//rstImage
 	Mat & beforeImg,//rstImage.clone()
 
 	cv::Mat &_testImg_resized,
-	list<Brush> &_brush_set,
+	//list<Brush> &_brush_set,
 	Point _fetch_color_Point,
 	Point centered_SrtPoint,
 	int paint_grid_w_size, int paint_grid_h_size,
-	String tag,
+	//String tag,
 	int astroke_number, int ing, int astroke_depth, int painting_count, 
 	int color_BGR_B, int color_BGR_G, int color_BGR_R,//BGR order
 	unsigned char * ing_canvas_data
@@ -95,7 +95,7 @@ int   P_Rendering(//cv::Mat srcImg,
 	int s_channels = (int)beforeImg.channels();
 
 	int brush_no = JudgementBrush(_testImg_resized, /*added by cwlee*/astroke_depth,
-		g_brush_thumbnail_size, g_brush_thumbnail_size, _brush_set);
+		g_brush_thumbnail_size, g_brush_thumbnail_size, brush_set);
 	//, stroke_no, paint_grid_w_size, paint_grid_h_size,
 	//centered_SrtPoint,centered_EndPoint,first_try);//get one of similiar best 5
 	cv::Mat bestBrush_src;
@@ -108,8 +108,8 @@ int   P_Rendering(//cv::Mat srcImg,
 	Mat hsv_v;
 
 	//bestBrush_src = brush_at_brush(_brush_set, brush_no);
-	bestBrush_gray_src= brush_at_brush_gray(_brush_set, brush_no);
-	bestBrush_embossed_src = brush_at_brush_embose(_brush_set, brush_no);
+	bestBrush_gray_src= brush_at_brush_gray(brush_set, brush_no);
+	bestBrush_embossed_src = brush_at_brush_embose(brush_set, brush_no);
 
 	//unsigned char * bestBrush_src_data = (unsigned char *)bestBrush_src.data;
 	unsigned char * bestBrush_embose_src_data = (unsigned char *)bestBrush_embossed_src.data;
@@ -132,12 +132,12 @@ int   P_Rendering(//cv::Mat srcImg,
 	 if (tbrush_cnt < 5) {
 		 
 	//	debug_image("br/T_bestBrush_src_" + tag, tbrush_cnt, bestBrush_src);
-		debug_image("br/T_bestBrush_gray_src_" + tag+to_string(brush_no), tbrush_cnt, bestBrush_gray_src);
-		debug_image("br/T_bestBrush_embossed_src_" + tag + to_string(brush_no), tbrush_cnt, bestBrush_embossed_src);
+		debug_image("br/T_bestBrush_gray_src_" + m_tag+to_string(brush_no), tbrush_cnt, bestBrush_gray_src);
+		debug_image("br/T_bestBrush_embossed_src_" + m_tag + to_string(brush_no), tbrush_cnt, bestBrush_embossed_src);
 
 	//	debug_image("br/IP0_bestBrush_resized_" + tag + to_string(brush_no), tbrush_cnt, bestBrush_resized);
-		debug_image("br/IP0_brush_gray_resized_" + tag + to_string(brush_no), tbrush_cnt, bestBrush_gray_resized);
-		debug_image("br/IP0_brush_embossed_resized_" + tag + to_string(brush_no), tbrush_cnt, bestBrush_embossed_resized);
+		debug_image("br/IP0_brush_gray_resized_" + m_tag + to_string(brush_no), tbrush_cnt, bestBrush_gray_resized);
+		debug_image("br/IP0_brush_embossed_resized_" + m_tag + to_string(brush_no), tbrush_cnt, bestBrush_embossed_resized);
 	//	if (tbrush_cnt == 0) {
 	//		mat_print(bestBrush_resized, "bestBrush_resized");
 	//		mat_print(bestBrush_gray_resized, "bestBrush_gray_resized");
@@ -263,18 +263,19 @@ int   P_Rendering(//cv::Mat srcImg,
 
 
 	if (tbrush_cnt < 5) {
-		debug_image("br/IP1_bestBrush_resized_" + tag + to_string(brush_no), tbrush_cnt, bestBrush_resized);
-		debug_image("br/IP1_alpha_" + tag + to_string(brush_no), tbrush_cnt,alpha_channel);
+		debug_image("br/IP1_bestBrush_resized_" + m_tag + to_string(brush_no), tbrush_cnt, bestBrush_resized);
+		debug_image("br/IP1_alpha_" + m_tag + to_string(brush_no), tbrush_cnt,alpha_channel);
 		if ( g_brush_style == BRUSH_ALPHA)
-			debug_image("br/IP1_hsv_v_" + tag + to_string(brush_no), tbrush_cnt, hsv_v);
+			debug_image("br/IP1_hsv_v_" + m_tag + to_string(brush_no), tbrush_cnt, hsv_v);
 		tbrush_cnt++;
 	}
 	//판단알고리즘 적용
 
 
 
-	int  int_result = JudgementImage(srcData, changedData, beforeData, paint_grid_w_size, paint_grid_h_size, centered_SrtPoint,
-		astroke_depth, s_width, s_height, s_channels,_fetch_color_Point,tag);
+	int  int_result = JudgementImage(m_srcData, changedData, beforeData,
+		paint_grid_w_size, paint_grid_h_size, centered_SrtPoint,
+		astroke_depth, s_width, s_height, s_channels,_fetch_color_Point,m_tag);
 
 	if (int_result == CHANGED_BETTER) {
 		for (int by = 0; by < paint_grid_h_size; by++)

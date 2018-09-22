@@ -105,9 +105,6 @@
     <ClInclude Include="rgb2hsv.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="draw_grid2.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="define.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -115,6 +112,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="saliency_itti.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="render_.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -194,9 +194,6 @@
     <ClCompile Include="rgb2hsv.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="draw_grid2.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="debug_image_compare.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -204,6 +201,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="saliency_itti.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="render_.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

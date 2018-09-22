@@ -123,10 +123,10 @@ cv::Mat SaliencyMap::SMGetSM(Mat &src,string tag_1)
   cv::Mat OCM = OCMGetCM(OFM, sSize);
   cv::Mat MCM = MCMGetCM(MFM_X, MFM_Y, sSize);
   
-  debug_image("saliency/ICM_"+tag,ICM);
-  debug_image("saliency/CCM_"+tag,CCM);
-  debug_image("saliency/OCM_"+tag,OCM);
-  debug_image("saliency/MCM_"+tag,MCM);
+  debug_image("saliency/0_ICM_"+tag,ICM);
+  debug_image("saliency/0_CCM_"+tag,CCM);
+  debug_image("saliency/0_OCM_"+tag,OCM);
+  debug_image("saliency/0_MCM_"+tag,MCM);
 
   for(int i=0; i<6; i++){
     /*cvReleaseMat(&IFM[i]);

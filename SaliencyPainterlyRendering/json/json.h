@@ -560,7 +560,7 @@ enum ValueType {
   realValue,     ///< double value
   stringValue,   ///< UTF-8 string value
   booleanValue,  ///< bool value
-  arrayValue,    ///< array value (ordered list)
+  arrayValue,    ///< array value (ordered vector)
   objectValue    ///< object value (collection of name/value pairs).
 };
 
@@ -619,7 +619,7 @@ private:
  * - UTF-8 string
  * - boolean
  * - 'null'
- * - an ordered list of Value
+ * - an ordered vector of Value
  * - collection of name/value pairs (javascript object)
  *
  * The type of the held value is represented by a #ValueType and
@@ -635,7 +635,7 @@ private:
  * The get() methods can be used to obtain default value in the case the
  * required element does not exist.
  *
- * It is possible to iterate over the list of a #objectValue values using
+ * It is possible to iterate over the vector of a #objectValue values using
  * the getMemberNames() method.
  *
  * \note #Value string-length fit in size_t, but keys must be < 2^30.
@@ -1042,9 +1042,9 @@ Json::Value obj_value(Json::objectValue); // {}
   bool isMember(const CppTL::ConstString& key) const;
 #endif
 
-  /// \brief Return a list of the member names.
+  /// \brief Return a vector of the member names.
   ///
-  /// If null, return an empty list.
+  /// If null, return an empty vector.
   /// \pre type() is objectValue or nullValue
   /// \post if type() was nullValue, it remains nullValue
   Members getMemberNames() const;
@@ -1490,9 +1490,9 @@ public:
   /// \see Json::operator>>(std::istream&, Json::Value&).
   bool parse(JSONCPP_ISTREAM& is, Value& root, bool collectComments = true);
 
-  /** \brief Returns a user friendly string that list errors in the parsed
+  /** \brief Returns a user friendly string that vector errors in the parsed
    * document.
-   * \return Formatted error message with the list of errors with their location
+   * \return Formatted error message with the vector of errors with their location
    * in
    *         the parsed document. An empty string is returned if no error
    * occurred
@@ -1502,9 +1502,9 @@ public:
   JSONCPP_DEPRECATED("Use getFormattedErrorMessages() instead.")
   JSONCPP_STRING getFormatedErrorMessages() const;
 
-  /** \brief Returns a user friendly string that list errors in the parsed
+  /** \brief Returns a user friendly string that vector errors in the parsed
    * document.
-   * \return Formatted error message with the list of errors with their location
+   * \return Formatted error message with the vector of errors with their location
    * in
    *         the parsed document. An empty string is returned if no error
    * occurred
@@ -1655,7 +1655,7 @@ public:
    * \param root [out] Contains the root value of the document if it was
    *             successfully parsed.
    * \param errs [out] Formatted error messages (if not NULL)
-   *        a user friendly string that lists errors in the parsed
+   *        a user friendly string that vectors errors in the parsed
    * document.
    * \return \c true if the document was successfully parsed, \c false if an
    error occurred.

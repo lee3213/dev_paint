@@ -25,5 +25,5 @@ int JudgementImage(unsigned char * srcData, unsigned char * changedData_p, unsig
 	int paint_grid_w_size, int paint_grid_h_size, Point centered_SrtPoint,
 	int astroke_depth, int i_w, int i_h, int i_c,Point _fetch_Point,string tag);
 int JudgementBrush(cv::Mat &srcImg, int depth, int width, int height,list<Brush>_brush_set);
-//, /* vector<Brush> &brush, int nBrushNumber,*/int st_no,
+//, /* list<Brush> &brush, int nBrushNumber,*/int st_no,
 	//int paint_grid_w_size, int paint_grid_h_size,Point C_S,Point C_E,int first_try);

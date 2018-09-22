@@ -112,21 +112,22 @@ void  PaintBackGround(unsigned char * rstData, int width, int height,int b0, int
 	}
 
 }
-void  PaintBackGround(cv::Mat &rstImg, int b0, int b1, int b2)
+
+void  PaintBackGround(cv::Mat &a_mat, int b0, int b1, int b2)
 {
-	//cv::Mat temp = rstImg;
-	unsigned char* rstData = (unsigned char*)rstImg.data;
-	int width = rstImg.size().width;
-	int height = rstImg.size().height;
+	//cv::Mat temp = a_mat;
+	unsigned char* a_mat_data = (unsigned char*)a_mat.data;
+	int width = a_mat.size().width;
+	int height = a_mat.size().height;
 
 	for (int y = 0; y < height; y++)
 	{
 		for (int x = 0; x < width; x++)
 		{
-			size_t index = y * rstImg.step1() + x * rstImg.channels();
-			rstData[index + 2] = b2;
-			rstData[index + 1] = b1;
-			rstData[index + 0] = b0;
+			size_t index = y * a_mat.step1() + x * a_mat.channels();
+			a_mat_data[index + 2] = b2;
+			a_mat_data[index + 1] = b1;
+			a_mat_data[index + 0] = b0;
 		}
 	}
 

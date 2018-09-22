@@ -10,7 +10,7 @@
 using namespace std;
 
 #define  DO_CENTERED_BRUSH true
-int Brush_adjust(vector<Brush> &brush_set)
+int Brush_adjust(list<Brush> &brush_set)
 {
 	cv::Mat temp_brush;
 	cv::Mat temp_index_brush;
@@ -55,7 +55,7 @@ int Brush_adjust(vector<Brush> &brush_set)
 	unsigned char * accumulation_centered_data = brush_centered_accumulation_map.data;
 	brush_accumulation_map.setTo(255);
 	brush_centered_accumulation_map.setTo(255);
-	vector<Brush>::iterator it = brush_set.begin();
+	list<Brush>::iterator it = brush_set.begin();
 	nth = 0;
 	for (; nth < g_BrushNumber; nth++, it++) {
 		string fname;

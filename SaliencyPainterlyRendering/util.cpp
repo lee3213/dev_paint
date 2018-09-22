@@ -56,25 +56,6 @@ void mat_copyTo(unsigned char *s, unsigned char * d, Rect s_rect, Rect d_rect, i
 
 }
 
- void rectangle_canvas(cv::Mat mat, cv::Rect  rect, Scalar s) {
-
-	rect.x = rect.x + g_canvas_size_bezel_size;
-	rect.y = rect.y + g_canvas_size_bezel_size;
-	cv::rectangle(mat, rect, s);
-}
- void p_poke_canvas(unsigned char * p, int p_x, int p_y, int p_0, int p_1, int p_2) {
-	int index = ((p_x + g_canvas_size_bezel_size) + (p_y + g_canvas_size_bezel_size) * g_canvas_size_width)* 3;
-	p[index] = p_0;
-	p[index + 1] = p_1;
-	p[index + 2] = p_2;
-}
- void p_peek_canvas(unsigned char * p, int p_x, int p_y, int &p_0, int &p_1, int &p_2) {
-	int index = ((p_x + g_canvas_size_bezel_size) + (p_y + g_canvas_size_bezel_size) * g_canvas_size_width) * 3;
-
-	p_0 = p[index];
-	p_1 = p[index + 1];
-	p_2 = p[index + 2];
-}
 void p_poke(unsigned char * p, int index, int p_0) {
 	p[index] = p_0;
 }
@@ -88,7 +69,7 @@ void p_peek(unsigned char * p, int index, int &p_0, int &p_1, int &p_2) {
 	p_1 = p[index + 1];
 	p_2 = p[index + 2];
 }
- void p_peek(unsigned char * p, int index, int &p_0) {
+ void p_peek_1c(unsigned char * p, int index, int &p_0) {
 	p_0 = p[index];
 }
 

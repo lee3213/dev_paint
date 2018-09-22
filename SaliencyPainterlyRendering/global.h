@@ -3,6 +3,7 @@
 #include "brush.h"
 #include <random>
 #include "define.h"
+#include "render_.h"
 //CWinApp theApp;
 //debug_image_single *g_debug_brush;
 //debug_image_single *g_debug_brush_thumbnail;
@@ -10,7 +11,7 @@
 //int g_brush_called_cnt = 0;
 bool g_first_time = true;
 //FILE *g_log;
-//vector<Brush> g_brush_set;//Brush set
+//list<Brush> g_brush_set;//Brush set
 int g_unique_id ;
 int g_merge_method;
 //cv::Mat g_grid_map[MAX_DEPTH]; //
@@ -62,10 +63,8 @@ int g_brush_style;
 //unsigned char * g_fetched_color_data;
 
 int  g_BrushNumber ;						//basic:64    expansion:48
-int  g_BrushMaxSize;						//1024size에는 130, 3072size에는 400으로 설정했습니다..
-int  g_BrushMinSize;
 int g_brush_thumbnail_size;
-
+int g_BrushMinSize;
 unsigned char *g_org_DensityMap_data;
 int g_INDEX_BRUSH_SIZE_WIDTH ;
 int g_INDEX_BRUSH_SIZE_HEIGHT;
@@ -75,33 +74,32 @@ int g_INDEX_BRUSH_SIZE_HEIGHT;
 //random_device rand_x[5], rnd_y[5];
 //mt19937 g_engine_x[5];// (GetTickCount());
 //uniform_int_distribution<int> *g_distribution[5];
-int g_debug_called_cnt;
-int g_debug_min_level;
-int g_grid_sum;//sum of g_Sgrid_painting_try[]
+//int g_debug_called_cnt;
+//int g_debug_min_level;
+//int g_grid_sum;//sum of g_Sgrid_painting_try[]
 #ifdef G_DEBUG_TOUCH
 cv::Mat g_touch;
 unsigned char * g_touch_data;
 #endif
-int g_canvas_size_width;
-int g_canvas_size_height;
-int g_canvas_size_bezel_size;
-//cv::Mat grid_map[5]; //
-//cv::Mat fetched_map[5]; // randominized fetched point
-//cv::Mat try_map[5]; // randominized try grid map
-string g_saliency_method;//without_saliency, saliency, pregraph, blackandwhite,resudual,fine_sobelined
-string g_paint_method;
-
-
-int g_paint_grid_scale;
-int g_QT_method_N;//N
-string g_Render_method;//Union, Only
-
 
 int g_src_image_width;
 int g_src_image_height;
 int g_src_image_channels;
 int g_src_image_step1;
-int g_brush_step;
+
+//cv::Mat grid_map[5]; //
+//cv::Mat fetched_map[5]; // randominized fetched point
+//cv::Mat try_map[5]; // randominized try grid map
+string g_saliency_method;//without_saliency, saliency, pregraph, blackandwhite,resudual,fine_sobelined
+string g_paint_method;
+string g_Render_method;//Union, Only
+
+int g_paint_grid_scale;
+int g_QT_method_N;//N
+
+
+
+
 
 //mt19937 g_engine_x[MAX_DEPTH];// (GetTickCount());
 //mt19937 g_engine_y[MAX_DEPTH];// (GetTickCount());
@@ -123,6 +121,7 @@ int g_merge_skip_count;
 string saliency_method[] = {"Sobel","Pregraph","Itti","Residual","Blackandwhite","Fine_grained" };
 string _re[MAX_DEPTH] = { "Sobel","Saliency","Twopass" };
 string _str_mm[MAX_DEPTH] = { "Attach","Merge" };
+
 int saliency_method_cnt = 6;
 int _re_cnt = 3;
 int _str_mm_cnt = 2;

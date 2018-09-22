@@ -179,8 +179,8 @@ int  set_global(string src_name,string deploy_name) {
 	
 
 
-	g_debug_called_cnt = 1000;
-	g_debug_min_level = 5;
+//	g_debug_called_cnt = 1000;
+//	g_debug_min_level = 5;
 	//cout << f_path;
 	return 0;
 }

@@ -9,4 +9,4 @@
 using namespace cv;
 int // return depth
 draw_grid_2(Mat _Quad_TreeMap,
-	vector<QuadTree::Img_node*> aStroke_set, string tag, int & depth, int draw_depth,int c);
+	list<Img_node*> *aStroke_set, string tag, int & depth, int draw_depth,int c);

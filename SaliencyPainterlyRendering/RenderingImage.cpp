@@ -7,7 +7,7 @@
 
 #include "draw_grid2.h"
 
-
+#include "render_.h"
 
 
 
@@ -102,73 +102,68 @@ void ChkIsInside(Point &bSrtPoint, Point &bEndPoint, Point &tryPoint, int bsize,
 
 
 
-cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke_set, string tag,
-	int _m_brush_size[], int _depth,Mat _grid_map[], int _Sgrid_painting_try[], list<Brush> &_brush_set,
-	int _QT_grid_count[], int _changed_count[], long int  _painting_area[]) {
+cv::Mat  render_::PainterlyRendering()
+//,cv::Mat &srcImg,  list<QuadTree::Img_node*> aStroke_set, string m_tag,
+	//int _m_brush_size[], int _depth,Mat _grid_map[], int _Sgrid_painting_try[], list<Brush> &_brush_set,
+//	int _QT_grid_count[], int _changed_count[], long int  _painting_area[]) 
+{
 
-	int image_width = srcImg.size().width;
-	int image_height = srcImg.size().height;
-	int image_channels = srcImg.channels();
-	int image_step1 = (int)srcImg.step1();
+	int image_width = g_src_image_width;
+	int image_height = g_src_image_height;
+	int image_channels = g_src_image_channels;
+	int image_step1 = (int)g_src_image_step1;
 
-	//string tag = g_method;
+	
 	Point St_srtPoint, St_endPoint, fetch_color_Point, centered_SrtPoint, centered_EndPoint;
 	int paint_grid_w_size, paint_grid_h_size;
 
-	//cv::Mat bestBrush;
-//	int density;
+
 
 	random_device rand_x[5];
 	random_device rand_y[5];
 
-#ifdef G_DEBUG_TOUCH
-	g_touch.create(image_height, image_width, CV_8UC3);
-	g_touch_data = g_touch.data;
-	PaintBackGround(g_touch, 0, 0, 0);
-#endif
-	//String f_path_t;
-	//String f_path3;
+
 	int stroke_no;
 	int ing = 0;
 	int saved_depth = -1;
-//	cv::String f_path;
+
 	int nth ;
-//	std::string p;
+
 
 	nth = 0;
 
-	//saved_depth = -1;
-	//int brush_no;
-//	bool debug_level;
+
 	int painting_count;
 	int astroke_depth;
-	int process_ratio;
+//	int process_ratio;
 	int saved_process_ratio = -1;
 	
 //	int rand_x, rand_y;
 	//int bmax = g_BrushMaxSize, bmin = g_BrushMinSize;
 
-	cv::Mat ing_canvas;
-	unsigned char* ing_canvas_data;
+	//cv::Mat ing_canvas;
+	//unsigned char* ing_canvas_data;
 //	for (int i = 0; i < _depth; i++) {
 	//	cout << "brush_size"<<i << ", " << m_brush_size[i] << endl;
 //	}
 
 	cv::Mat rstImg;
+
 	rstImg.create(image_height, image_width, CV_8UC3);
-	PaintBackGround(rstImg, 255, 255, 255);
+	rstImg.setTo(255);
+	//PaintBackGround(rstImg, 255, 255, 255);
 	unsigned char* rstData = (unsigned char*)rstImg.data;
-	unsigned char* srcData = (unsigned char*)srcImg.data;
+	//unsigned char* srcData = (unsigned char*)m_srcImg.data;
 	cv::Mat St_painting_area_canvas;
 	//unsigned char * St_painting_area_data;
-	St_painting_area_canvas.create(g_canvas_size_height, g_canvas_size_width, CV_8UC3);
+	St_painting_area_canvas.create(canvas_size_height,canvas_size_width, CV_8UC3);
 	//St_painting_area_data = St_painting_area_canvas.data;
 	St_painting_area_canvas.setTo(255);
 	//PaintBackGround(St_painting_area_data, g_canvas_size_width, g_canvas_size_height, 255, 255, 255);
 
 	cv::Mat Canvas;
 	unsigned char * Canvas_data;
-	Canvas.create(g_canvas_size_height, g_canvas_size_width, CV_8UC3);
+	Canvas.create(canvas_size_height, canvas_size_width, CV_8UC3);
 	Canvas_data = Canvas.data;
 	PaintBackGround(Canvas, 255, 255, 255);
 	
@@ -187,14 +182,14 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 #ifdef G_DEBUG_TOUCH
 	cv::Mat fetched_map[MAX_DEPTH]; // randominized fetched point
 #endif
-	cv::Mat try_map_1c[MAX_DEPTH]; // randominized try grid map
+//	cv::Mat try_map_1c[MAX_DEPTH]; // randominized try grid map
 	unsigned char * current_try_map_data_1c;
 	cv::Mat changed_map_canvas[MAX_DEPTH];
 	//int try_count[MAX_DEPTH];
 	//int changed_count[MAX_DEPTH]			;
 
 	//	uniform_int_distribution<int> distribution(0, m_brush_size[saved_depth]);	// 생성 범위
-	for (astroke_depth = 0; astroke_depth < _depth; astroke_depth++) {
+	for (astroke_depth = 0; astroke_depth < m_depth; astroke_depth++) {
 			
 	
 #ifdef G_DEBUG_TOUCH
@@ -205,12 +200,12 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 		try_map_1c[astroke_depth].create(image_height,image_width,CV_8UC1);
 		try_map_1c[astroke_depth].setTo(255);
 			
-		changed_map_canvas[astroke_depth].create(g_canvas_size_height, g_canvas_size_width, CV_8UC3);
+		changed_map_canvas[astroke_depth].create(canvas_size_height, canvas_size_width, CV_8UC3);
 		changed_map_canvas[astroke_depth].setTo(255);
 	
-		_Sgrid_painting_try[astroke_depth] = 0;
+		grid_painting_try[astroke_depth] = 0;
 	//	try_count[astroke_depth] = 0;
-		_changed_count[astroke_depth] = 0;
+		changed_count[astroke_depth] = 0;
 	
 	}
 	
@@ -219,24 +214,25 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 	debug_image_single *astroke_region = new debug_image_single(Size(rstImg.size().width,rstImg.size().height),
 		(int)aStroke.size(), CV_8UC3);
 
-	p.append(format("%s/st/st_%s_",g_para_method_path.c_str(),tag.c_str()));
+	p.append(format("%s/st/st_%s_",g_para_method_path.c_str(),m_tag.c_str()));
 	cout << p.c_str() << endl;
 	astroke_region->set_file_format(p);
 
 #endif
-
-	ing_canvas.create(g_canvas_size_height,g_canvas_size_width,CV_8UC3);
+	Mat ing_canvas;
+	unsigned char * ing_canvas_data;
+	ing_canvas.create(canvas_size_height,canvas_size_width,CV_8UC3);
 	ing_canvas_data = (unsigned char*)ing_canvas.data;
 	PaintBackGround(ing_canvas, 255, 255, 255);
 
 	//int level_try = 0;
 	//cv::Mat level_cropped;
 	saved_depth = -1;
-	//f_path3 = format("%s/ing/ing_%s_%02d_i%04d.ppm", g_para_method_path.c_str(), tag.c_str(), saved_depth, ing);
+	//f_path3 = format("%s/ing/ing_%s_%02d_i%04d.ppm", g_para_method_path.c_str(), m_tag.c_str(), saved_depth, ing);
 	//cv::imwrite(f_path3, debug_image_depth);
 	//------------------------------------------------------------------------------------------------------------//
 
-	for (vector<QuadTree::Img_node*>::iterator St_it = aStroke_set.begin(); St_it != aStroke_set.end(); St_it++, ing++)
+	for (list<Img_node*>::iterator St_it = m_aStroke_set->begin(); St_it != m_aStroke_set->end(); St_it++, ing++)
 	{
 		int st_w_size, st_h_size;
 		St_srtPoint.x = (*St_it)->info.srtPoint.x, St_srtPoint.y = (*St_it)->info.srtPoint.y;
@@ -248,7 +244,7 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 		st_w_size = St_endPoint.x - St_srtPoint.x;
 		st_h_size = St_endPoint.y - St_srtPoint.y;
 
-		_painting_area[astroke_depth] += st_w_size*st_h_size;
+		painting_area[astroke_depth] += st_w_size*st_h_size;
 		//int st_w_size_half = st_w_size / 2;
 		//int st_h_size_half = st_h_size / 2;
 
@@ -258,28 +254,28 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 
 			continue;
 		}
-		if (_m_brush_size[astroke_depth] < 0) {
-			cerr << "m_brush[" << astroke_depth << "]" << _m_brush_size[astroke_depth]<<endl;
-			cout << "m_brush[" << astroke_depth << "]" << _m_brush_size[astroke_depth] << endl;
+		if (brush_size[astroke_depth] < 0) {
+			cerr << "m_brush[" << astroke_depth << "]" << brush_size[astroke_depth]<<endl;
+			cout << "m_brush[" << astroke_depth << "]" << brush_size[astroke_depth] << endl;
 			cout << "stroke =" << stroke_no << endl;
-			for (int i = 0; i < _depth; i++) {
-				cout << i << ", " << _m_brush_size[i] << endl;
-				cerr << i << ", " << _m_brush_size[i] << endl;
+			for (int i = 0; i < m_depth; i++) {
+				cout << i << ", " << brush_size[i] << endl;
+				cerr << i << ", " << brush_size[i] << endl;
 
 			}
 			continue;
 		}
-		paint_grid_h_size = _m_brush_size[astroke_depth];// brush size(painting area) per each depth
-		paint_grid_w_size = _m_brush_size[astroke_depth];// brush size(painting area) per each depth
+		paint_grid_h_size = brush_size[astroke_depth];// brush size(painting area) per each depth
+		paint_grid_w_size = brush_size[astroke_depth];// brush size(painting area) per each depth
 		int paint_grid_h_size_half = paint_grid_h_size / 2;
 		int paint_grid_w_size_half = paint_grid_w_size / 2;
 
 		int paint_grid_count = (st_w_size * st_h_size *g_paint_grid_scale) /
-			(_m_brush_size[astroke_depth] * _m_brush_size[astroke_depth]);
+			(brush_size[astroke_depth] * brush_size[astroke_depth]);
 
 		if (paint_grid_count == 0) {
 			cout << "paint_grid_count == 0 depth " << astroke_depth << " st_size : " << st_w_size << ", " << st_h_size << " g_paint_grid_Scale " <<
-				g_paint_grid_scale << " m_brush_size " << _m_brush_size[astroke_depth] << endl;
+				g_paint_grid_scale << " m_brush_size " << brush_size[astroke_depth] << endl;
 			paint_grid_count = 4;
 		}
 	
@@ -291,16 +287,16 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 		if (saved_depth != astroke_depth )// new depth
 		{	
 			if (saved_depth != -1) {
-				debug_image("ing/painting_area" + to_string(saved_depth) + "_" + tag,  St_painting_area_canvas);
-				debug_image("ing/ing_" + to_string(saved_depth) + "_" + tag, ing_canvas);
-				debug_image("ing/accu_" + to_string(saved_depth) + "_" + tag, rstImg);
-				debug_image("ing/try_map_" + to_string(saved_depth) + "f_" + tag,  try_map_1c[saved_depth]);
+				debug_image("ing/painting_area" + to_string(saved_depth) + "_" + m_tag,  St_painting_area_canvas);
+				debug_image("ing/ing_" + to_string(saved_depth) + "_" + m_tag, ing_canvas);
+				debug_image("ing/accu_" + to_string(saved_depth) + "_" + m_tag, rstImg);
+				debug_image("ing/try_map_" + to_string(saved_depth) + "f_" + m_tag,  try_map_1c[saved_depth]);
 				St_painting_area_canvas.setTo(255);
 				//PaintBackGround(St_painting_area_data, g_canvas_size_width, g_canvas_size_height, 255, 255, 255);
 				//PaintBackGround(ing_canvas, 255, 255, 255);
 				ing_canvas.setTo(255);
-				int ret = draw_grid_2(rstImg.clone(), aStroke_set,"rst_"+ tag, _depth,saved_depth,255);
-				ret = draw_grid_2(try_map_1c[saved_depth], aStroke_set, "try_"+tag, _depth, saved_depth,255);
+				int ret = draw_grid_2(rstImg.clone(), m_aStroke_set,"rst_"+ m_tag, m_depth,saved_depth,255,m_tag);
+				ret = draw_grid_2(try_map_1c[saved_depth], m_aStroke_set, "try_"+m_tag, m_depth, saved_depth,255,m_tag);
 		}
 			//level_try = 0;
 			current_try_map_data_1c = try_map_1c[astroke_depth].data;
@@ -311,7 +307,7 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 		saved_depth = astroke_depth;
 	
 
-		process_ratio = (int)(ing / (double)aStroke_set.size() * 100.);
+		//process_ratio = (int)(ing / (double)m_aStroke_set->size() * 100.);
 	
 
 
@@ -338,7 +334,7 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 			 //	cout << bestBrush.size()<< endl;
 
 			// try_count[astroke_depth]++;
-//			 string f_path_a = format("%s/p%d/%s_d%d_s%d_t%d_", g_para_method_path.c_str(), astroke_depth, tag.c_str(), astroke_depth, stroke_no, painting_count);
+//			 string f_path_a = format("%s/p%d/%s_d%d_s%d_t%d_", g_para_method_path.c_str(), astroke_depth, m_tag.c_str(), astroke_depth, stroke_no, painting_count);
 
 #ifdef DEBUG_SELECTED_BRUSH
 			 selected_brush->image_add(bestBrush);
@@ -366,7 +362,7 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 
 
 				 if (in_out == false) {
-					 cout << "error in_out" +tag<< endl;
+					 cout << "error in_out" +m_tag<< endl;
 
 					 //skip rest of do block to reduce computing
 
@@ -375,7 +371,7 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 				 if (retry_cnt > 20)in_out = true;
 			 } while (in_out == false);
 
-			 _Sgrid_painting_try[astroke_depth] ++;//
+			 grid_painting_try[astroke_depth] ++;//
 
 			 //	proof_box(fetch_color_Point, image_width, image_height);
 				 //int cIndex = 
@@ -388,7 +384,7 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 			// unsigned char* srcData = (unsigned char*)srcImg.data;
 
 			 int color_BGR_B, color_BGR_G, color_BGR_R;
-			 p_peek(srcData, fetch_Index, color_BGR_B, color_BGR_G, color_BGR_R);
+			 p_peek(m_srcData, fetch_Index, color_BGR_B, color_BGR_G, color_BGR_R);
 
 			 p_poke(current_try_map_data_1c, fetch_Index_1c, 0);
 			
@@ -422,11 +418,13 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 		 */
 			 Rect rect = safe_Rect(centered_SrtPoint, centered_EndPoint,image_width,image_height);
 
-			 cv::Mat testImg_src = srcImg(rect).clone();
+			 cv::Mat testImg_src = m_srcImg_(rect).clone();
 		//	 mat_print(testImg_src, "testImg_Src", first_try);
 			 Mat testImg_resized;
 			 resize(testImg_src, testImg_resized, cv::Size(g_brush_thumbnail_size, g_brush_thumbnail_size));
-			 cv::cvtColor(testImg_resized, testImg_resized, COLOR_RGB2GRAY);
+			 if ( testImg_resized.channels() == 3)
+				 cv::cvtColor(testImg_resized, testImg_resized, COLOR_RGB2GRAY);
+
 
 			
 
@@ -440,9 +438,11 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 			unsigned char *beforeData = beforeImg.data;
 
 			int result = P_Rendering(//srcImg, 
-				srcData, rstData, beforeImg, testImg_resized, _brush_set,
+				//srcData, 
+				rstData, beforeImg, testImg_resized, 
 				fetch_color_Point, centered_SrtPoint, 
-				paint_grid_w_size, paint_grid_h_size, tag,
+				paint_grid_w_size, paint_grid_h_size, 
+				//m_tag,
 				stroke_no, ing, astroke_depth, painting_count, color_BGR_B, color_BGR_G, color_BGR_R,
 				ing_canvas_data);
 
@@ -454,7 +454,7 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 
 			}
 			else {//result==1
-				_changed_count[astroke_depth]++;//CHANGED_BETTER 
+				changed_count[astroke_depth]++;//CHANGED_BETTER 
 				Rect safe_rect = Rect(centered_SrtPoint, centered_EndPoint);
 				rectangle_canvas(changed_map_canvas[astroke_depth],safe_rect, Scalar(0, 0, 255));//RED
 			}
@@ -467,7 +467,7 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 
 	/*	
 		if (!(ing % 5)) {
-			f_path_t = format("%s/ing/%s_%03d_%03d_rst.ppm", g_para_method_path.c_str(),tag.c_str(), astroke_depth, ing);
+			f_path_t = format("%s/ing/%s_%03d_%03d_rst.ppm", g_para_method_path.c_str(),m_tag.c_str(), astroke_depth, ing);
 		
 			cout << "f_path " << f_path_t.c_str() << endl;
 			cv::imwrite(f_path_t, rstImg);
@@ -487,20 +487,22 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 #endif	
 	}//end of it astroke
 
-
+	if (saved_depth == -1) {
+		cout << "astroke_depth.size() == 0 " + m_tag_ << endl;
+	}
 	//g_debug_brush->image_final_split(50);
+	else {
+		debug_image("ing/painting_area" + to_string(saved_depth) + "f_" + m_tag, St_painting_area_canvas);
+		debug_image("ing/ing_" + to_string(saved_depth) + "f_" + m_tag, ing_canvas);
+		debug_image("ing/accu_" + to_string(saved_depth) + "f_" + m_tag, rstImg);
+		debug_image("ing/try_map_" + to_string(saved_depth) + "f_" + m_tag, try_map_1c[saved_depth]);
 
-	debug_image("ing/painting_area"+ to_string(saved_depth)+"f_"+tag, St_painting_area_canvas);
-	debug_image("ing/ing_"+ to_string(saved_depth)+"f_"+tag, ing_canvas);
-	debug_image("ing/accu_"+ to_string(saved_depth)+"f_"+tag,  rstImg);
-	debug_image("ing/try_map_"+ to_string(saved_depth)+"f_"+tag,  try_map_1c[saved_depth]);
-	
-	int ret = draw_grid_2(rstImg.clone(), aStroke_set, "rst_"+tag, _depth, saved_depth,255);
-	ret = draw_grid_2(try_map_1c[saved_depth], aStroke_set, "try_" + tag, _depth, saved_depth,255);
-
+		int ret = draw_grid_2(rstImg.clone(), m_aStroke_set, "rst_" + m_tag, m_depth, saved_depth, 255,m_tag);
+		ret = draw_grid_2(try_map_1c[saved_depth], m_aStroke_set, "try_" + m_tag, m_depth, saved_depth, 255,m_tag);
+	}
 #ifdef G_DEBUG_TOUCH
 
-	f_path_t = format("%s/ing/t_%s_d%03d_g%03d_i%03d_touch.ppm", g_para_method_path.c_str(), tag.c_str(), saved_depth, g_Sgrid_painting_try[astroke_depth], ing);
+	f_path_t = format("%s/ing/t_%s_d%03d_g%03d_i%03d_touch.ppm", g_para_method_path.c_str(), m_tag.c_str(), saved_depth, g_Sgrid_painting_try[astroke_depth], ing);
 	//cout << "f_path " << f_path_t.c_str() << endl;
 	cv::imwrite(f_path_t, g_touch);
 #endif
@@ -518,18 +520,18 @@ cv::Mat PainterlyRendering(cv::Mat &srcImg,  vector<QuadTree::Img_node*> aStroke
 	cout<< "Merge SKIP count : "<< g_merge_skip_count <<endl;
 	cout << "Merge_method : " << g_merge_method<<endl;
 
-	//debug_image("fetched_color_"+tag, _depth, fetched_color);
+	//debug_image("fetched_color_"+m_tag, _depth, fetched_color);
 	//overlap(fetched_color, _grid_map[_depth-1]);
-	//debug_image("fetched_grid_F_"+tag, fetched_color);
-	for (int i = 0; i < _depth; i++) {
+	//debug_image("fetched_grid_F_"+m_tag, fetched_color);
+	for (int i = 0; i < m_depth; i++) {
 		
 
-		debug_image("ing/changed_" + tag, i, changed_map_canvas[i]);
+		debug_image("ing/changed_" + m_tag, i, changed_map_canvas[i]);
 	}
 #ifdef G_DEBUG_TOUCH
-	f_path_t = format("%s/ing/%s_d%03d_g%03d_i%03d_touch.ppm", g_para_method_path.c_str(), tag.c_str(), saved_depth, g_Sgrid_painting_try[astroke_depth], ing);
+	f_path_t = format("%s/ing/%s_d%03d_g%03d_i%03d_touch.ppm", g_para_method_path.c_str(), m_tag.c_str(), saved_depth, g_Sgrid_painting_try[astroke_depth], ing);
 	cv::imwrite(f_path_t, g_touch);
 #endif
 
-	return rstImg;
+	return rstImg.clone();
 }

@@ -6,6 +6,7 @@
 #include "opencv2\opencv.hpp"
 #include "opencv2\core.hpp"
 #include <random>
+#include "render_.h"
 //extern CWinApp theApp;
 
 //using namespace cv;
@@ -19,7 +20,7 @@
 //#define BrushMaxSize 80							//1024size에는 130, 3072size에는 400으로 설정했습니다..
 //#define BrushMinSize 10
 
-//extern vector<Brush> g_brush_set;
+//extern list<Brush> g_brush_set;
 extern int g_merge_method;
 
 extern int g_QT_avgSThreshold;
@@ -69,7 +70,7 @@ extern int g_QT_method_N;//N
 extern string g_Render_method;//Union, Only
 
 extern int  g_BrushNumber;							//basic:64    expansion:48
-extern int  g_BrushMaxSize;						//1024size에는 130, 3072size에는 400으로 설정했습니다..
+//extern int  g_BrushMaxSize;						//1024size에는 130, 3072size에는 400으로 설정했습니다..
 extern int  g_BrushMinSize;
 //extern int m_brush_size_x;
 //extern int m_brush_size_y;
@@ -90,16 +91,16 @@ extern int g_brush_thumbnail_size;
 
 //extern cv::Mat g_fetched_map[MAX_DEPTH]; // randominized fetched point
 //extern cv::Mat g_try_map[MAX_DEPTH]; // randominized try grid map
-extern int g_debug_called_cnt;
-extern int g_debug_min_level;
+//extern int g_debug_called_cnt;
+//extern int g_debug_min_level;
 //extern int g_grid_sum;
 #ifdef G_DEBUG_TOUCH
 extern cv::Mat g_touch;
 extern unsigned char * g_touch_data;
 #endif
-extern int g_canvas_size_width;
-extern int g_canvas_size_height;
-extern int g_canvas_size_bezel_size;
+//extern int g_canvas_size_width;
+//extern int g_canvas_size_height;
+//extern int g_canvas_size_bezel_size;
 
 //extern cv::Mat grid_map[MAX_DEPTH]; //
 extern streambuf* g_stream_buffer_file_cout;

@@ -12,7 +12,7 @@
 
 
 bool compareDistance(DisData a, double b);
-void TakeColorDistance(cv::Mat &testImg, vector<DisData> &colorDis);
+void TakeColorDistance(cv::Mat &testImg, list<DisData> &colorDis);
 
 bool compareDistance_rev(DisData a, double b);
 int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, list<Brush> &_brush_set)
@@ -56,7 +56,7 @@ int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, list<B
 //rstImg = JudgementImage(rstImg, tempImg, bsize, srcData, rstData, tempData, bSrtPoint);
 //int  result = JudgementImage(srcData, changedData, beforeData, paint_grid_w_size, paint_grid_h_size, centered_SrtPoint,
 	//astroke_depth, s_width, s_height, s_channels);
-#define DEBUG_
+
 int JudgementImage(unsigned char * srcData, unsigned char * changedData_p, unsigned char * beforeData_p, 
 	int paint_grid_w_size, int paint_grid_h_size, Point centered_SrtPoint,
 	int astroke_depth, int i_w, int i_h, int i_c,
@@ -119,13 +119,13 @@ int JudgementImage(unsigned char * srcData, unsigned char * changedData_p, unsig
 			p_poke(ch_data, b_index, c_0, c_1, c_2);
 			p_poke(sr_data, b_index, s_0, s_1, s_2);
 			p_poke(be_data, b_index, b_0, b_1, b_2);
-#endif
+
 			rectangle(sr, 
 				Point(paint_grid_w_size/2 - 2, paint_grid_w_size/2 - 2),
 				Point(paint_grid_w_size/2 + 2, paint_grid_w_size/2 + 2),
 
 				Scalar(0,0,255));
-
+#endif
 			src2rst += abs(s_2 - c_2)+ abs(s_1 - c_1)+ abs(s_0- c_0);
 
 			src2before += abs(s_2 - b_2) + abs(s_1 - b_1) + abs(s_0 - b_0);
@@ -146,11 +146,12 @@ int JudgementImage(unsigned char * srcData, unsigned char * changedData_p, unsig
 		debug_image(string("p") + to_string(astroke_depth) + string("/") + to_string(called_cnt) + string("_0sr_"+tag), sr);
 		called_cnt++;
 	}
-#endif
-	clog << ", "<<", "<<src2rst << "," << src2before <<","<<src2rst-src2before<< endl;
 	ch.release();
 	be.release();
 	sr.release();
+#endif
+	clog << ", "<<", "<<src2rst << "," << src2before <<","<<src2rst-src2before<< endl;
+	
 	if (src2rst <= src2before)
 	return CHANGED_BETTER ;
 	else
@@ -160,7 +161,7 @@ int JudgementImage(unsigned char * srcData, unsigned char * changedData_p, unsig
 
 
 int  JudgementBrush(cv::Mat &testImg, int depth, int width, int height,list<Brush> _brush_set)
-	/* vector<Brush> &brush_set, int nBrushNumber,*/
+	/* list<Brush> &brush_set, int nBrushNumber,*/
 //	 int stroke_no,int paint_grid_w_size,int paint_grid_h_size)// Point centered_SrtPoint,
 //	Point centered_EndPoint,int first_try)
 {
@@ -183,7 +184,7 @@ int  JudgementBrush(cv::Mat &testImg, int depth, int width, int height,list<Brus
 
 
 	//가장 적합한 Brush 확인(index Brush와 testImage간의 색상거리 확인)
-	//vector<DisData> colorDis;
+	//list<DisData> colorDis;
 	//colorDis.resize(BrushNumber);// room for total brush
 //	TakeColorDistance(brush, testImg, colorDis);
 
@@ -204,7 +205,7 @@ bool compareDistance_rev(DisData a, double b)
 	return a.distance < b ? true : false;
 }
 
-void TakeColorDistance(vector<Brush> &brush, cv::Mat &testImg, vector<DisData> &colorDis)
+void TakeColorDistance(list<Brush> &brush, cv::Mat &testImg, list<DisData> &colorDis)
 {
 	DisData newDistance;
 	unsigned char* testData = (unsigned char*)testImg.data;
@@ -212,7 +213,7 @@ void TakeColorDistance(vector<Brush> &brush, cv::Mat &testImg, vector<DisData> &
 	int height = testImg.size().height;
 
 	int nth = 0;
-	for (vector<Brush>::iterator it = brush.begin(); it != brush.end(); it++, nth++)
+	for (list<Brush>::iterator it = brush.begin(); it != brush.end(); it++, nth++)
 	{
 		unsigned char* indexData = (unsigned char*)(*it).index_brush.data;
 		double cDis = 0;
@@ -227,7 +228,7 @@ void TakeColorDistance(vector<Brush> &brush, cv::Mat &testImg, vector<DisData> &
 			}
 		}
 		cDis /= (width * height);
-		vector<DisData>::iterator it2 = lower_bound(colorDis.begin(), colorDis.end(), (double)cDis, compareDistance_rev);
+		list<DisData>::iterator it2 = lower_bound(colorDis.begin(), colorDis.end(), (double)cDis, compareDistance_rev);
 		
 		newDistance.distance = cDis;
 		newDistance.nth = nth;
