@@ -86,7 +86,7 @@ int draw_grid_depth(Mat  _grid_map_1c[],
 
 			debug_image("_grid_" + tag, __saved_depth, _grid_map_1c[__saved_depth]);
 
-			cout << "depth " + tag << setw(5) << __saved_depth << " : " << _QT_grid_count[__saved_depth] << endl;
+			//cout << " y depth " + tag << setw(5) << __saved_depth << " : " << _QT_grid_count[__saved_depth] << endl;
 			if (do_overlay_grid) {
 				grid_map_sum += _QT_grid_count[__saved_depth];
 			}
@@ -118,7 +118,7 @@ int draw_grid_depth(Mat  _grid_map_1c[],
 		debug_image("ing/_o_grid_" + tag + "_" + to_string(__saved_depth) + "_f", overlay_grid_map[__saved_depth]);
 	debug_image("QT_" + tag + "_" + to_string(__saved_depth) + "_f", _grid_map_1c[MAX_DEPTH]);
 
-	cout << "depth " + tag << setw(5) << __saved_depth << " : " << _QT_grid_count[__saved_depth] << endl;
+	cout << "z depth " + tag << setw(5) << __saved_depth << " : " << _QT_grid_count[__saved_depth] << endl;
 	if (__saved_depth > depth) {
 		cout << "depth changed  : " << __saved_depth << endl;
 	}
@@ -135,7 +135,7 @@ void render_::func_(){
 	int c_sum = 0;
 	int t_sum = 0;
 	//_painting_area[astroke_depth] += st_w_size*st_h_size;
-	cout << "g_Scale = " << g_paint_grid_scale << endl;
+	cout << m_tag_+"    g_Scale = " << g_paint_grid_scale << endl;
 	cout << endl <<
 		setw(6) << "[]" <<
 		setw(7) << "QT_cnt" <<
@@ -330,7 +330,10 @@ int render_::prepare() {
 		m_aStroke_set = new list<Img_node*>(*stroke_set_saliency);
 				cout << "astroke.size()= " +m_tag<< m_aStroke_set->size() << endl;
 		for (list<Img_node*>::iterator St_it = stroke_set_saliency->begin(); St_it != stroke_set_saliency->end(); St_it++) {
-			if ((*St_it)->depth < 3) continue;;
+			if (render_sobel->m_depth> 5 && (*St_it)->depth < 4) 
+				continue;
+			else if  ((*St_it)->depth < 3) continue;
+
 			info = (*St_it)->info;
 			if ( g_merge_method == DEF_MERGE)
 				depth = (*St_it)->depth;
@@ -342,12 +345,12 @@ int render_::prepare() {
 			(*m_aStroke_set).push_back(me_node);
 		}
 		
-		
+		m_aStroke_set->sort();
 	}
 	cout << m_tag + "_aStrokeset_size() : " << m_aStroke_set->size() << endl;
 	m_depth = QT_depth = draw_grid_depth(grid_map_1c, m_aStroke_set, m_tag, m_depth,
 		grid_map_sum, QT_grid_count, true, -1, 0);
-	cout << "depth " + m_tag + " = " << m_depth  << endl;
+	cout << "x depth " + m_tag + " = " << m_depth  << endl;
 	calc_brush_size(BrushMaxSize, BrushMinSize, m_depth,
 	brush_size, m_tag);
 

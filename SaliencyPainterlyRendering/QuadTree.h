@@ -10,18 +10,29 @@ typedef struct Imageinformation
 	cv::Point endPoint;
 }Imginfo;
 
-typedef struct Image_Tree
+class Img_node
 {
+public:
+	int depth;
 	//Img_node *TL;
 //	Img_node *TR;
 	//Img_node *BL;
 	//Img_node *BR;
 	int chk = false;
 	Imginfo info;
-	int depth;
+
 	int avgS;
 	int no;
-}Img_node;
+
+	bool operator<(const Img_node & other)
+	{
+		if (depth < other.depth)
+			return true;
+		else
+			return false;
+	};
+
+};//Img_node;
 
 class QuadTree
 {

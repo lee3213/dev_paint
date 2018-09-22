@@ -13,7 +13,7 @@ bool QuadTree::compareDepth_I(Img_node* A, Img_node* B)
 Img_node * QuadTree::copyImageTree(Imginfo info, int depth, int avgS)
 {
 
-	Img_node *newT = (Img_node *)malloc(sizeof(Img_node));
+	Img_node *newT = new Img_node;
 	if (newT != NULL) {
 		newT->info = info;
 	//	newT->TL = NULL;
