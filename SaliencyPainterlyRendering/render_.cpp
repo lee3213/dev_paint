@@ -27,7 +27,7 @@ void render_::brush_delete(list<Brush> &brush_set) {
 
 }
 int draw_grid_2(Mat _Quad_TreeMap,
-	list<Img_node*> *aStroke_set, string tag, int & depth, int draw_depth, int c,string _tag) {
+	list<Img_node*> *_aStroke_set, string tag, int & depth, int draw_depth, int c,string _tag) {
 	int __saved_depth = -1;
 	Mat overlay_grid_map[MAX_DEPTH];
 
@@ -37,7 +37,7 @@ int draw_grid_2(Mat _Quad_TreeMap,
 	}
 
 
-	for (list<Img_node*>::iterator St_it = aStroke_set->begin(); St_it != aStroke_set->end(); St_it++)
+	for (list<Img_node*>::iterator St_it = _aStroke_set->begin(); St_it != _aStroke_set->end(); St_it++)
 	{
 		if (draw_depth != -1 && __saved_depth != draw_depth) {
 			continue;
@@ -56,7 +56,7 @@ int draw_grid_2(Mat _Quad_TreeMap,
 
 	}//end of QuadTree dump
 	if (__saved_depth == -1) {
-		cout << "aStroke_Set size() = 0 "+_tag << endl;
+		cout << "aStroke_Set size() = 0 "+_tag << +": "<<to_string(draw_depth)<<endl;
 	}
 	else if (draw_depth == -1 || __saved_depth == draw_depth)
 		debug_image("ing/_o_" + tag + "_" + to_string(__saved_depth) + "_f", overlay_grid_map[__saved_depth]);
@@ -151,7 +151,7 @@ void render_::func_(){
 		endl;
 	for (int i = 0; i < m_depth; i++) {
 		if (grid_painting_try[i] != 0 && painting_area[i] !=0  && QT_grid_count[i] !=0){
-		cout << setw(5) << i << "," <<
+		cout << setw(15) << i << "," <<
 			setw(6) << QT_grid_count[i] << ", " <<
 			setw(6) << grid_painting_try[i] << ", " <<
 
@@ -171,7 +171,7 @@ void render_::func_(){
 		
 		}
 		else {
-			cout << setw(5) << to_string(i)+m_tag << "," <<
+			cout << setw(15) << to_string(i)+","+m_tag<< "," <<
 				setw(6) << QT_grid_count[i] << ", " <<
 				setw(6) << grid_painting_try[i] << ", " <<
 
@@ -307,12 +307,12 @@ int render_::prepare() {
 	canvas_size_height = g_src_image_height + canvas_size_bezel_size * 2;
 
 
-
+	cout << "*********************************************************" << endl;
 	grid_map_1c[MAX_DEPTH] = gradient_map[render_method];
 
 	if (render_method != RENDER_TWOPASS_ATTACH && render_method != RENDER_TWOPASS_MERGE) {
 		m_aStroke_set = new list<Img_node*>();
-		cout << "aStroke_set->size()= " + m_tag << m_aStroke_set->size() << endl;
+		cout << "aStroke_set->size().initialize = " + m_tag << ", "<<m_aStroke_set->size() << endl;
 		ret = QuadTree::TakeQuadTree(gradient_map[render_method], m_aStroke_set, m_tag);
 	}
 	else {
@@ -322,20 +322,21 @@ int render_::prepare() {
 		int depth, S;
 		
 		list<Img_node*> *stroke_set_sobel = render_sobel->get_stroke_set();
-		cout << "sobel.size()= " + m_tag << stroke_set_sobel->size() << endl;
+		cout << "sobel.size()= " + m_tag << ", "<<stroke_set_sobel->size() << endl;
 
 		list<Img_node*> *stroke_set_saliency = render_saliency->get_stroke_set();
-		cout << "saliency.size()= " + m_tag << stroke_set_saliency->size() << endl;
+		cout << "saliency.size()= " + m_tag<< ", "  << stroke_set_saliency->size() << endl;
 	
 		m_aStroke_set = new list<Img_node*>(*stroke_set_saliency);
-				cout << "astroke.size()= " +m_tag<< m_aStroke_set->size() << endl;
+				cout << "astroke.size()= " +m_tag<< ", " << m_aStroke_set->size() << endl;
+				int kk = 0;
 		for (list<Img_node*>::iterator St_it = stroke_set_saliency->begin(); St_it != stroke_set_saliency->end(); St_it++) {
 			if (render_sobel->m_depth> 5 && (*St_it)->depth < 4) 
 				continue;
 			else if  ((*St_it)->depth < 3) continue;
 
 			info = (*St_it)->info;
-			if ( g_merge_method == DEF_MERGE)
+			if (render_method == RENDER_TWOPASS_MERGE)
 				depth = (*St_it)->depth;
 			else {
 				depth= render_saliency->m_depth + (*St_it)->depth-3;
@@ -343,14 +344,19 @@ int render_::prepare() {
 			S = (*St_it)->avgS;
 			me_node = QuadTree::copyImageTree(info, depth, S);
 			(*m_aStroke_set).push_back(me_node);
+			kk++;
 		}
-		
+		cout << " added " << kk << endl;
 		m_aStroke_set->sort();
 	}
 	cout << m_tag + "_aStrokeset_size() : " << m_aStroke_set->size() << endl;
 	m_depth = QT_depth = draw_grid_depth(grid_map_1c, m_aStroke_set, m_tag, m_depth,
 		grid_map_sum, QT_grid_count, true, -1, 0);
 	cout << "x depth " + m_tag + " = " << m_depth  << endl;
+	for (int i = 0; i < m_depth ; i++)
+	{
+		cout << setw(15) << m_tag + ", " + to_string(i) << QT_grid_count[i] << endl;
+	}
 	calc_brush_size(BrushMaxSize, BrushMinSize, m_depth,
 	brush_size, m_tag);
 
@@ -366,6 +372,7 @@ int render_::prepare() {
 		cout << "unexpected Stroke Tree" + m_tag + " = 0" << endl;
 		return -20000;
 	}
-	ret = draw_grid_2(m_srcImg_.clone(), m_aStroke_set, "src_0_" + m_tag, m_depth, -1, 0,m_tag);
+	//ret = draw_grid_2(m_srcImg_.clone(), m_aStroke_set, "src_0_" + m_tag, m_depth, -1, 0,m_tag);
+	cout << "------------------------------------------------------------------" << endl;
 	return 0;
 }
