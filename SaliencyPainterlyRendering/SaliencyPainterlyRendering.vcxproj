@@ -198,6 +198,7 @@
   <ItemGroup>
     <ClCompile Include="brush.cpp" />
     <ClCompile Include="brush_adjust.cpp" />
+    <ClCompile Include="brush_resize.cpp" />
     <ClCompile Include="bsShowImage.cpp" />
     <ClCompile Include="debug_image.cpp" />
     <ClCompile Include="debug_image_compare.cpp" />

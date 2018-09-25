@@ -3,7 +3,7 @@
 
 #include "opencv2\opencv.hpp"
 #include "opencv2\core.hpp"
-
+#include <list>
 typedef struct Imageinformation
 {
 	cv::Point srtPoint;
@@ -23,15 +23,33 @@ public:
 
 	int avgS;
 	int no;
-
-	bool operator<(const Img_node & other)
+	bool ptrsorter(Img_node *a, Img_node *b) {
+		return (a->depth < b->depth ?true:false);
+	}
+	bool operator<(const Img_node * other)
 	{
-		if (depth < other.depth)
+		cout << "called< " << depth << " : " << other->depth << endl;
+		if (depth < other->depth)
 			return true;
 		else
 			return false;
 	};
-
+	bool operator>(const Img_node * other)
+	{
+		cout << "called> " << depth << " : " << other->depth << endl;
+		if (depth > other->depth)
+			return true;
+		else
+			return false;
+	};
+	bool compareDepth_I(Img_node& A, Img_node& B)
+	{
+		return (A.depth < B.depth ? true : false);
+	}
+	bool compareDepth_I(Img_node * A, Img_node* B)
+	{
+		return (A->depth < B->depth ? true : false);
+	}
 };//Img_node;
 
 class QuadTree
@@ -41,9 +59,10 @@ public:
 
 
 
-	static Img_node *copyImageTree(Imginfo info, int depth, int S);
-	static int  TakeQuadTree(cv::Mat &SaliencyMap, std::list<Img_node*> *aStroke,string tag);
+	//static Img_node *copyImageTree(Imginfo info, int depth, int S);
+	static int  TakeQuadTree(cv::Mat &SaliencyMap, std::list<Img_node*> aStroke[],string tag);
 	static cv::Mat TakeDensity(cv::Mat &srcImg, std::list<Img_node*> *aStroke);
-
-	bool compareDepth_I(Img_node* A, Img_node* B);
+	static Img_node *newImageTree(Imginfo info, int depth, double S);
+	static Img_node *copyImageTree(Imginfo info, int depth, int avgS);
+	
 };

@@ -6,10 +6,8 @@
 #include "debug_image.h"
 using namespace std;
 using namespace cv;
-bool QuadTree::compareDepth_I(Img_node* A, Img_node* B)
-{
-	return A->depth < B->depth ? true : (A->depth == B->depth ? true : false);
-}
+
+
 Img_node * QuadTree::copyImageTree(Imginfo info, int depth, int avgS)
 {
 
@@ -32,10 +30,11 @@ Img_node * QuadTree::copyImageTree(Imginfo info, int depth, int avgS)
 	}
 	else return newT;// NULL;
 }
-Img_node *newImageTree(Imginfo info,int depth,double S)
+
+Img_node * QuadTree::newImageTree(Imginfo info,int depth,double S)
 {
 
-	Img_node *newT = (Img_node*)malloc(sizeof(Img_node));
+	Img_node *newT = new Img_node;
 	if (newT != NULL) {
 		newT->info = info;
 		//newT->TL = NULL;
@@ -317,7 +316,7 @@ Point get_midPoint(cv::Mat &srcImg,Point s, Point e, double *D,int d) {
 }
 
 
-int DivideImage(cv::Mat &SaliencyMap, Img_node* me_node, list<Img_node*> *aStroke_set,
+int DivideImage(cv::Mat &SaliencyMap, Img_node* me_node, list<Img_node*> aStroke_set[],
 	 string  quad,Mat & gradient_src,Mat stageMap,int depth,string tag)
 {
 	Point srtPoint, endPoint, midPoint;
@@ -338,8 +337,8 @@ int DivideImage(cv::Mat &SaliencyMap, Img_node* me_node, list<Img_node*> *aStrok
 
 
 		//Depth의 값을 오름차순으로 저장
-		list<Img_node*>::iterator Qt_it = lower_bound(aStroke_set->begin(), aStroke_set->end(), me_node, compareDepth);
-		aStroke_set->insert(Qt_it, me_node);
+		//list<Img_node*>::iterator Qt_it = lower_bound(aStroke_set->begin(), aStroke_set->end(), me_node, compareDepth);
+		aStroke_set[me_node->depth].push_back(me_node);
 
 		srtPoint = my_Info.srtPoint;
 		endPoint = my_Info.endPoint;
@@ -380,7 +379,7 @@ int DivideImage(cv::Mat &SaliencyMap, Img_node* me_node, list<Img_node*> *aStrok
 
 					double avgS = TakeAvgS(SaliencyMap, child_Info.srtPoint, child_Info.endPoint);
 					if (avgS > g_QT_avgSThreshold ) {
-						TL = newImageTree(child_Info, child_QT_depth, avgS);
+						TL = QuadTree::newImageTree(child_Info, child_QT_depth, avgS);
 
 						get_depth=DivideImage(SaliencyMap,TL, aStroke_set,
 							string("TL") + to_string(child_QT_depth),stageMap, gradient_src,depth,tag);
@@ -402,7 +401,7 @@ int DivideImage(cv::Mat &SaliencyMap, Img_node* me_node, list<Img_node*> *aStrok
 
 					double avgS = TakeAvgS(SaliencyMap, child_Info.srtPoint, child_Info.endPoint);
 					if (avgS > g_QT_avgSThreshold) {
-						TR = newImageTree(child_Info, child_QT_depth, avgS);
+						TR = QuadTree::newImageTree(child_Info, child_QT_depth, avgS);
 						DivideImage(SaliencyMap, TR, aStroke_set,
 							string("TR") + to_string(child_QT_depth), stageMap, gradient_src,depth,tag);
 						if (get_depth > depth)
@@ -421,7 +420,7 @@ int DivideImage(cv::Mat &SaliencyMap, Img_node* me_node, list<Img_node*> *aStrok
 
 					double avgS = TakeAvgS(SaliencyMap, child_Info.srtPoint, child_Info.endPoint);
 					if (avgS > g_QT_avgSThreshold) {
-						BL = newImageTree(child_Info, child_QT_depth, avgS);
+						BL = QuadTree::newImageTree(child_Info, child_QT_depth, avgS);
 						DivideImage(SaliencyMap, BL, aStroke_set,
 							string("BL") + to_string(child_QT_depth), stageMap, gradient_src,depth,tag);
 						if (get_depth > depth)
@@ -440,7 +439,7 @@ int DivideImage(cv::Mat &SaliencyMap, Img_node* me_node, list<Img_node*> *aStrok
 
 					double avgS = TakeAvgS(SaliencyMap, child_Info.srtPoint, child_Info.endPoint);
 					if (avgS > g_QT_avgSThreshold) {
-						BR = newImageTree(child_Info, child_QT_depth, avgS);
+						BR = QuadTree::newImageTree(child_Info, child_QT_depth, avgS);
 						DivideImage(SaliencyMap, BR, aStroke_set,
 							string("BR") + to_string(child_QT_depth), stageMap, gradient_src,depth,tag);
 						if (get_depth > depth)
@@ -459,7 +458,7 @@ int DivideImage(cv::Mat &SaliencyMap, Img_node* me_node, list<Img_node*> *aStrok
 	}
 //g_QT_method_N
 
-	int  QuadTree :: TakeQuadTree(cv::Mat &SaliencyMap,  list<Img_node*> *aStroke_set,string tag)
+	int  QuadTree :: TakeQuadTree(cv::Mat &SaliencyMap,  list<Img_node*> aStroke_set[],string tag)
 {
 	//cv::Mat Quad_treeMap;
 	Mat Quad_treeMap = SaliencyMap.clone();

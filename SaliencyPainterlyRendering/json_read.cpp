@@ -51,9 +51,9 @@ int  json_deployment(string path) {
 	g_brush_Ts = root.get("g_brush_Ts", 230).asInt();
 	
 	g_paint_method = root.get("g_paint_method", "copy").asString();
-	g_paint_grid_scale = root.get("g_paint_grid_scale", 8).asInt();
-	cout << "g_paint_grid_scale  "<<g_paint_grid_scale << endl;
-	g_paint_grid_scale = 8;
+	g_paint_area_scale = root.get("g_paint_area_scale", 8).asInt();
+	cout << "g_paint_area_scale  "<<g_paint_area_scale << endl;
+	g_paint_area_scale = 8;
 	g_QT_method_N= root.get("g_QT_method_N",1).asInt();
 	g_Render_method = root.get("g_Render_method", "Only").asString();
 	string str_g_merge_method = root.get("g_merge_method","attach").asString();

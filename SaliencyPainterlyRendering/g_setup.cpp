@@ -56,7 +56,7 @@ int  set_global(string src_name,string deploy_name) {
 
 	 g_para = string("s") + to_string(g_QT_avgSThreshold) + "d" + to_string(g_depth_limit)
 	+"g" + to_string(g_min_gridsize) + "_b" + to_string(g_BrushMinSize) + 
-		 "_N" + to_string(g_QT_method_N)+"_ps"+to_string(g_paint_grid_scale);
+		 "_N" + to_string(g_QT_method_N)+"_ps"+to_string(g_paint_area_scale);
 
 	 cout << "g_para " << g_para << endl;
 
@@ -148,7 +148,7 @@ int  set_global(string src_name,string deploy_name) {
 	cout << "g_Depth_Limit = " << g_depth_limit << endl;
 	cout << "g_min_gridsize = " << g_min_gridsize <<endl;
 	cout << "g_QT_avgSThreshold = " << g_QT_avgSThreshold << endl;
-	cout << "g_Scale = " << g_paint_grid_scale << endl;
+	cout << "g_Scale = " << g_paint_area_scale << endl;
 	cout << "g_BrushMinSize = " << g_BrushMinSize << endl;
 	cout << "g_brush_thumbnail_size = " << g_brush_thumbnail_size << endl;
 	cout << endl;

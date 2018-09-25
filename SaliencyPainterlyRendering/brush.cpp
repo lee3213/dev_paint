@@ -143,8 +143,8 @@ int BrushInitialization(list<Brush> &_brush_set,int _brush_depth,int brush_size[
 				int color_BGR_B = 255;
 				int color_BGR_G = 0;
 				int color_BGR_R = 0;
-				int paint_grid_w_size = bsize_w;
-				int	paint_grid_h_size = bsize_h;
+				int paint_area_w_size = bsize_w;
+				int	paint_area_h_size = bsize_h;
 
 				Scalar s_rgb, s_hsv;
 
@@ -153,8 +153,8 @@ int BrushInitialization(list<Brush> &_brush_set,int _brush_depth,int brush_size[
 				int br_BGR_R = 0;
 				unsigned char * alpha_channel_data;
 				unsigned char * hsv_v_data;
-				alpha_channel.create(paint_grid_w_size, paint_grid_h_size, CV_8UC1);
-				hsv_v.create(paint_grid_w_size, paint_grid_h_size, CV_8UC1);
+				alpha_channel.create(paint_area_w_size, paint_area_h_size, CV_8UC1);
+				hsv_v.create(paint_area_w_size, paint_area_h_size, CV_8UC1);
 				debug_image("br2/ET_" , nth, temp_bump);
 				for (color_BGR_B = 0; color_BGR_B < 255; color_BGR_B++) {
 					R.setTo(255);
@@ -167,9 +167,9 @@ int BrushInitialization(list<Brush> &_brush_set,int _brush_depth,int brush_size[
 
 					int Alpha;
 					int _TH = 200;
-					for (int by = 0; by < paint_grid_h_size; by++)
+					for (int by = 0; by < paint_area_h_size; by++)
 					{
-						for (int bx = 0; bx < paint_grid_w_size; bx++)
+						for (int bx = 0; bx < paint_area_w_size; bx++)
 						{
 
 							p.x = (centered_SrtPoint.x + bx);
@@ -183,7 +183,7 @@ int BrushInitialization(list<Brush> &_brush_set,int _brush_depth,int brush_size[
 							//브러시에 색상 입히기
 
 							int bIndex_3c = by *b_step1 + bx * b_channels;
-							int gray_bIndex_1c = by*paint_grid_w_size + bx;
+							int gray_bIndex_1c = by*paint_area_w_size + bx;
 
 							//for tranparent effect 
 

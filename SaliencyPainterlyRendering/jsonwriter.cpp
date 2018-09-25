@@ -22,7 +22,7 @@ int _grid[] = { 5,10 };
 int QT_N[] = { 1 };
 //int _mm[] = { 1,2 };// "attach", tag_union
 ;
-int _ps[] = { 6 };//"g_paint_grid_scale"
+int _ps[] = { 6 };//"g_paint_area_scale"
 int _br[] = { 5,10 }; //g_BrushMinSize
 int _gs[] = { 1 };//grid skip 
 int br, th, de, gr, sm, qt, re, mm, gs, ps;
@@ -73,7 +73,7 @@ int  json_write_method(string path) {
 												root["g_BrushMinSize"] = _br[br]; //5,10
 												root["g_Ts"] = 230;
 												root["end"] = "end";
-												root["g_paint_grid_scale"] = _ps[ps];//
+												root["g_paint_area_scale"] = _ps[ps];//
 												root["g_merge_method"] = _str_mm[mm];
 												root["g_merge_skip_count"] = _gs[gs];
 												root["QT_avgSThreshold"] = thresh[th];//15, 25

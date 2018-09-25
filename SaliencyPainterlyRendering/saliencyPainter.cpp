@@ -105,25 +105,7 @@ Mat saliency_union(Mat saliency_map_C, Mat saliency_map_G) {
 	return union_map;
 }
 
-void image_save(string image_name, Mat result_image, Mat Quad_TreeMap) {
-	debug_image_abs(g_root_image_path, g_para_method + string("_") + image_name, result_image);
-	debug_image_abs(g_root_image_path, g_para_method + string("_") + image_name + string("_QT"), Quad_TreeMap);
 
-	debug_image_abs(g_para_path + string("/"), g_para_method + string("_") + image_name, result_image);
-	debug_image_abs(g_para_path + string("/"), g_para_method + string("_") + image_name + string("_QT"), Quad_TreeMap);
-
-	debug_image_abs(g_para_method_path + string("/"), g_para_method + string("_") + image_name, result_image);
-	debug_image_abs(g_para_method_path + string("/"), g_para_method + string("_") + image_name + string("_QT"), Quad_TreeMap);
-
-
-	debug_image_abs(g_para_method_image_path, g_para_method + string("_") + image_name, result_image);
-	debug_image_abs(g_para_method_image_path, g_para_method + string("_") + image_name + string("_QT"), Quad_TreeMap);
-	
-	
-
-	debug_image(g_para_method + string("_") + g_image_name, result_image);
-	debug_image(g_para_method + string("_") + g_image_name, Quad_TreeMap);
-}
 
 
 
@@ -133,20 +115,14 @@ void image_save(string image_name, Mat result_image, Mat Quad_TreeMap) {
 
 
 void run_render(render_ * _render ) {
-	_render->result_image = _render->PainterlyRendering();
-	//.m_srcImg,
-	//	_render[_render_method].aStroke_set, _render[_render_method].tag,
-	//	_render[_render_method].brush_size, _render[_render_method].depth,
-	//	_render[_render_method].grid_map_1c, _render[_render_method].grid_painting_try,
-	//	_render[_render_method].brush_set, _render[_render_method].QT_grid_count,
-	//	_render[_render_method].changed_count,
-//		_render[_render_method].painting_area
-//	);
-
-	image_save(g_image_name + _render->m_tag_, _render->result_image, _render->grid_map_1c[MAX_DEPTH]);
-//	image_save(g_image_name + _render->m_tag_, _render->result_image, _render->result_image_DEPTH]);
-	//cout << "sobel_ " << sobel_depth << " : " << aStroke_set_sobel.size() << endl;
-}
+	for(int j=0;j<_render->mm_depth;j++)
+	if (_render->mm_aStroke_set[j].size() == 0) {
+		cout << _render->m_tag << " stroke_size==0" << endl;
+		return;
+	}
+	_render->success_or_fail = _render->PainterlyRendering();
+//	image_save(g_image_name + _render->m_tag_, _render->result_image, _render->grid_map_1c[MAX_DEPTH]);
+	}
 
 int   RenderingImage(char * src_name, char * deploy_name)
 {
@@ -325,9 +301,19 @@ int   RenderingImage(char * src_name, char * deploy_name)
 	_render[RENDER_TWOPASS_MERGE]->add_render(_render[0], _render[1]);
 	for (int i = 0; i < RENDER_MAX; i++) {
 		_render[i]->prepare();
+		for(int j=0;j<_render[i]->mm_depth;j++)
+		cout << _render[i]->m_tag << " : " << _render[i]->mm_aStroke_set[j].size() << endl;
+		cout << "++++++++++++++++++ prepare "+_render[i]->m_tag+" ++++++++++++++++++++++++++++++++++++++++" << endl;
 	}
-
-	
+#ifndef RUN_THREAD	
+	for (int i = 0; i < RENDER_MAX; i++) {
+		for (int j = 0; j<_render[i]->mm_depth; j++)
+	//	cout << _render[i]->m_tag << " : " << _render[i]->mm_aStroke_set[j].size() << endl;
+		_render[i]->success_or_fail= _render[i]->PainterlyRendering();
+		cout << "================= "<< _render[i]->m_tag<<" "<<_render[i]->success_or_fail<<" =========================================" << endl;
+	//	image_save(g_image_name + _render[i]->m_tag_, _render[i]->result_image, _render[i]->r_grid_map_1c_accu);
+	}
+#else
 
 		std::thread *p_render[RENDER_MAX];
 
@@ -382,7 +368,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 			_render[RENDER_TWOPASS_ATTACH]->post_process();
 		}
 		
-
+#endif
 	return 0;
 }
 

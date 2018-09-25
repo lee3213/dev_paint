@@ -94,7 +94,7 @@ string g_saliency_method;//without_saliency, saliency, pregraph, blackandwhite,r
 string g_paint_method;
 string g_Render_method;//Union, Only
 
-int g_paint_grid_scale;
+int g_paint_area_scale;
 int g_QT_method_N;//N
 
 

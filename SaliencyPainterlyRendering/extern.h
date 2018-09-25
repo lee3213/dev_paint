@@ -65,7 +65,7 @@ extern string g_para_path;
 extern string g_para_method_image_path;
 //extern string g_win_path;
 extern string g_root_image_path;
-extern int g_paint_grid_scale;
+extern int g_paint_area_scale;
 extern int g_QT_method_N;//N
 extern string g_Render_method;//Union, Only
 

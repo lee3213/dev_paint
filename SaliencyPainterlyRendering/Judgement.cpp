@@ -54,13 +54,15 @@ int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, list<B
 	return brush_no;
 }
 //rstImg = JudgementImage(rstImg, tempImg, bsize, srcData, rstData, tempData, bSrtPoint);
-//int  result = JudgementImage(srcData, changedData, beforeData, paint_grid_w_size, paint_grid_h_size, centered_SrtPoint,
+//int  result = JudgementImage(srcData, changedData, beforeData, brush_area_w_size, brush_area_h_size, centered_SrtPoint,
 	//astroke_depth, s_width, s_height, s_channels);
 
 int JudgementImage(unsigned char * srcData, unsigned char * changedData_p, unsigned char * beforeData_p, 
-	int paint_grid_w_size, int paint_grid_h_size, Point centered_SrtPoint,
-	int astroke_depth, int i_w, int i_h, int i_c,
-	Point _fetch_color_point,string tag)
+	int brush_area_w_size, int brush_area_h_size,
+	Point centered_SrtPoint, Point _fetch_color_point,
+	int astroke_depth, int s_w, int s_h, int s_c,
+	int c_w, int c_h, int c_c,
+	string tag)
 {
 //	unsigned char * beforeData_p = beforeImg.data;
 	//unsigned char * changedData_p = changedImg.data;
@@ -73,31 +75,32 @@ int JudgementImage(unsigned char * srcData, unsigned char * changedData_p, unsig
 		called_cnt = 0;
 		saved_depth = astroke_depth;
 	}
-	cv::Mat be(paint_grid_w_size, paint_grid_h_size, CV_8UC3);
+	cv::Mat be(brush_area_w_size, brush_area_h_size, CV_8UC3);
 	unsigned char * be_data = be.data;
-	PaintBackGround(be_data, paint_grid_w_size, paint_grid_h_size, 0, 0, 0);
+	PaintBackGround(be_data, brush_area_w_size, brush_area_h_size, 0, 0, 0);
 	
-	cv::Mat ch(paint_grid_w_size, paint_grid_h_size, CV_8UC3);
+	cv::Mat ch(brush_area_w_size, brush_area_h_size, CV_8UC3);
 	unsigned char * ch_data = ch.data;
-	PaintBackGround(ch_data, paint_grid_w_size, paint_grid_h_size, 0, 0, 0);
+	PaintBackGround(ch_data, brush_area_w_size, brush_area_h_size, 0, 0, 0);
 
-	cv::Mat sr(paint_grid_w_size, paint_grid_h_size, CV_8UC3);
+	cv::Mat sr(brush_area_w_size, brush_area_h_size, CV_8UC3);
 	unsigned char * sr_data = sr.data;
-	PaintBackGround(sr_data, paint_grid_w_size, paint_grid_h_size, 0, 0, 0);
+	PaintBackGround(sr_data, brush_area_w_size, brush_area_h_size, 0, 0, 0);
 
 #endif
-	int s_channel = i_c;
-	int s_height = i_h;
-	int s_width = i_w;
-	int s_step1 = i_c*i_w;
+	int s_channel = s_c;
+	int s_height = s_h;
+	int s_width = s_w;
+	int s_step1 = s_c*s_w;
 	int s_Idx_x, s_Idx_y;
-
-	for (int by = 0; by < paint_grid_h_size; by++)
+	int c_step1 = c_c*c_w;
+	for (int by = 0; by < brush_area_h_size; by++)
 	{
-		for (int bx = 0; bx < paint_grid_w_size; bx++)
+		for (int bx = 0; bx < brush_area_w_size; bx++)
 		{
 			s_Idx_x = centered_SrtPoint.x + bx;
 			s_Idx_y = centered_SrtPoint.y + by;
+		
 			if (s_Idx_x < 0) continue; //skip outside of image
 			if (s_Idx_y < 0) continue;
 			if (s_Idx_y > (s_height-1)) continue;
@@ -105,27 +108,28 @@ int JudgementImage(unsigned char * srcData, unsigned char * changedData_p, unsig
 		
 			int s_index = (s_Idx_y) *s_step1  + (s_Idx_x ) * s_channel;
 		
-			int b_index = bx*s_channel + (by*paint_grid_w_size*s_channel);
-			
+			int b_index = bx*s_channel + (by*brush_area_w_size*s_channel);
+			int c_index= (s_Idx_y)*c_step1 + (s_Idx_x)* c_c;
 			int s_0, s_1, s_2;
 			int b_0, b_1, b_2;
 			int c_0, c_1, c_2;
 
 
 			p_peek(srcData, s_index, s_0, s_1, s_2);
-			p_peek(beforeData_p, s_index, b_0, b_1, b_2);
-			p_peek(changedData_p, s_index, c_0, c_1, c_2);
+			p_peek(beforeData_p, c_index, b_0, b_1, b_2);
+			p_peek(changedData_p, c_index, c_0, c_1, c_2);
 #ifdef DEBUG_
-			p_poke(ch_data, b_index, c_0, c_1, c_2);
 			p_poke(sr_data, b_index, s_0, s_1, s_2);
-			p_poke(be_data, b_index, b_0, b_1, b_2);
+			p_poke(ch_data, c_index, c_0, c_1, c_2);
+			p_poke(be_data, c_index, b_0, b_1, b_2);
 
 			rectangle(sr, 
-				Point(paint_grid_w_size/2 - 2, paint_grid_w_size/2 - 2),
-				Point(paint_grid_w_size/2 + 2, paint_grid_w_size/2 + 2),
+				Point(brush_area_w_size/2 - 2, brush_area_w_size/2 - 2),
+				Point(brush_area_w_size/2 + 2, brush_area_w_size/2 + 2),
 
 				Scalar(0,0,255));
 #endif
+
 			src2rst += abs(s_2 - c_2)+ abs(s_1 - c_1)+ abs(s_0- c_0);
 
 			src2before += abs(s_2 - b_2) + abs(s_1 - b_1) + abs(s_0 - b_0);
@@ -141,9 +145,10 @@ int JudgementImage(unsigned char * srcData, unsigned char * changedData_p, unsig
 	}
 #ifdef DEBUG_
 	if (called_cnt < 30) {
+		debug_image(string("p") + to_string(astroke_depth) + string("/") + to_string(called_cnt) + string("_0sr_" + tag), sr);
 		debug_image(string("p") + to_string(astroke_depth) + string("/") + to_string(called_cnt) + string("_2ch_")+tag, ch);
 		debug_image(string("p") + to_string(astroke_depth) + string("/") + to_string(called_cnt) + string("_1be_")+tag, be);
-		debug_image(string("p") + to_string(astroke_depth) + string("/") + to_string(called_cnt) + string("_0sr_"+tag), sr);
+		
 		called_cnt++;
 	}
 	ch.release();
@@ -162,7 +167,7 @@ int JudgementImage(unsigned char * srcData, unsigned char * changedData_p, unsig
 
 int  JudgementBrush(cv::Mat &testImg, int depth, int width, int height,list<Brush> _brush_set)
 	/* list<Brush> &brush_set, int nBrushNumber,*/
-//	 int stroke_no,int paint_grid_w_size,int paint_grid_h_size)// Point centered_SrtPoint,
+//	 int stroke_no,int brush_area_w_size,int brush_area_h_size)// Point centered_SrtPoint,
 //	Point centered_EndPoint,int first_try)
 {
 	
