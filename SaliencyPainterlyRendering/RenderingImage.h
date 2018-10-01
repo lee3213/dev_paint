@@ -25,7 +25,7 @@ int RenderingImage(char * srcImgname, char * saliImgname);
 //cv::Mat &srcImg, list<QuadTree::Img_node*> aStroke, string tag,
 
 ////	int saliency_brush_size[], int saliency_depth, Mat saliency_grid_map[], int saliency_Sgrid_painting_try[],
-//	list<Brush>& saliency_brush_set, int saliency_QT_grid_count[],int changed_count[],
+//	vector <Brush*>& saliency_brush_set, int saliency_QT_grid_count[],int changed_count[],
 //	long int _paintng_area[]
 
 //);

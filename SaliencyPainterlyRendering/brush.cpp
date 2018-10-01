@@ -10,7 +10,7 @@
 using namespace std;
 
 
-int BrushInitialization(list<Brush> &_brush_set,int _brush_depth,int brush_size[])
+int BrushInitialization(vector <Brush*> &_brush_set,int _brush_depth,int brush_size[])
 {
 	cv::Mat temp_brush;
 	cv::Mat temp_index_brush;
@@ -43,7 +43,7 @@ int BrushInitialization(list<Brush> &_brush_set,int _brush_depth,int brush_size[
 	nth = 0;
 	Mat brush_gray;
 	string fname;
-	Brush __brush;
+	Brush *__brush;
 	int b_step1, b_channels;
 	int s_step1, s_channels;
 
@@ -111,13 +111,14 @@ int BrushInitialization(list<Brush> &_brush_set,int _brush_depth,int brush_size[
 			return -9998;
 		}
 	
-		__brush.brush_thumbnail=temp_thumbnail.clone();
-		__brush.brush_gray = brush_gray.clone();
-		__brush.brush = temp_brush.clone();
-		__brush.brush_no = nth;
+		__brush = new Brush;
+		__brush->brush_thumbnail=temp_thumbnail.clone();
+		__brush->brush_gray = brush_gray.clone();
+		__brush->brush = temp_brush.clone();
+		__brush->brush_no = nth;
 	
-		__brush.bump=temp_bump.clone();
-		__brush.index_brush=temp_index_brush.clone();
+		__brush->bump=temp_bump.clone();
+		__brush->index_brush=temp_index_brush.clone();
 		_brush_set.push_back(__brush);
 		if ( run_once){
 			if (_brush_depth > 0)

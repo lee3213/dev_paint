@@ -60,8 +60,9 @@ int  set_global(string src_name,string deploy_name) {
 
 	 cout << "g_para " << g_para << endl;
 
-	g_para_method = g_para + "_m" + g_saliency_method + "_" + g_Render_method +
-		+"_p" + g_paint_method+"_q"+to_string(g_merge_method)+"_gs"+to_string(g_merge_skip_count);
+	g_para_method = g_para + "_m" + g_saliency_method + "_" //+ g_Render_method +
+		+"_p" + g_paint_method//+"_q"+to_string(g_merge_method)
+		+"_gs"+to_string(g_merge_skip_count);
 
 	g_para_path = g_root_path + string("/") + g_para;
 	g_para_method_path = g_root_path + string("/") + g_para + "/" + g_para_method;

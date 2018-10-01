@@ -44,9 +44,9 @@ public:
 	//list<Img_node*> *m_aStroke_set_merge;
 
 	//list<QuadTree::Img_node*>aStroke_set_Sgrad;
-
-	list<Brush> brush_set;
-	list<Brush> brush_resized_set[MAX_DEPTH];
+	int depth_sobel, depth_saliency, depth_attach;
+	vector <Brush*> brush_set;
+	vector <Brush*> brush_resized_set[MAX_DEPTH];
 	int QT_depth;
 
 	int brush_size[MAX_DEPTH];
@@ -84,7 +84,7 @@ public:
 	}
 	void p_peek_canvas(unsigned char * p, int index, int y, int &r, int &g, int &b);
 	//void  render_::p_poke_canvas(unsigned char * p, int p_x, int p_y, int p_0, int p_1, int p_2);
-	void render_::brush_delete(list<Brush> &brush_set);
+	void render_::brush_delete(vector <Brush*> brush_set);
 	//void  render_::p_poke_canvas(unsigned char * p, int p_x, int p_y, int p_0, int p_1, int p_2);
 	void add_render(render_ *_sobel_render, render_ *_saliency_render) {
 		render_sobel = _sobel_render;
@@ -92,83 +92,92 @@ public:
 	};
 	//void  render_::p_peek_canvas(unsigned char * p, int p_x, int p_y, int &p_0, int &p_1, int &p_2);
 
-
-
-	int   render_::P_Rendering(
-		unsigned char * changedData,//rstImage
-		Mat & beforeImg,//rstImage.clone()
-
-		cv::Mat &_testImg_resized,
-		//list<Brush> &_brush_set,
+	int render_::calc_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth,
+		int _brush_size[], string tag);
+	int   render_::P_Rendering(//cv::Mat srcImg,
+							   //	unsigned char * srcData,
+							   //	unsigned char * changed_canvas_data,//rstImage
+		Mat & _src_ROI,
+		Mat & _before_ROI,//rstImage.clone()
+		cv::Mat & _changed_ROI,
+		cv:: Mat & ing_ROI,
+		//vector <Brush*> &_brush_set,
 		Point _fetch_color_Point,
 		Point centered_SrtPoint,
-		int paint_area_w_size, int paint_area_h_size,
-		
+		Point canvas_centered_SrtPoint,
+		Point canvas_centered_EndPoint,
+		int brush_area_w_size, int brush_area_h_size,
+		//String tag,
+		//int astroke_number,
+		//int ing,
 		int astroke_depth, int painting_count,
-		int color_BGR_B, int color_BGR_G, int color_BGR_R,//BGR order
-		unsigned char * _ing_canvas_data
+		int color_BGR_B, int color_BGR_G, int color_BGR_R//BGR order
+														  //unsigned char * _ing_canvas_data
 
-	);
+		);
+
 	void brush_resize();
+	/*
+	Mat brush_at_brush_clone(vector <Brush*> & _brush_set, int no) {
 
-	Mat brush_at_brush_clone(list<Brush> & _brush_set, int no) {
-
-		list<Brush>::iterator it = _brush_set.begin();
+		vector <Brush*>::iterator it = _brush_set.begin();
 		for (; it != _brush_set.end(); it++) {
-			if ((*it).brush_no == no)
-				return (*it).brush.clone();
+			if ((*it)->brush_no == no)
+				return (*it)->brush.clone();
 		}
-		return _brush_set.front().brush.clone();
+		return _brush_set.front()->brush.clone();
 	}
 
-	Mat brush_at_brush_embose_clone(list<Brush> & _brush_set, int no) {
+	Mat brush_at_brush_embose_clone(vector <Brush*> & _brush_set, int no) {
 
-		list<Brush>::iterator it = _brush_set.begin();
+		vector <Brush*>::iterator it = _brush_set.begin();
 		for (; it != _brush_set.end(); it++) {
-			if ((*it).brush_no == no)
-				return (*it).bump.clone();
+			if ((*it)->brush_no == no)
+				return (*it)->bump.clone();
 		}
-		return _brush_set.front().bump.clone();
+		return _brush_set.front()->bump.clone();
 	}
-	Mat brush_at_brush_gray_clone(list<Brush> & _brush_set, int no) {
+	Mat brush_at_brush_gray_clone(vector <Brush*> & _brush_set, int no) {
 
-		list<Brush>::iterator it = _brush_set.begin();
+		vector <Brush*>::iterator it = _brush_set.begin();
 		for (; it != _brush_set.end(); it++) {
-			if ((*it).brush_no == no)
-				return (*it).brush_gray;
-		}
-		cerr << "at G " << no << endl;
-		return(*it).brush_gray;
-	}
-	Mat brush_at_brush(list<Brush> & _brush_set, int no) {
-
-		list<Brush>::iterator it = _brush_set.begin();
-		for (; it != _brush_set.end(); it++) {
-			if ((*it).brush_no == no)
-				return (*it).brush;
-		}
-		return (*it).brush;
-	}
-
-	Mat brush_at_brush_embose(list<Brush> & _brush_set, int no) {
-
-		list<Brush>::iterator it = _brush_set.begin();
-		for (; it != _brush_set.end(); it++) {
-			if ((*it).brush_no == no)
-				return (*it).bump;
-		}
-		return (*it).bump;
-	}
-	Mat brush_at_brush_gray(list<Brush> & _brush_set, int no) {
-
-		list<Brush>::iterator it = _brush_set.begin();
-		for (; it != _brush_set.end(); it++) {
-			if ((*it).brush_no == no)
-				return (*it).brush_gray.clone();
+			if ((*it)->brush_no == no)
+				return (*it)->brush_gray;
 		}
 		cerr << "at G " << no << endl;
-		return (*it).brush_gray;
+		return(*it)->brush_gray;
 	}
-}
+	Mat brush_at_brush(vector <Brush*> & _brush_set, int no) {
+
+		vector <Brush*>::iterator it = _brush_set.begin();
+		for (; it != _brush_set.end(); it++) {
+			if ((*it)->brush_no == no)
+				return (*it)->brush;
+		}
+		return (*it)->brush;
+	}
+
+	Mat brush_at_brush_embose(vector <Brush*> & _brush_set, int no) {
+
+		vector <Brush*>::iterator it = _brush_set.begin();
+		for (; it != _brush_set.end(); it++) {
+			if ((*it)->brush_no == no)
+				return (*it)->bump;
+		}
+		return (*it)->bump;
+	}
+	Mat brush_at_brush_gray(vector <Brush*> & _brush_set, int no) {
+
+		vector <Brush*>::iterator it = _brush_set.begin();
+		for (; it != _brush_set.end(); it++) {
+			if ((*it)->brush_no == no)
+				return (*it)->brush_gray.clone();
+		}
+		cerr << "at G " << no << endl;
+		return (*it)->brush_gray;
+	}
+	*/
+	}
+
 
 ;

@@ -55,14 +55,14 @@ int  json_deployment(string path) {
 	cout << "g_paint_area_scale  "<<g_paint_area_scale << endl;
 	g_paint_area_scale = 8;
 	g_QT_method_N= root.get("g_QT_method_N",1).asInt();
-	g_Render_method = root.get("g_Render_method", "Only").asString();
-	string str_g_merge_method = root.get("g_merge_method","attach").asString();
-	if ( str_g_merge_method == "Attach" ||
-		str_g_merge_method == "attach")
-	g_merge_method = DEF_ATTACH;
-	else
-		g_merge_method = DEF_MERGE;
-
+//	g_Render_method = root.get("g_Render_method", "Only").asString();
+//	string str_g_merge_method = root.get("g_merge_method","attach").asString();
+//	if ( str_g_merge_method == "Attach" ||
+//		str_g_merge_method == "attach")
+//	g_merge_method = DEF_ATTACH;
+//	else
+	//	g_merge_method = DEF_MERGE;
+//
 	g_merge_skip_count = root.get("g_merge_skip_count", 1).asInt();
 	// And you can write to a stream, using the StyledWriter automatically.
 	//std::cout << root<<endl;

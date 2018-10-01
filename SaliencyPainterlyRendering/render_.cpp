@@ -29,16 +29,16 @@ void image_save(string image_name, Mat result_image, Mat Quad_TreeMap) {
 	debug_image(g_para_method + string("_") + g_image_name, result_image);
 	debug_image(g_para_method + string("_") + g_image_name, Quad_TreeMap);
 }
-void render_::brush_delete(list<Brush> &brush_set) {
+void render_::brush_delete(vector <Brush*> brush_set) {
 	int nth = 0;
-	for (std::list<Brush>::iterator i = brush_set.begin(), endI = brush_set.end(); i != endI; ++i, nth++)
+	for (std::vector <Brush*>::iterator i = brush_set.begin(), endI = brush_set.end(); i != endI; ++i, nth++)
 	{
 
-		(*i).brush.release();
-		(*i).brush_thumbnail.release();
-		(*i).bump.release();
-		(*i).index_brush.release();
-		(*i).brush_gray.release();
+		(*i)->brush.release();
+		(*i)->brush_thumbnail.release();
+		(*i)->bump.release();
+		(*i)->index_brush.release();
+		(*i)->brush_gray.release();
 	}
 
 	brush_set.clear();
@@ -136,7 +136,8 @@ int draw_grid_depth(Mat  _grid_map_1c[], Mat _grid_map_1c_accu,
 	}
 
 	for (int i = 0; i < MAX_DEPTH; i++) {
-	//	cout << "z : stroke " << i<<" : "<<__saved_depth <<" , "<<aStroke_set[i].size() << endl;
+		int ssize=(int) aStroke_set[i].size();
+		//cout << "z : stroke " << i<<" : "<<__saved_depth <<" , "<<aStroke_set[i].size() << endl;
 		if (aStroke_set[i].size() == 0) 
 			break;
 		for (list<Img_node*>::iterator St_it = aStroke_set[i].begin(); St_it != aStroke_set[i].end(); St_it++)
@@ -164,7 +165,7 @@ int draw_grid_depth(Mat  _grid_map_1c[], Mat _grid_map_1c_accu,
 			debug_image("_grid_" + tag, i, _grid_map_1c[i]);
 			called_cnt++;
 		}
-		cout << " y depth " + tag << setw(5) << i << " : " << __saved_depth<<", "<<_QT_grid_count[i] << endl;
+	//	cout << " y depth " + tag << setw(5) << i << " : " << __saved_depth<<", "<<_QT_grid_count[i] << endl;
 		if (do_grid_cnt) {
 			grid_map_sum += _QT_grid_count[i];
 		}
@@ -172,7 +173,7 @@ int draw_grid_depth(Mat  _grid_map_1c[], Mat _grid_map_1c_accu,
 
 	debug_image("QT_" + tag + "_" + to_string(__saved_depth) + "_f", _grid_map_1c_accu);
 
-	cout << "z depth " + tag << setw(5) << __saved_depth << " : QT_" << _QT_grid_count[__saved_depth] << endl;
+	//cout << "z depth " + tag << setw(5) << __saved_depth << " : QT_" << _QT_grid_count[__saved_depth] << endl;
 	
 	int depth = __saved_depth + 1;
 	cout << "finalized Depth : " << depth << " : " << _QT_grid_count[__saved_depth] << endl;
@@ -255,28 +256,60 @@ void render_::func_(){
 	cout << setw(12) << Qt_sum << setw(18) << try_sum << setw(8) << c_sum << endl;
 
 }
-int calc_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth,
+int render_::calc_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth,
 	int _brush_size[], string tag)
 {
-	int brush_step = (int)((_BrushMaxSize - _BrushMinSize) / _depth);
+	
 
+	int brush_step;
+	int k_depth;
+	if (render_method == RENDER_TWOPASS_ATTACH ) {
+		if (render_sobel->mm_depth > render_saliency->mm_depth) {
+		k_depth = render_sobel->mm_depth; 
+		}
+		else 	k_depth = render_saliency->mm_depth; 
+		
+	 brush_step = (int)((_BrushMaxSize - _BrushMinSize) / (k_depth-1));
+		for (int i = 0; i < k_depth; i++)
+		{
+			_brush_size[i] = (int)(_BrushMaxSize - (i)* brush_step);
+
+			if (_brush_size[i] < _BrushMinSize)
+				_brush_size[i] = _BrushMinSize;
+			if (i == 0)_brush_size[0] = (int)(_BrushMaxSize*1.7);
+		//	cout << tag << "   Brush Size : " << i << ", " << setw(4) << _brush_size[i] << endl;
+			g_file_cstat << g_para_method + "," << g_image_name << ", " << "brush_size" + to_string(i) + "," <<
+				_brush_size[i] << endl;
+		}
+		int _B = _brush_size[k_depth-1];
+		int _brush_step = (_B - _BrushMinSize) / (depth_attach - k_depth);
+		for (int i = 0; i < (depth_attach-k_depth); i++)
+		{
+			_brush_size[i+k_depth] = (int)(_B - (i+1)* _brush_step);
+		}
+	//	cout << "_brush_step " << _brush_step << endl;
+	}
+	else {
+	 brush_step = (int)((_BrushMaxSize - _BrushMinSize) / (_depth-1));
+		for (int i = 0; i < _depth; i++)
+		{
+			_brush_size[i] = (int)(_BrushMaxSize - (i)* brush_step);
+
+			if (_brush_size[i] < _BrushMinSize)
+				_brush_size[i] = _BrushMinSize;
+			if (i == 0)_brush_size[0] = (int)(_BrushMaxSize*1.5);
+		//	cout << tag << "   Brush Size : " << i << ", " << setw(4) << _brush_size[i] << endl;
+			g_file_cstat << g_para_method + "," << g_image_name << ", " << "brush_size" + to_string(i) + "," <<
+				_brush_size[i] << endl;
+		}
+	}
 	cout << tag + " image depth  " << _depth << ", size: " << g_src_image_width << ",  " << g_src_image_height << endl;
 	cout << "_BrushMaxSize " << _BrushMaxSize << "      ";
 	cout << "_BrushMinSize " << _BrushMinSize << "       ";
-	cout << "_brush_step " << brush_step << endl;
-
-	for (int i = 0; i < _depth; i++)
-	{
-		_brush_size[i] = (int)(_BrushMaxSize - (i)* brush_step);
-
-		if (_brush_size[i] < _BrushMinSize)
-			_brush_size[i] = _BrushMinSize;
-		if (i == 0)_brush_size[0] = (int)(_BrushMaxSize*1.5);
-		cout << tag << "   Brush Size : " << i << ", " << setw(4) << _brush_size[i] << endl;
-		g_file_cstat << g_para_method + "," << g_image_name << ", " << "brush_size" + to_string(i) + "," <<
-			_brush_size[i] << endl;
-	}
-
+	cout << "brush_step " << brush_step << endl;
+	//for (int i = 0; i < mm_depth; i++) {
+	//	cout << setw(2) << i << setw(3) << _brush_size[i] << endl;
+//	}
 	return _depth;
 }
 
@@ -349,13 +382,15 @@ render_::~render_() {
 	}
 	}
 	brush_delete(brush_set);
+	for(int i=0;i<MAX_DEPTH;i++)
+		brush_delete(brush_resized_set[i]);
 
 };
 
 int render_::prepare() {
 
 	int ret;
-	int depth_sobel, depth_saliency;
+	
 	int k_depth;
 	if (g_src_image_width < g_src_image_height)
 		BrushMaxSize = g_src_image_width / 10;
@@ -420,25 +455,30 @@ int render_::prepare() {
 		//mm_aStroke_set->sort();
 		stroke_dump(mm_aStroke_set, m_tag, mm_depth);
 		kk = 0;
-
+		k_depth = 0;
 		for (int i = 0; i < render_saliency->mm_depth; i++) {
 			//cout << "astroke.size()= " + m_tag << ", " << mm_aStroke_set[i].size() << endl;
 
 			for (list<Img_node*>::iterator St_it = stroke_set_saliency[i]->begin(); St_it != stroke_set_saliency[i]->end(); St_it++) {
-				if (render_sobel->mm_depth > 5 && (*St_it)->depth < 4)
-					continue;
-				else if ((*St_it)->depth < 3)
-					continue;
-
-				info = (*St_it)->info;
 				if (render_method == RENDER_TWOPASS_MERGE)
 					k_depth = (*St_it)->depth;
 				else {
 					if (render_sobel->mm_depth > 5)
-						k_depth = render_saliency->mm_depth + (*St_it)->depth - 4;
-					else
-						k_depth = render_saliency->mm_depth + (*St_it)->depth - 3;
+					{
+						if ((*St_it)->depth < 4)
+							continue;
+						else
+							k_depth = render_sobel->mm_depth + (*St_it)->depth - 4;
+					}
+					else {
+						if ((*St_it)->depth < 3) {
+							continue;
+						}
+						else
+							k_depth = render_sobel->mm_depth + (*St_it)->depth - 3;
+					}
 				}
+				info = (*St_it)->info;
 				S = (*St_it)->avgS;
 				me_node = QuadTree::newImageTree(info, k_depth, S);
 				mm_aStroke_set[k_depth].push_back(me_node);
@@ -447,7 +487,11 @@ int render_::prepare() {
 		}
 		cout << " added " << kk << ": " << k_depth << endl;
 
-		depth_saliency = k_depth;
+		depth_saliency = render_saliency->mm_depth;
+		mm_depth=depth_attach = k_depth+1;
+		for (int i = 0; i < mm_depth; i++) {
+			cout << m_tag + "  _aStrokeset_size() : " <<i << ": " << mm_aStroke_set[i].size() << endl;
+		}
 	}
 	//m_aStroke_set->sort(Img_node::greater<Img_node*>());
 
@@ -459,6 +503,9 @@ int render_::prepare() {
 	int astroke_depth;
 	int k = 0;
 	for(int i=0;i<mm_depth;i++){
+		if (mm_aStroke_set[i].size() == 0) {
+			cout << m_tag + "Fail Sort check _aStrokeset_size() : " << k_depth << ": " << mm_aStroke_set[i].size() << endl;
+		}
 	for (list<Img_node*>::iterator St_it = mm_aStroke_set[i].begin(); St_it != mm_aStroke_set[i].end(); St_it++, k++)
 	{
 		astroke_depth = (*St_it)->depth;
@@ -471,19 +518,16 @@ int render_::prepare() {
 		}
 		k_depth = astroke_depth;
 	}
-	cout << m_tag + "Sort check _aStrokeset_size() : " << k_depth<<": "<<mm_aStroke_set[i].size() << endl;
+	cout << m_tag + " Sort check _aStrokeset_size() : " << k_depth<<": "<<mm_aStroke_set[i].size() << endl;
 	}
-	/*if (depth_sobel > depth_saliency) {
-		m_depth = QT_depth = depth_sobel;
-	}
-	else 	m_depth = QT_depth = depth_saliency;
-	*/
+	
 	
 	mm_depth=draw_grid_depth(r_grid_map_1c, r_grid_map_1c_accu,mm_aStroke_set, m_tag,
 		grid_map_sum, QT_grid_count, true, -1, 0);
 	QT_depth = mm_depth;
 	
-	cout << "x depth " + m_tag + " = " << mm_depth  << endl;
+	//cout << "x depth " + m_tag + " = " << mm_depth  << endl;
+	
 	for (int i = 0; i < mm_depth ; i++)
 	{
 		cout << setw(15) << m_tag + ", " + to_string(i) <<", "<< QT_grid_count[i] << endl;
@@ -497,6 +541,8 @@ int render_::prepare() {
 		cerr << "Brush Initialization Error_" + m_tag << endl;
 		return -1001;
 	}
+	brush_resize();
+
 	////for (int i = 0; i < mm_depth; i++) {
 	//	cout << "Brush "<<i << ", " << brush_size[i] << endl;
 	//}

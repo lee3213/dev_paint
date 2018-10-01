@@ -10,7 +10,7 @@
 using namespace std;
 
 #define  DO_CENTERED_BRUSH true
-int Brush_adjust(list<Brush> &brush_set)
+int Brush_adjust(vector <Brush*> &brush_set)
 {
 	cv::Mat temp_brush;
 	cv::Mat temp_index_brush;
@@ -55,7 +55,7 @@ int Brush_adjust(list<Brush> &brush_set)
 	unsigned char * accumulation_centered_data = brush_centered_accumulation_map.data;
 	brush_accumulation_map.setTo(255);
 	brush_centered_accumulation_map.setTo(255);
-	list<Brush>::iterator it = brush_set.begin();
+	vector <Brush*>::iterator it = brush_set.begin();
 	nth = 0;
 	for (; nth < g_BrushNumber; nth++, it++) {
 		string fname;
@@ -71,8 +71,8 @@ int Brush_adjust(list<Brush> &brush_set)
 			cout << fname << endl;
 			exit(-9998);
 		}
-		(*it).brush.push_back(temp_brush);
-		(*it).brush_no = nth;
+		(*it)->brush.push_back(temp_brush);
+		(*it)->brush_no = nth;
 		//mat_print(temp_brush, "temp_brush");
 		Rect b_rect;
 		b_rect = rounding_box(temp_brush, bsize_x, bsize_y, 235);
@@ -164,7 +164,7 @@ int Brush_adjust(list<Brush> &brush_set)
 		cv::Size siz = Size(g_INDEX_BRUSH_SIZE_WIDTH, g_INDEX_BRUSH_SIZE_HEIGHT);
 		//	cout << s.height << "," << s.width << endl;
 		cv::resize(temp_brush, temp_index_brush, siz);
-		(*it).index_brush.push_back(temp_index_brush);
+		(*it)->index_brush.push_back(temp_index_brush);
 
 		fname = cv::format("./brush/bump/%02d.ppm", nth + 1);
 		temp_bump = imread(fname.c_str(), IMREAD_GRAYSCALE);
@@ -172,7 +172,7 @@ int Brush_adjust(list<Brush> &brush_set)
 			temp_bump.size().height == 0) {
 			cout << "bump file error " << " : " << nth + 1 << endl;
 		}
-		(*it).bump.push_back(temp_bump);
+		(*it)->bump.push_back(temp_bump);
 
 
 
@@ -186,7 +186,7 @@ int Brush_adjust(list<Brush> &brush_set)
 			temp_thumbnail.size().height == 0) {
 			cout << "thumbnail file error " << " : " << nth + 1 << endl;
 		}
-		(*it).brush_thumbnail.push_back(temp_thumbnail);
+		(*it)->brush_thumbnail.push_back(temp_thumbnail);
 		int t_size =  temp_thumbnail.size().width;
 		b_rect = rounding_box(temp_thumbnail, t_size, t_size, 235);// bsize_x, bsize_y, 235);
 

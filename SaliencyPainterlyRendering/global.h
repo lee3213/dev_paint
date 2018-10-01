@@ -11,7 +11,7 @@
 //int g_brush_called_cnt = 0;
 bool g_first_time = true;
 //FILE *g_log;
-//list<Brush> g_brush_set;//Brush set
+//vector <Brush*> g_brush_set;//Brush set
 int g_unique_id ;
 int g_merge_method;
 //cv::Mat g_grid_map[MAX_DEPTH]; //
@@ -92,7 +92,7 @@ int g_src_image_step1;
 //cv::Mat try_map[5]; // randominized try grid map
 string g_saliency_method;//without_saliency, saliency, pregraph, blackandwhite,resudual,fine_sobelined
 string g_paint_method;
-string g_Render_method;//Union, Only
+//string g_Render_method;//Union, Only
 
 int g_paint_area_scale;
 int g_QT_method_N;//N
@@ -118,10 +118,10 @@ int g_TH = 240;
 int g_ET = 1;//positive ET=-1 negative
 int g_merge_skip_count;
 
-string saliency_method[] = {"Sobel","Pregraph","Itti","Residual","Blackandwhite","Fine_grained" };
-string _re[MAX_DEPTH] = { "Sobel","Saliency","Twopass" };
-string _str_mm[MAX_DEPTH] = { "Attach","Merge" };
+string saliency_method[] = {"Pregraph","Itti","Residual","Blackandwhite","Fine_grained" };
+//string _re[MAX_DEPTH] = { "Sobel","Saliency","Twopass" };
+//string _str_mm[MAX_DEPTH] = { "Attach","Merge" };
 
-int saliency_method_cnt = 6;
-int _re_cnt = 3;
-int _str_mm_cnt = 2;
+int saliency_method_cnt = 5;
+//int _re_cnt = 3;
+//int _str_mm_cnt = 2;

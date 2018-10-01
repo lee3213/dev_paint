@@ -43,38 +43,28 @@ void proof_box(Point &s, int i_width, int i_height, char * p) {
 
 int   render_::P_Rendering(//cv::Mat srcImg,
 //	unsigned char * srcData,
-	unsigned char * changed_canvas_data,//rstImage
-	Mat & beforeImg,//rstImage.clone()
-	cv::Mat &_testImg_resized,
-	//list<Brush> &_brush_set,
+//	unsigned char * changed_canvas_data,//rstImage
+Mat & _src_ROI_canvas,
+	Mat & _before_ROI_canvas,
+	cv::Mat & _changed_ROI_clone,
+	cv::Mat & _ing_ROI_clone,
+	//vector <Brush*> &_brush_set,
 	Point _fetch_color_Point,
-	Point centered_SrtPoint,
+	Point _centered_SrtPoint,
+	Point canvas_centered_SrtPoint,
+	Point canvas_centered_EndPoint,
 	int brush_area_w_size, int brush_area_h_size,
 	//String tag,
 	//int astroke_number,
 	//int ing,
 	int astroke_depth, int painting_count, 
-	int color_BGR_B, int color_BGR_G, int color_BGR_R,//BGR order
-	unsigned char * _ing_canvas_data
+	int color_BGR_B, int color_BGR_G, int color_BGR_R//BGR order
+	//unsigned char * _ing_canvas_data
 	
 	)
 	
 {
-	unsigned char *before_canvas_data = beforeImg.data;
 
-	int canvas_s_width = beforeImg.size().width;
-	int canvas_s_height = beforeImg.size().height;
-	int canvas_s_step1 = (int)beforeImg.step1();
-	int canvas_s_channels = (int)beforeImg.channels();
-
-	int src_s_width = g_src_image_width;
-	int src_s_height = g_src_image_height;
-	int src_s_step1 = g_src_image_step1;
-	int src_s_channels = g_src_image_channels;
-	int brush_no = JudgementBrush(_testImg_resized, /*added by cwlee*/astroke_depth,
-		g_brush_thumbnail_size, g_brush_thumbnail_size, brush_set);
-	//, stroke_no, paint_area_w_size, paint_area_h_size,
-	//centered_SrtPoint,centered_EndPoint,first_try);//get one of similiar best 5
 	//cv::Mat bestBrush_src;
 	cv::Mat bestBrush_resized;
 	//cv::Mat bestBrush_gray_src;
@@ -83,57 +73,61 @@ int   render_::P_Rendering(//cv::Mat srcImg,
 	cv::Mat bestBrush_embossed_resized;//R
 	Mat alpha_channel;
 	Mat hsv_v;
+	unsigned char * src_ROI_canvas_data = _src_ROI_canvas.data;
+	unsigned char * ing_ROI_clone_data = _ing_ROI_clone.data;
+	unsigned char *before_ROI_canvas_data = _before_ROI_canvas.data;
+	unsigned char * changed_ROI_clone_data = _changed_ROI_clone.data;
+	
+	int canvas_ROI_width = _before_ROI_canvas.size().width;
 
-	//
-	bestBrush_resized = brush_at_brush(brush_resized_set[astroke_depth],brush_no);
-	bestBrush_gray_resized= brush_at_brush_gray(brush_resized_set[astroke_depth],brush_no);
-	bestBrush_embossed_resized = brush_at_brush_embose(brush_resized_set[astroke_depth], brush_no);
-	/*
-	//unsigned char * bestBrush_src_data = (unsigned char *)bestBrush_src.data;
-//	unsigned char * bestBrush_embose_src_data = (unsigned char *)bestBrush_embossed_src.data;
+	int canvas_ROI_height = _before_ROI_canvas.size().height;
+	int canvas_ROI_step1 = (int)_before_ROI_canvas.step1();
+	int canvas_ROI_channels = (int)_before_ROI_canvas.channels();
 
-//	int brush_size_width = bestBrush_src.cols;
-//	int brush_size_height = bestBrush_src.rows;
+//	int src_s_width = _src_ROI.size().width;
+//	int src_s_height = _src_ROI.size().height;
+//	int src_s_step1 = (int)_src_ROI.step1();
+//	int src_s_channels = (int)_src_ROI.channels();
 
-//	cv::resize(bestBrush_src, bestBrush_resized, cv::Size(paint_area_w_size, paint_area_h_size));
-	cv::resize(bestBrush_gray_src, bestBrush_gray_resized, cv::Size(brush_area_w_size, brush_area_h_size));
-	cv::resize(bestBrush_embossed_src, bestBrush_embossed_resized, cv::Size(brush_area_w_size, brush_area_h_size));
-	*/
-	static int tbrush_cnt = 0;
-	bestBrush_resized.create(brush_area_h_size, brush_area_w_size, CV_8UC3);
-	bestBrush_resized.setTo(255);
+	cv::Mat testImg_src = _src_ROI_canvas.clone();
+	Mat testImg_resized;
+	resize(testImg_src, testImg_resized, cv::Size(g_brush_thumbnail_size, g_brush_thumbnail_size));
+	if (testImg_resized.channels() == 3)
+		cv::cvtColor(testImg_resized, testImg_resized, COLOR_RGB2GRAY);
 
-	unsigned char * bestBrush_data_resized = (unsigned char *)bestBrush_resized.data;
+	int brush_no = JudgementBrush(testImg_resized, /*added by cwlee*/astroke_depth,
+		g_brush_thumbnail_size, g_brush_thumbnail_size, brush_set);
+
+	
+
+	bestBrush_gray_resized= brush_resized_set[astroke_depth].at(brush_no)->brush_gray;
+	bestBrush_embossed_resized = brush_resized_set[astroke_depth].at(brush_no)->bump;
 	unsigned char * bestBrush_data_gray_resized = (unsigned char *)bestBrush_gray_resized.data;
 	unsigned char * bestBrush_embossed_resized_data = bestBrush_embossed_resized.data;
 
-	 if (tbrush_cnt < 5) {
-		 
-	//	debug_image("br/T_bestBrush_src_" + tag, tbrush_cnt, bestBrush_src);
-		//debug_image("br/T_bestBrush_gray_src_" + m_tag+to_string(brush_no), tbrush_cnt, bestBrush_gray_src);
-		//debug_image("br/T_bestBrush_embossed_src_" + m_tag + to_string(brush_no), tbrush_cnt, bestBrush_embossed_src);
 
-		debug_image("br/IP0_bestBrush_resized_" + m_tag + to_string(brush_no), tbrush_cnt, bestBrush_resized);
-		debug_image("br/IP0_brush_gray_resized_" + m_tag + to_string(brush_no), tbrush_cnt, bestBrush_gray_resized);
-		debug_image("br/IP0_brush_embossed_resized_" + m_tag + to_string(brush_no), tbrush_cnt, bestBrush_embossed_resized);
-	//	if (tbrush_cnt == 0) {
-	//		mat_print(bestBrush_resized, "bestBrush_resized");
-	//		mat_print(bestBrush_gray_resized, "bestBrush_gray_resized");
-	//		mat_print(bestBrush_embossed_resized, "bestBrush_embossed_Resized");
-	//	}
-		
-
-	 }
-
+	static int tbrush_cnt = 0;
+	bestBrush_resized.create(brush_area_h_size, brush_area_w_size, CV_8UC3);
+	bestBrush_resized.setTo(255);
+	unsigned char * bestBrush_data_resized = (unsigned char *)bestBrush_resized.data;
+	int b_width = brush_area_w_size;
+	int b_height = brush_area_h_size;
 	int b_step1 = (int)bestBrush_resized.step1();
 	int b_channels = bestBrush_resized.channels();
 
+	 if (tbrush_cnt < 5) {
+	
+		debug_image("br/IP0_brush_gray_resized_" + m_tag + to_string(brush_no), tbrush_cnt, bestBrush_gray_resized);
+		debug_image("br/IP0_brush_embossed_resized_" + m_tag + to_string(brush_no), tbrush_cnt, bestBrush_embossed_resized);
+	 }
+
+	
 
 	int br_BGR_B, br_BGR_G, br_BGR_R;
 	Point p;
 	Scalar s_rgb,s_hsv;
 	
-	
+
 	alpha_channel.create(brush_area_w_size, brush_area_h_size, CV_8UC1);
 	alpha_channel.setTo(0);
 
@@ -145,27 +139,25 @@ int   render_::P_Rendering(//cv::Mat srcImg,
 	hsv_v.setTo(0);
 	unsigned char * hsv_v_data = hsv_v.data;
 
-	
 		int Alpha;// bestBrush_data[bIndex] /200.;
-	
-	
-
 	//g_brush_style = BRUSH_ALPHA;
+
 
 	for (int by = 0; by < brush_area_h_size; by++)
 	{
 		for (int bx = 0; bx < brush_area_w_size; bx++)
 		{
 
-			p.x = (centered_SrtPoint.x + bx);
-			p.y = (centered_SrtPoint.y + by);
-			bool c_flag = false;
+			p.x = ( bx);
+			p.y = ( by);
+		/*	bool c_flag = false;
 
 			if (p.x < 0) c_flag = true;
 			if (p.y < 0) c_flag = true;
 			if (p.x >(src_s_width - 1)) c_flag = true;
 			if (p.y >(src_s_height - 1))  c_flag = true;
 			//브러시에 색상 입히기
+			*/
 
 			int bIndex_3c = by *b_step1 + bx * b_channels;
 			int gray_bIndex_1c = by*brush_area_w_size + bx;
@@ -175,19 +167,13 @@ int   render_::P_Rendering(//cv::Mat srcImg,
 		//	if (bestBrush_data_gray[gray_bIndex] > g_brush_Ts) c_flag = true;
 
 			if (bestBrush_data_gray_resized[gray_bIndex_1c] > g_brush_Ts) {
-				c_flag = true;
+			
 				alpha_channel_data[gray_bIndex_1c] = 50;
 				continue;
 			}
-			//	
-			if (c_flag == true) {
-			//	p_poke(bestBrush_data_re, bIndex, 255, 255, 255);
-				alpha_channel_data[gray_bIndex_1c] = 99;
-				continue;
-			}
-
-			int sIndex = p.y * src_s_step1 + p.x * src_s_channels;
-			int s_canvas_Index = p.y * canvas_s_step1 + p.x * canvas_s_channels;
+			
+		//	int sIndex = p.y * src_s_step1 + p.x * src_s_channels;
+		//	int s_canvas_Index = p.y * canvas_ROI_step1 + p.x * canvas_ROI_channels;
 			if (g_brush_style == BRUSH_ALPHA) {
 				s_rgb.val[_R] = color_BGR_R;//R
 				s_rgb.val[_G] = color_BGR_G;//G
@@ -216,7 +202,7 @@ int   render_::P_Rendering(//cv::Mat srcImg,
 					br_BGR_G = bestBrush_data_resized[bIndex_3c + _BGR_G];
 					br_BGR_B = bestBrush_data_resized[bIndex_3c + _BGR_B];
 
-					p_poke(changed_canvas_data, s_canvas_Index, br_BGR_B, br_BGR_G, br_BGR_R);
+					p_poke(changed_ROI_clone_data, bIndex_3c, br_BGR_B, br_BGR_G, br_BGR_R);
 				}
 			}
 
@@ -228,12 +214,9 @@ int   render_::P_Rendering(//cv::Mat srcImg,
 				br_BGR_G = bestBrush_data_resized[bIndex_3c + _BGR_G];
 				br_BGR_B = bestBrush_data_resized[bIndex_3c + _BGR_B];
 				alpha_channel_data[gray_bIndex_1c] = 255;
-					p_poke(changed_canvas_data, s_canvas_Index, br_BGR_B, br_BGR_G, br_BGR_R);
+					p_poke(changed_ROI_clone_data, bIndex_3c, br_BGR_B, br_BGR_G, br_BGR_R);
 			}
 
-		
-
-	
 			//그리기
 			
 		}
@@ -251,11 +234,13 @@ int   render_::P_Rendering(//cv::Mat srcImg,
 
 
 	
-	int  int_result = JudgementImage(m_srcData, changed_canvas_data, before_canvas_data,
-		brush_area_w_size, brush_area_h_size, centered_SrtPoint, _fetch_color_Point,
+	int  int_result = JudgementImage(src_ROI_canvas_data, changed_ROI_clone_data, before_ROI_canvas_data,
+		brush_area_w_size, brush_area_h_size, 
+		//centered_SrtPoint, 
+		//_fetch_color_Point,
 		astroke_depth,
-		src_s_width, src_s_height, src_s_channels,
-		canvas_s_width, canvas_s_height, canvas_s_channels,
+		b_width, b_height, b_channels, b_step1,
+		canvas_ROI_width, canvas_ROI_height, canvas_ROI_channels,canvas_ROI_step1,
 		m_tag);
 
 	if (int_result == CHANGED_BETTER) {
@@ -264,8 +249,8 @@ int   render_::P_Rendering(//cv::Mat srcImg,
 			for (int bx = 0; bx < brush_area_w_size; bx++)
 			{
 
-				p.x = (centered_SrtPoint.x + bx);
-				p.y = (centered_SrtPoint.y + by);
+				p.x = ( bx);
+				p.y = ( by);
 				int gray_bIndex_1c = by*brush_area_w_size + bx;
 				int bIndex_3c = by *b_step1 + bx * b_channels;
 				//int sIndex = p.y * s_step1 + p.x * s_channels;
@@ -275,7 +260,7 @@ int   render_::P_Rendering(//cv::Mat srcImg,
 					br_BGR_R = bestBrush_data_resized[bIndex_3c + _BGR_R];
 					br_BGR_G = bestBrush_data_resized[bIndex_3c + _BGR_G];
 					br_BGR_B = bestBrush_data_resized[bIndex_3c + _BGR_B];
-					p_poke_canvas(_ing_canvas_data, p.x, p.y, br_BGR_B, br_BGR_G, br_BGR_R);
+					p_poke(ing_ROI_clone_data, bIndex_3c, br_BGR_B, br_BGR_G, br_BGR_R);
 				}
 
 			}//for x

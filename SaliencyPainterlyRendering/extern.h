@@ -20,7 +20,7 @@
 //#define BrushMaxSize 80							//1024size에는 130, 3072size에는 400으로 설정했습니다..
 //#define BrushMinSize 10
 
-//extern list<Brush> g_brush_set;
+//extern vector <Brush*> g_brush_set;
 extern int g_merge_method;
 
 extern int g_QT_avgSThreshold;
@@ -67,7 +67,7 @@ extern string g_para_method_image_path;
 extern string g_root_image_path;
 extern int g_paint_area_scale;
 extern int g_QT_method_N;//N
-extern string g_Render_method;//Union, Only
+//extern string g_Render_method;//Union, Only
 
 extern int  g_BrushNumber;							//basic:64    expansion:48
 //extern int  g_BrushMaxSize;						//1024size에는 130, 3072size에는 400으로 설정했습니다..
@@ -122,9 +122,9 @@ extern int g_src_image_step1;
 extern int g_TH;
 extern int g_ET;//positive ET=-1 negative
 
-extern string saliency_method[MAX_DEPTH];// = { "Wo","Pregraph","Itti","Residual","Blackandwhite","Fine_grained" };
-extern string _re[MAX_DEPTH];// = { "Sobel","Union","Saliency","Twopass" };
-extern string _str_mm[MAX_DEPTH];// = { "Attach","Merge" };
+extern string saliency_method[MAX_DEPTH];// = { "Pregraph","Itti","Residual","Blackandwhite","Fine_grained" };
+//extern string _re[MAX_DEPTH];// = { "Sobel","Union","Saliency","Twopass" };
+//extern string _str_mm[MAX_DEPTH];// = { "Attach","Merge" };
 extern int saliency_method_cnt;// = 6;
-extern int _re_cnt;// = 4;
-extern int _str_mm_cnt;// = 2;
+//extern int _re_cnt;// = 4;
+//extern int _str_mm_cnt;// = 2;

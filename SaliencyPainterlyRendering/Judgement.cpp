@@ -15,7 +15,7 @@ bool compareDistance(DisData a, double b);
 void TakeColorDistance(cv::Mat &testImg, list<DisData> &colorDis);
 
 bool compareDistance_rev(DisData a, double b);
-int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, list<Brush> &_brush_set)
+int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, vector <Brush*> &_brush_set)
 {
 	vector<DisData> colorDis;
 	colorDis.resize(g_BrushNumber);
@@ -27,9 +27,9 @@ int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, list<B
 	int brush_no;
 
 	int nth = 0;
-	for (list<Brush>::iterator it = _brush_set.begin(); it != _brush_set.end(); it++, nth++)
+	for (vector <Brush*>::iterator it = _brush_set.begin(); it != _brush_set.end(); it++, nth++)
 	{
-		unsigned char* indexData = (unsigned char*)(*it).brush_thumbnail.data;
+		unsigned char* indexData = (unsigned char*)(*it)->brush_thumbnail.data;
 
 		double cDis = 0;
 		for (int y = 0; y < height; y++)
@@ -57,11 +57,12 @@ int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, list<B
 //int  result = JudgementImage(srcData, changedData, beforeData, brush_area_w_size, brush_area_h_size, centered_SrtPoint,
 	//astroke_depth, s_width, s_height, s_channels);
 
-int JudgementImage(unsigned char * srcData, unsigned char * changedData_p, unsigned char * beforeData_p, 
+int JudgementImage(unsigned char * src_ROI_canvas_Data_p, unsigned char * changed_ROI_clone_Data_p, unsigned char * before_ROI_canvas_Data_p, 
 	int brush_area_w_size, int brush_area_h_size,
-	Point centered_SrtPoint, Point _fetch_color_point,
-	int astroke_depth, int s_w, int s_h, int s_c,
-	int c_w, int c_h, int c_c,
+	//Point centered_SrtPoint, Point _fetch_color_point,
+	int astroke_depth,
+	int b_w, int b_h, int b_c, int b_step1,
+	int canvas_w, int canvas_h, int canvas_c,int canvas_ROI_step1,
 	string tag)
 {
 //	unsigned char * beforeData_p = beforeImg.data;
@@ -88,46 +89,47 @@ int JudgementImage(unsigned char * srcData, unsigned char * changedData_p, unsig
 	PaintBackGround(sr_data, brush_area_w_size, brush_area_h_size, 0, 0, 0);
 
 #endif
-	int s_channel = s_c;
-	int s_height = s_h;
-	int s_width = s_w;
-	int s_step1 = s_c*s_w;
-	int s_Idx_x, s_Idx_y;
-	int c_step1 = c_c*c_w;
+//	int s_channel = s_c;
+//	int s_height = s_h;
+//	int s_width = s_w;
+//	int s_step1 = s_c*s_w;
+//	int s_Idx_x, s_Idx_y;
+	//int c_step1 = ccanvas_c*c_w;
 	for (int by = 0; by < brush_area_h_size; by++)
 	{
 		for (int bx = 0; bx < brush_area_w_size; bx++)
 		{
-			s_Idx_x = centered_SrtPoint.x + bx;
-			s_Idx_y = centered_SrtPoint.y + by;
-		
+		//	s_Idx_x = bx;
+		//	s_Idx_y = by;
+		/*
 			if (s_Idx_x < 0) continue; //skip outside of image
 			if (s_Idx_y < 0) continue;
 			if (s_Idx_y > (s_height-1)) continue;
 			if (s_Idx_x > (s_width-1)) continue;
 		
-			int s_index = (s_Idx_y) *s_step1  + (s_Idx_x ) * s_channel;
-		
-			int b_index = bx*s_channel + (by*brush_area_w_size*s_channel);
-			int c_index= (s_Idx_y)*c_step1 + (s_Idx_x)* c_c;
+			
+		*/
+			int canvas_index = (by*canvas_ROI_step1) + (bx)* canvas_c;
+			int b_index = (by*b_step1) + bx*b_c;
+		//	int c_index= (s_Idx_y)*c_step1 + (s_Idx_x)* c_c;
 			int s_0, s_1, s_2;
 			int b_0, b_1, b_2;
 			int c_0, c_1, c_2;
 
 
-			p_peek(srcData, s_index, s_0, s_1, s_2);
-			p_peek(beforeData_p, c_index, b_0, b_1, b_2);
-			p_peek(changedData_p, c_index, c_0, c_1, c_2);
+			p_peek(src_ROI_canvas_Data_p, canvas_index, s_0, s_1, s_2);
+			p_peek(before_ROI_canvas_Data_p, b_index, b_0, b_1, b_2);
+			p_peek(changed_ROI_clone_Data_p, b_index, c_0, c_1, c_2);
 #ifdef DEBUG_
 			p_poke(sr_data, b_index, s_0, s_1, s_2);
-			p_poke(ch_data, c_index, c_0, c_1, c_2);
-			p_poke(be_data, c_index, b_0, b_1, b_2);
+			p_poke(ch_data, b_index, c_0, c_1, c_2);
+			p_poke(be_data, b_index, b_0, b_1, b_2);
 
-			rectangle(sr, 
-				Point(brush_area_w_size/2 - 2, brush_area_w_size/2 - 2),
-				Point(brush_area_w_size/2 + 2, brush_area_w_size/2 + 2),
+		//	rectangle(sr, 
+		//		Point(brush_area_w_size/2 - 2, brush_area_w_size/2 - 2),
+			//	Point(brush_area_w_size/2 + 2, brush_area_w_size/2 + 2),
 
-				Scalar(0,0,255));
+			//	Scalar(0,0,255));
 #endif
 
 			src2rst += abs(s_2 - c_2)+ abs(s_1 - c_1)+ abs(s_0- c_0);
@@ -165,8 +167,8 @@ int JudgementImage(unsigned char * srcData, unsigned char * changedData_p, unsig
 
 
 
-int  JudgementBrush(cv::Mat &testImg, int depth, int width, int height,list<Brush> _brush_set)
-	/* list<Brush> &brush_set, int nBrushNumber,*/
+int  JudgementBrush(cv::Mat &testImg, int depth, int width, int height,vector <Brush*> _brush_set)
+	/* vector <Brush*> &brush_set, int nBrushNumber,*/
 //	 int stroke_no,int brush_area_w_size,int brush_area_h_size)// Point centered_SrtPoint,
 //	Point centered_EndPoint,int first_try)
 {
@@ -210,7 +212,7 @@ bool compareDistance_rev(DisData a, double b)
 	return a.distance < b ? true : false;
 }
 
-void TakeColorDistance(list<Brush> &brush, cv::Mat &testImg, list<DisData> &colorDis)
+void TakeColorDistance(vector <Brush*> &brush, cv::Mat &testImg, list<DisData> &colorDis)
 {
 	DisData newDistance;
 	unsigned char* testData = (unsigned char*)testImg.data;
@@ -218,9 +220,9 @@ void TakeColorDistance(list<Brush> &brush, cv::Mat &testImg, list<DisData> &colo
 	int height = testImg.size().height;
 
 	int nth = 0;
-	for (list<Brush>::iterator it = brush.begin(); it != brush.end(); it++, nth++)
+	for (vector <Brush*>::iterator it = brush.begin(); it != brush.end(); it++, nth++)
 	{
-		unsigned char* indexData = (unsigned char*)(*it).index_brush.data;
+		unsigned char* indexData = (unsigned char*)(*it)->index_brush.data;
 		double cDis = 0;
 		for (int y = 0; y < height; y++)
 		{
