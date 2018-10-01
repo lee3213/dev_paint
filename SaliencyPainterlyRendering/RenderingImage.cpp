@@ -266,9 +266,9 @@ int   render_::PainterlyRendering()
 				size_mismatch++;
 
 			}
-
-			uniform_int_distribution<int> dist_x(0, (int)(st_w_size));
-			uniform_int_distribution<int> dist_y(0, (int)(st_h_size));
+		
+				uniform_int_distribution<int> dist_x(0, (int)(st_w_size)-brush_area_h_size);
+				uniform_int_distribution<int> dist_y(0, (int)(st_h_size)-brush_area_h_size);
 
 			
 		

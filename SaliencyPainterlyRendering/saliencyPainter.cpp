@@ -7,7 +7,7 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-
+#define RUN_THREAD 1
 #include "debug_image.h"
 #include "use_json.h"
 #include "set_result_path.h"
@@ -535,33 +535,24 @@ int   RenderingImage(char * src_name, char * deploy_name)
 
 	p_render[0] = new thread(run_render,_render[RENDER_SOBEL]);
 
-	if (g_Render_method != "Sobel" )
-		{
+	
 		p_render[RENDER_SALIENCY] = new thread(run_render,_render[RENDER_SALIENCY]);
 		p_render[RENDER_UNION] = new thread(run_render,_render[RENDER_UNION]);
-	}
-
-	cout << "p_sobel    : " << p_render[RENDER_SOBEL]->get_id() << endl;
-
-	if (g_Render_method != "Sobel") {
-		cout << "p_saliency : " << p_render[RENDER_SALIENCY]->get_id() << endl;
-	cout << "p_union    : " << p_render[RENDER_UNION]->get_id() << endl;
-	}
-
 	
-	std::cout << "Number of threads = "+ g_Render_method
+	cout << "p_sobel    : " << p_render[RENDER_SOBEL]->get_id() << endl;
+	cout << "p_saliency : " << p_render[RENDER_SALIENCY]->get_id() << endl;
+	cout << "p_union    : " << p_render[RENDER_UNION]->get_id() << endl;
+	
+	
+	std::cout << "Number of threads = " 
 		<< std::thread::hardware_concurrency() << std::endl;
 	
 
-	p_render[RENDER_SOBEL]->join();
-	
 
-	if (g_Render_method != "Sobel" ){
+		p_render[RENDER_SOBEL]->join();
 		p_render[RENDER_SALIENCY]->join();
 		p_render[RENDER_UNION]->join();
-	}
 	
-	if (g_Render_method == "Twopass") {
 		
 		p_render[RENDER_TWOPASS_ATTACH] = new thread(run_render, _render[RENDER_TWOPASS_ATTACH]);
 		cout << "p_twopass  ATTACH: " << p_render[RENDER_TWOPASS_ATTACH]->get_id() << endl;
@@ -571,18 +562,12 @@ int   RenderingImage(char * src_name, char * deploy_name)
 			<< std::thread::hardware_concurrency() << std::endl;
 		p_render[RENDER_TWOPASS_ATTACH]->join();
 		p_render[RENDER_TWOPASS_MERGE]->join();
-	}
 	
-	_render[RENDER_SOBEL]->post_process();
-	
-	if (g_Render_method != "Sobel"){
+			_render[RENDER_SOBEL]->post_process();
 			_render[RENDER_SALIENCY]->post_process();
 			_render[RENDER_UNION]->post_process();
-		}
-	if (g_Render_method == "Twopass" ){
 			_render[RENDER_TWOPASS_MERGE]->post_process();
 			_render[RENDER_TWOPASS_ATTACH]->post_process();
-		}
 		
 #endif
 	time(&e_time);
