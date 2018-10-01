@@ -458,8 +458,10 @@ int render_::prepare() {
 		k_depth = 0;
 		for (int i = 0; i < render_saliency->mm_depth; i++) {
 			//cout << "astroke.size()= " + m_tag << ", " << mm_aStroke_set[i].size() << endl;
-
+			int mod = 0;
 			for (list<Img_node*>::iterator St_it = stroke_set_saliency[i]->begin(); St_it != stroke_set_saliency[i]->end(); St_it++) {
+				mod++;
+				//if ((mod % 2) == 0) continue;
 				if (render_method == RENDER_TWOPASS_MERGE)
 					k_depth = (*St_it)->depth;
 				else {

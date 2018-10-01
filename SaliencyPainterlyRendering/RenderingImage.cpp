@@ -247,8 +247,8 @@ int   render_::PainterlyRendering()
 
 			brush_area_h_size = brush_size[astroke_depth];// brush size(painting area) per each depth
 			brush_area_w_size = brush_size[astroke_depth];// brush size(painting area) per each depth
-			int brush_area_h_size_half = brush_area_h_size / 2;
-			int brush_area_w_size_half = brush_area_w_size / 2;
+			int brush_area_h_size_half = brush_area_h_size / 2+brush_area_h_size%2;
+			int brush_area_w_size_half = brush_area_w_size / 2 + brush_area_w_size % 2;
 
 
 			 paint_area_brush_count = (st_w_size * st_h_size *g_paint_area_scale) /
@@ -267,10 +267,11 @@ int   render_::PainterlyRendering()
 
 			}
 		
-				uniform_int_distribution<int> dist_x(0, (int)(st_w_size)-brush_area_h_size);
-				uniform_int_distribution<int> dist_y(0, (int)(st_h_size)-brush_area_h_size);
-
-			
+				uniform_int_distribution<int> dist_x(0, (int)(st_w_size));
+				uniform_int_distribution<int> dist_y(0, (int)(st_h_size));
+				uniform_int_distribution<int> dist_x_0(0, (int)(st_w_size)-brush_area_w_size_half);
+				uniform_int_distribution<int> dist_y_0(0, (int)(st_h_size)-brush_area_w_size_half);
+				
 		
 			for (int painting_count = 0; painting_count < paint_area_brush_count; painting_count++)
 			{
@@ -310,8 +311,9 @@ int   render_::PainterlyRendering()
 
 				centered_SrtPoint.x = fetch_color_Point.x - brush_area_w_size_half;
 				centered_SrtPoint.y = fetch_color_Point.y - brush_area_h_size_half;
-				centered_EndPoint.x = fetch_color_Point.x + brush_area_w_size_half;
-				centered_EndPoint.y = fetch_color_Point.y + brush_area_h_size_half;
+
+				centered_EndPoint.x = fetch_color_Point.x +(brush_area_w_size-brush_area_w_size_half);
+				centered_EndPoint.y = fetch_color_Point.y +(brush_area_h_size-brush_area_h_size_half);
 
 			//	modified = FixToInside(fetch_color_Point, St_srtPoint, St_endPoint, image_width, image_height, brush_area_h_size);
 			//	if (modified) {
@@ -394,7 +396,7 @@ int   render_::PainterlyRendering()
 		strftime(s_buff, 20, "%Y-%m-%d %H:%M:%S",&t_s );
 		char e_buff[20];
 		strftime(e_buff, 20, "%Y-%m-%d %H:%M:%S",&t_e );
-		cout << m_tag << " :: d "<<setw(3)<<uu<<" ,size "<< mm_aStroke_set[uu].size()<<
+		cout << setw(15)<<m_tag << " :: d "<<setw(3)<<uu<<" ,size "<< setw(5) << mm_aStroke_set[uu].size()<<
 			"  "<< setw(4)<<paint_area_brush_count<<
 			" " << s_buff << " : " << e_buff << endl;
 		clog << m_tag << " ," << setw(3) << uu << " ,size, " << mm_aStroke_set[uu].size() <<
@@ -432,7 +434,7 @@ int   render_::PainterlyRendering()
 	strftime(s_buff, 20, "%Y-%m-%d %H:%M:%S", &t_s);
 	char e_buff[20];
 	strftime(e_buff, 20, "%Y-%m-%d %H:%M:%S", &t_e);
-	cout << m_tag<<"-->"<<s_buff << " : "<<e_buff << endl;
+	cout << setw(15) << m_tag<<"-->"<<s_buff << " : "<<e_buff << endl;
 	clog << "R End, "<<m_tag << "," << s_buff << "," << e_buff << endl;
 		return 0;
 
