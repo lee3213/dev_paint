@@ -433,7 +433,7 @@ int   render_::PainterlyRendering()
 	char e_buff[20];
 	strftime(e_buff, 20, "%Y-%m-%d %H:%M:%S", &t_e);
 	cout << m_tag<<"-->"<<s_buff << " : "<<e_buff << endl;
-	clog << "R End, "<<m_tag << "," << s_buff << "," << e_buff << endl;
+	clog << m_tag << "," << s_buff << "," << e_buff << endl;
 		return 0;
 
 }

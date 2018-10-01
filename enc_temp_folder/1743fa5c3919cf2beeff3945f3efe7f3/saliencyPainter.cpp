@@ -497,7 +497,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 		localtime_s(&s_t_e, &s_e_time);
 		strftime(s_e_buff, 20, "%Y-%m-%d %H:%M:%S", &s_t_e);
 		cout << "saliency End " << s_s_buff << " : " << s_e_buff << endl;
-		clog << "saliency End, " << s_s_buff << "," << s_e_buff << endl;
+		clog << "saliency End " << s_s_buff << "," << s_e_buff << endl;
 	_render[RENDER_TWOPASS_ATTACH]->add_render(_render[0], _render[1]);
 	_render[RENDER_TWOPASS_MERGE]->add_render(_render[0], _render[1]);
 	for (int i = 0; i < RENDER_MAX; i++) {
@@ -517,8 +517,8 @@ int   RenderingImage(char * src_name, char * deploy_name)
 		time(&p_e_time);
 		localtime_s(&p_t_e, &p_e_time);
 		strftime(p_e_buff, 20, "%Y-%m-%d %H:%M:%S", &p_t_e);
-		cout << "Prepare End " << _render[i]->m_tag <<p_s_buff << " : " << p_e_buff << endl;
-		clog << "Prepare End, " << _render[i]->m_tag << p_s_buff << ", " << p_e_buff << endl;
+		cout << "Prepare End " << p_s_buff << " : " << p_e_buff << endl;
+		clog << "Prepare End, " << p_s_buff << ", " << p_e_buff << endl;
 	}
 #ifndef RUN_THREAD	
 	for (int i = 0; i < RENDER_MAX; i++) {
