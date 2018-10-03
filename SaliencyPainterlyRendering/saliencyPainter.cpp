@@ -41,6 +41,42 @@ string _tag[] = { "_0_sobel", "_1_saliency", "_2_union", "_3_twopass","_4_twopas
 
 
 
+cv::Mat get_canny_map(Mat & srcImg) {
+	cv::Mat gray_Map;
+	cv::Mat org_Gaussian_Map;
+	cv::Mat canny_map;
+	//Take GradientImg from source Image
+	static int called = 0;
+	cv::cvtColor(srcImg, gray_Map, CV_BGR2GRAY);							//3ch -> 1ch
+																			//f_path = cv::format("%s/src_1ch.ppm", g_para_method_path.c_str());
+																			//cv::imwrite(f_path, gray_Map);
+//	debug_image("src_1ch" + to_string(called), gray_Map);
+	int gray_map_width = gray_Map.size().width;
+	int gray_map_height = gray_Map.size().height;
+
+	//	org_Gaussian_Map = bsShowImage::TakeGaussianBlurImg(gray_Map);
+
+	cv::GaussianBlur(gray_Map, org_Gaussian_Map, Size(3, 3), 0);
+//	debug_image("src_take_blur" + to_string(called), org_Gaussian_Map);
+	int ddepth = CV_16S;
+	//org_sobeldient_Map = bsShowImage::TakeGradient(org_Gaussian_Map);
+
+	cv::Mat grad_x, grad_y, abs_sobeld_x, abs_sobeld_y;
+
+	cv::Canny(org_Gaussian_Map, canny_map, 50, 100, 3);
+	debug_image("canny_1.jpg", canny_map);
+	mat_print(canny_map, "canny_map");
+	//cv::convertScaleAbs(grad_x, abs_sobeld_x);
+	//debug_image("canny_2.jpg", abs_sobeld_x);
+	/// Gradient Y
+	//Scharr( src_gray, grad_y, ddepth, 0, 1, scale, delta, BORDER_DEFAULT );
+
+	/// Total Gradient (approximate)
+	//cv::addWeighted(abs_sobeld_x, 0.5, abs_sobeld_y, 0.5, 0, canny_map);
+	debug_image("canny_3.jpg", canny_map);
+	called++;
+	return canny_map;
+}
 
 
 cv::Mat get_sobel_map(Mat & srcImg) {
@@ -364,7 +400,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 	}
 
 	debug_image("0_sobel_gradient", sobel_8UC1);
-
+	Mat canny_map = get_canny_map(x_srcImg);
 	//if (g_Render_method != "Sobel") {
 		cv::cvtColor(sobel_8UC1, sobel_8UC3, CV_GRAY2RGB);
 	
@@ -465,6 +501,18 @@ int   RenderingImage(char * src_name, char * deploy_name)
 				saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
 				gradient_Map_G = saliency_8UC1;
 		//	}
+		}
+		else if (g_saliency_method == string("Perazzi")) {
+
+			saliency_32F = saliency_Perazzi_main(x_srcImg);
+			saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
+			gradient_Map_C = saliency_8UC1;
+			//	if (g_Render_method != "Saliency") {
+			saliency_32F = preGraph_main(sobel_8UC3);
+			saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
+			gradient_Map_G = saliency_8UC1;
+			//	}
+
 		}
 
 		else {

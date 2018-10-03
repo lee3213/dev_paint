@@ -29,7 +29,7 @@ Mat preGraph_main(Mat &srcImg)
 	//cout << sal;
 	Mat salMap = SpMat.Sal2Img(superpixels, sal);
 	Mat tmpsuperpixels;
-	debug_image("superpixel", salMap);
+	debug_image("saliency/superpixel", salMap);
 	//normalize(salMap, tmpsuperpixels, 255.0, 0.0, NORM_MINMAX);
 	mat_print(salMap,"sal_map");
 	//tmpsuperpixels.convertTo(tmpsuperpixels, CV_8UC3, 1.0);

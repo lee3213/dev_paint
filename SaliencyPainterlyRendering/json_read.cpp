@@ -48,7 +48,7 @@ int  json_deployment(string path) {
 	g_QT_avgSThreshold =root.get("QT_avgSThreshold",23).asInt();
 	g_BrushMinSize = root.get("g_BrushMinSize", 10).asInt();
 	g_saliency_method = root.get("g_saliency_method", "wo").asString();
-	g_brush_Ts = root.get("g_brush_Ts", 230).asInt();
+	g_brush_Ts = root.get("g_Ts", 230).asInt();
 	
 	g_paint_method = root.get("g_paint_method", "copy").asString();
 	g_paint_area_scale = root.get("g_paint_area_scale", 8).asInt();

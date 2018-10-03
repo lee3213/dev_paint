@@ -9,7 +9,7 @@ using namespace std;
 #include "debug_image.h"
 
 char bsShowImage::key = -1;
-
+/*
 void bsShowImage::show(const char* winname, const cv::Mat& img, int delay)
 {
 	imshow(winname, img);
@@ -17,7 +17,7 @@ void bsShowImage::show(const char* winname, const cv::Mat& img, int delay)
 	if (ch != -1)
 		key = ch;
 }
-
+*/
 void bsShowImage::save(const char* winname, const cv::Mat& img, int delay)
 {
 	imwrite(winname, img);
