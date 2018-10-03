@@ -56,18 +56,20 @@ int  set_global(string src_name,string deploy_name) {
 
 	 g_para = string("s") + to_string(g_QT_avgSThreshold) + "d" + to_string(g_depth_limit)
 	+"g" + to_string(g_min_gridsize) + "_b" + to_string(g_BrushMinSize) + 
-		 "_N" + to_string(g_QT_method_N)+"_ps"+to_string(g_paint_area_scale);
+		 "_N" + to_string(g_QT_method_N)+"_ps"+to_string(g_paint_area_scale)+"_ts"+to_string(g_brush_Ts)
+		 + "_gs" + to_string(g_merge_skip_count);
 
 	 cout << "g_para " << g_para << endl;
 
 	g_para_method = g_para + "_m" + g_saliency_method + "_" //+ g_Render_method +
-		+"_p" + g_paint_method//+"_q"+to_string(g_merge_method)
-		+"_gs"+to_string(g_merge_skip_count);
+	//	+"_p" + g_paint_method//+"_q"+to_string(g_merge_method)
+		;
 
 	g_para_path = g_root_path + string("/") + g_para;
 	g_para_method_path = g_root_path + string("/") + g_para + "/" + g_para_method;
 	g_para_method_image_path = g_para_method_path + "/" + g_image_name;
 	g_root_image_path = g_root_path + "/" + g_image_name;
+
 	cout << "g_para_method [" << g_para_method << "]"<<endl;										 //	g_win_path = g_root_path_win + string("\\") + g_method + string("\\") + g_image_name;
 	cout << "g_para_path [" << g_para_path <<"]"<< endl;
 	cout << "g_image_path [" << g_root_image_path << "]" << endl;

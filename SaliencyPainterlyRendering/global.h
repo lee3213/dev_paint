@@ -118,7 +118,7 @@ int g_TH = 240;
 int g_ET = 1;//positive ET=-1 negative
 int g_merge_skip_count;
 
-string saliency_method[] = {"Pregraph","Itti","Residual","Blackandwhite","Fine_grained" };
+string saliency_method[] = { "Itti","Pregraph","Residual","Blackandwhite","Fine_grained" };
 //string _re[MAX_DEPTH] = { "Sobel","Saliency","Twopass" };
 //string _str_mm[MAX_DEPTH] = { "Attach","Merge" };
 

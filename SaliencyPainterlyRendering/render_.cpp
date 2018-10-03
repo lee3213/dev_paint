@@ -88,7 +88,7 @@ int stroke_dump(list<Img_node*> *_aStroke_set, string tag,  int  depth) {
 	}
 	return depth;
 }
-int draw_grid_2(Mat _Quad_TreeMap,
+int render_::draw_grid_2(Mat _Quad_TreeMap,
 	list<Img_node*> aStroke_set[], string ftag, int  depth, int draw_depth, int c,string _tag) {
 	int __saved_depth = -1;
 	Mat overlay_grid_map[MAX_DEPTH];
@@ -111,8 +111,8 @@ int draw_grid_2(Mat _Quad_TreeMap,
 			__saved_depth = (*St_it)->depth;
 
 			if (draw_depth == -1 || __saved_depth == draw_depth)
-				cv::rectangle(overlay_grid_map[__saved_depth], Rect((*St_it)->info.srtPoint,
-				(*St_it)->info.endPoint), RGB(c, c, c));
+			rectangle_canvas(overlay_grid_map[__saved_depth], Rect((*St_it)->info.srtPoint,
+				(*St_it)->info.endPoint), Scalar(c, c, c));
 
 		}//end of QuadTree dump
 	}// for depth

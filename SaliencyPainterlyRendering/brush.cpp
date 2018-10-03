@@ -26,43 +26,66 @@ int BrushInitialization(vector <Brush*> &_brush_set,int _brush_depth,int brush_s
 	
 #endif
 	int nth;
-	static bool run_once = true;
+	static bool run_once = false;
 	cv::Mat brush_cr, brush_th;
 	string f_name;
-	//Mat b160x160;
-	//b160x160.create(160, 160, CV_8UC1);
+	
 	int bsize_w, bsize_h;
 	Size sz;
 	
 
 	
-	//	unsigned char * s;
-	//unsigned char *d;
 
-	
 	nth = 0;
 	Mat brush_gray;
+	Mat *brush_gray_x[4];
+
 	string fname;
 	Brush *__brush;
 	int b_step1, b_channels;
 	int s_step1, s_channels;
 
-
+	_brush_set.reserve(g_BrushNumber);
 	for (; nth < g_BrushNumber; nth++)	{
-		
+		string f_path = "/render/brush/mask/";
 
-		fname = cv::format("/render/brush/mask/%02d.jpg", nth + 1);
+		string fn = cv::format("%02d.jpg",nth + 1);
+		fname = f_path + fn;
+		//	fname = cv::format("/render/brush/mask/%02d.jpg", nth + 1);
 		temp_brush = imread(fname.c_str(), IMREAD_COLOR);
 
-		unsigned char * temp_brush_data = temp_brush.data;
-		bsize_w = temp_brush.size().width;
-		bsize_h = temp_brush.size().height;
-		s_step1=b_step1 = (int)temp_brush.step1();
-		s_channels=b_channels = temp_brush.channels();
+		
 		if (temp_brush.size().width == 0 || temp_brush.size().height == 0)
 		{
 			cout << fname << endl;
-			return -9998;
+			continue;
+		}
+		int _brush_Ts[] = { 100,150,200,230 };
+		unsigned char * temp_brush_data = temp_brush.data;
+		bsize_w = temp_brush.size().width;
+		bsize_h = temp_brush.size().height;
+		s_step1 = b_step1 = (int)temp_brush.step1();
+		s_channels = b_channels = temp_brush.channels();
+		unsigned char * brush_gray_x_data[4];
+
+		if (run_once) {
+			for (int i = 0; i < 4; i++) {
+				brush_gray_x[i] = new Mat(bsize_h, bsize_w, CV_8UC3);
+				brush_gray_x_data[i] = brush_gray_x[i]->data;
+
+				for (int y = 0; y < bsize_h; y++)
+				{
+					for (int x = 0; x < bsize_w; x++) {
+						int pos = y*s_step1 + x*s_channels;
+						if (temp_brush_data[pos] > _brush_Ts[i]) {
+							brush_gray_x_data[i][pos] = 255;
+							brush_gray_x_data[i][pos + 1] = 255;
+							brush_gray_x_data[i][pos + 2] = 255;
+						}
+					}
+				}
+				debug_image(string("/br/g_") + fn+to_string(i), *brush_gray_x[i]);
+			}
 		}
 		 cv::cvtColor(temp_brush, brush_gray, COLOR_RGB2GRAY);
 		
@@ -97,7 +120,7 @@ int BrushInitialization(vector <Brush*> &_brush_set,int _brush_depth,int brush_s
 		if (temp_thumbnail.size().width == 0 ||
 			temp_thumbnail.size().height == 0) {
 			cout << "thumbnail file error " << " : " << nth + 1 << endl;
-			return -9998;
+			continue;
 		}
 		
 		int t_size=g_brush_thumbnail_size= temp_thumbnail.size().width;
@@ -262,10 +285,11 @@ int BrushInitialization(vector <Brush*> &_brush_set,int _brush_depth,int brush_s
 					*/
 				}//for color_B
 				debug_image("br2/alpha_channel_" + to_string(color_BGR_B), nth, alpha_channel);
-				run_once = false;
+				
 			}//run once
 			}//if > 0
 		//mat_print(temp_thumbnail,"temp_thumbnail");
+			
 #ifdef DEBUG_BRUSH_IMAGE
 		if (nth == 0)
 		{
@@ -307,7 +331,7 @@ int BrushInitialization(vector <Brush*> &_brush_set,int _brush_depth,int brush_s
 	//	delete brush_accumulation_map;
 	}//for nth
 	
-	
+	run_once = false;
 #ifdef DEBUG_BRUSH_IMAGE
 	if (debug_image_mask != nullptr)
 		debug_image_mask->image_final();

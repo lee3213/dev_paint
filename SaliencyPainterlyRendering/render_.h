@@ -91,7 +91,8 @@ public:
 		render_saliency = _saliency_render;
 	};
 	//void  render_::p_peek_canvas(unsigned char * p, int p_x, int p_y, int &p_0, int &p_1, int &p_2);
-
+	int draw_grid_2(Mat _Quad_TreeMap,
+		list<Img_node*> aStroke_set[], string ftag, int  depth, int draw_depth, int c, string _tag);
 	int render_::calc_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth,
 		int _brush_size[], string tag);
 	int   render_::P_Rendering(//cv::Mat srcImg,

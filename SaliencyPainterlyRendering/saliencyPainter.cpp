@@ -520,6 +520,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 		cout << "Prepare End " << _render[i]->m_tag <<p_s_buff << " : " << p_e_buff << endl;
 		clog << "Prepare End, " << _render[i]->m_tag << p_s_buff << ", " << p_e_buff << endl;
 	}
+	//return -997788;
 #ifndef RUN_THREAD	
 	for (int i = 0; i < RENDER_MAX; i++) {
 		//for (int j = 0; j<_render[i]->mm_depth; j++){
