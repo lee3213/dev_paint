@@ -303,13 +303,6 @@ void DeleteAllFiles(string folderPath)
 }
 
 
-//create_batch(string("..\\x64\\Debug\\SaliencyPainterlyRendering"), string("\\render\\deployment"), string("\\render\\method"), string("source(512)"), string(".\\src"), string("_render.bat"));
-//create_batch(string("\\render\\deployment"), string("\\render\\method"), string("\\render\\batch"),
-	//string("..\\..\\x64\\Debug\\SaliencyPainterlyRendering"), string(".\\render\\deployment"), string(".\\render\\method"), string("\\render\\src"), string("source(512)"), string("_render.bat"));
-//create_batch_a(
-	//exe_path, deploy_folderPath, batch_dir + string("\\") + deploy_folderPath, image_file_path + "\\" + img_fname + string(".ppm"), img_fname + fname);
-
-
 /*
 
 

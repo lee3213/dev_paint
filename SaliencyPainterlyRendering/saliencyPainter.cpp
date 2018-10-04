@@ -287,7 +287,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 	tm t_s, t_e;
 	time(&s_time);
 	localtime_s(&t_s, &s_time);
-	
+
 	char s_buff[20];
 	strftime(s_buff, 20, "%Y-%m-%d %H:%M:%S", &t_s);
 	char e_buff[20];
@@ -302,23 +302,23 @@ int   RenderingImage(char * src_name, char * deploy_name)
 	Mat sobel_8UC3;
 	Mat gradient_Union;
 
-/*	Mat saliency_finegrained_C;
-	Mat saliency_pregraph_C;
-	Mat saliency_blackandwhite_C;
-	Mat saliency_residual_C;
-	Mat saliency_itti_C;
+	/*	Mat saliency_finegrained_C;
+		Mat saliency_pregraph_C;
+		Mat saliency_blackandwhite_C;
+		Mat saliency_residual_C;
+		Mat saliency_itti_C;
 
-	Mat saliency_finegrained_G;
-	Mat saliency_pregraph_G;
-	Mat saliency_blackandwhite_G;
-	Mat saliency_residual_G;
-	Mat saliency_itti_G;
+		Mat saliency_finegrained_G;
+		Mat saliency_pregraph_G;
+		Mat saliency_blackandwhite_G;
+		Mat saliency_residual_G;
+		Mat saliency_itti_G;
 
-	int get_depth_saliency;
-	int get_depth_twopass;
-	int get_depth_sobel;
-	int get_depth_union;
-*/
+		int get_depth_saliency;
+		int get_depth_twopass;
+		int get_depth_sobel;
+		int get_depth_union;
+	*/
 	int saved_depth = -1;
 
 
@@ -334,7 +334,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 		cout << "Src " << src_name << " size 0" << endl;
 		return -100;
 	}
-	/* ROI test 
+	/* ROI test
 	Mat clone = x_srcImg.clone();
 	Point Point_LT, Point_RB;
 	Point_LT.x = 0;
@@ -371,7 +371,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 
 	debug_image("src_image", x_srcImg);
 	for (int i = 0; i < RENDER_MAX; i++) {
-		_render[i] = new  render_(i,tag[i], tag_[i], _tag[i], x_srcImg);
+		_render[i] = new  render_(i, tag[i], tag_[i], _tag[i], x_srcImg);
 	}
 
 	//Brush initialization
@@ -381,7 +381,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 
 
 	cout << "Saliency Method " << g_saliency_method << endl;
-//	cout << "g_Render_method " << g_Render_method << endl;
+	//	cout << "g_Render_method " << g_Render_method << endl;
 	time_t s_s_time, s_e_time;
 	tm s_t_s, s_t_e;
 	time(&s_s_time);
@@ -400,93 +400,98 @@ int   RenderingImage(char * src_name, char * deploy_name)
 	}
 
 	debug_image("0_sobel_gradient", sobel_8UC1);
+#ifdef CANNY
 	Mat canny_map = get_canny_map(x_srcImg);
-	//if (g_Render_method != "Sobel") {
-		cv::cvtColor(sobel_8UC1, sobel_8UC3, CV_GRAY2RGB);
-	
-		Mat saliency_8UC1;
-		//Mat saliency_8UC3;
-		Mat saliency_32F;
-	/*
-		Mat sa;
+#endif
+
+	cv::cvtColor(sobel_8UC1, sobel_8UC3, CV_GRAY2RGB);
+
+	Mat saliency_8UC1;
+
+	Mat saliency_32F;
+
+#ifdef BING
+	Mat sa;
 	//	if (g_saliency_method == string("ObjectnessBING")) {
-	
-		Mat saliency_Objectness_C, saliency_Objectness_G;
-		string training_path = "/render/ObjectnessTrainedModel";
-			//Mat saliency_residual_8UC1;
-			Ptr<ObjectnessBING> saliencyAlgorithm_O = ObjectnessBING::create();
-			//saliencyAlgorithm = ObjectnessBING::create();
-			vector<Vec4i> saliencyMap;
-			saliencyAlgorithm_O.dynamicCast<ObjectnessBING>()->setTrainingPath(training_path);
-			saliencyAlgorithm_O.dynamicCast<ObjectnessBING>()->setBBResDir("/rst/Results");
-			sa = saliencyAlgorithm_O->computeSaliency(x_srcImg, saliencyMap);
-			
-			int ndet = int(saliencyMap.size());//int(sa_size);
-			int maxd = 7, step = 255 / maxd, jitter = 9; // jitter to seperate single rects
-			Mat draw = x_srcImg.clone();
-			for (int i = 0; i < std::min(maxd, ndet); i++) {
-				Vec4i bb = saliencyMap[i];
-				Scalar col = Scalar(((i*step) % 255), 50, 255 - ((i*step) % 255));
-				Point off(theRNG().uniform(-jitter, jitter), theRNG().uniform(-jitter, jitter));
-				rectangle(draw, Point(bb[0] + off.x, bb[1] + off.y), Point(bb[2] + off.x, bb[3] + off.y), col, 2);
-				rectangle(draw, Rect(20, 20 + i * 10, 10, 10), col, -1); // mini temperature scale
-				debug_image("BING_"+to_string(i), draw);
-			}
-			
-			Mat mag1u, mag1u_rgb, mag1u_hsv;
-			gradientGray(x_srcImg, mag1u);
-			debug_image("BING_g_Gray", mag1u);
-			gradientRGB(x_srcImg, mag1u_rgb);
-			debug_image("BING_g_RGB", mag1u_rgb);
-			gradientHSV(x_srcImg, mag1u_hsv);
-			debug_image("BING_g_HSV", mag1u_hsv);
-			*/
-	
-			
-		if (g_saliency_method == string("Residual")) {
+
+	Mat saliency_Objectness_C, saliency_Objectness_G;
+	string training_path = "/render/ObjectnessTrainedModel";
+	//Mat saliency_residual_8UC1;
+	Ptr<ObjectnessBING> saliencyAlgorithm_O = ObjectnessBING::create();
+	//saliencyAlgorithm = ObjectnessBING::create();
+	vector<Vec4i> saliencyMap;
+	saliencyAlgorithm_O.dynamicCast<ObjectnessBING>()->setTrainingPath(training_path);
+	saliencyAlgorithm_O.dynamicCast<ObjectnessBING>()->setBBResDir("/rst/Results");
+	sa = saliencyAlgorithm_O->computeSaliency(x_srcImg, saliencyMap);
+
+	int ndet = int(saliencyMap.size());//int(sa_size);
+	int maxd = 7, step = 255 / maxd, jitter = 9; // jitter to seperate single rects
+	Mat draw = x_srcImg.clone();
+	for (int i = 0; i < std::min(maxd, ndet); i++) {
+		Vec4i bb = saliencyMap[i];
+		Scalar col = Scalar(((i*step) % 255), 50, 255 - ((i*step) % 255));
+		Point off(theRNG().uniform(-jitter, jitter), theRNG().uniform(-jitter, jitter));
+		rectangle(draw, Point(bb[0] + off.x, bb[1] + off.y), Point(bb[2] + off.x, bb[3] + off.y), col, 2);
+		rectangle(draw, Rect(20, 20 + i * 10, 10, 10), col, -1); // mini temperature scale
+		debug_image("BING_" + to_string(i), draw);
+	}
+
+	Mat mag1u, mag1u_rgb, mag1u_hsv;
+	gradientGray(x_srcImg, mag1u);
+	debug_image("BING_g_Gray", mag1u);
+	gradientRGB(x_srcImg, mag1u_rgb);
+	debug_image("BING_g_RGB", mag1u_rgb);
+	gradientHSV(x_srcImg, mag1u_hsv);
+	debug_image("BING_g_HSV", mag1u_hsv);
+	*/
+
+#endif		
+		if (g_saliency_method == string("Sobel")) {
+		}
+		else if (g_saliency_method == string("Residual")) {
 
 			//Mat saliency_residual_8UC1;
 			Ptr<StaticSaliencySpectralResidual> saliencyAlgorithm = StaticSaliencySpectralResidual::create();
 			saliencyAlgorithm->computeSaliency(x_srcImg, saliency_8UC1);
-		//	mat_print(saliency_8UC1, "Residual");
-			gradient_Map_C =  saliency_8UC1.clone();
-		//	if (g_Render_method != "Saliency") {
-				saliencyAlgorithm->computeSaliency(sobel_8UC3, saliency_8UC1);
-				gradient_Map_G = saliency_8UC1.clone();
-		//	}
+			//	mat_print(saliency_8UC1, "Residual");
+			gradient_Map_C = saliency_8UC1.clone();
+			//	if (g_Render_method != "Saliency") {
+			saliencyAlgorithm->computeSaliency(sobel_8UC3, saliency_8UC1);
+			gradient_Map_G = saliency_8UC1.clone();
+			//	}
 
 		}
 		else if (g_saliency_method == string("Fine_grained")) {
 			//	Mat saliency_finegrained_8UC1;
 			Ptr<StaticSaliencyFineGrained> saliencyAlgorithmG = StaticSaliencyFineGrained::create();
 			saliencyAlgorithmG->computeSaliency(x_srcImg, saliency_8UC1);
-			gradient_Map_C =  saliency_8UC1.clone();
-		//	if (g_Render_method != "Saliency") {
-				saliencyAlgorithmG->computeSaliency(sobel_8UC3, saliency_8UC1);
-				gradient_Map_G = saliency_8UC1.clone();
-		//	}
+			gradient_Map_C = saliency_8UC1.clone();
+			//	if (g_Render_method != "Saliency") {
+			saliencyAlgorithmG->computeSaliency(sobel_8UC3, saliency_8UC1);
+			gradient_Map_G = saliency_8UC1.clone();
+			//	}
 
 		}
 		else if (g_saliency_method == string("Blackandwhite")) {
 
 			//Mat saliency_blackandwhite_8UC1;
 			saliency_8UC1 = saliency_blackandwhite_main(x_srcImg);
-			gradient_Map_C =  saliency_8UC1.clone();
-		//	if (g_Render_method != "Saliency") {
-				saliency_8UC1 = saliency_blackandwhite_main(sobel_8UC3);
-				gradient_Map_G = saliency_8UC1.clone();
-		//	}
-			}
+			gradient_Map_C = saliency_8UC1.clone();
+			//	if (g_Render_method != "Saliency") {
+			saliency_8UC1 = saliency_blackandwhite_main(sobel_8UC3);
+			gradient_Map_G = saliency_8UC1.clone();
+			//	}
+		}
 		else if (g_saliency_method == string("Pregraph")) {
 
 			saliency_32F = preGraph_main(x_srcImg);
 			saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-			gradient_Map_C =  saliency_8UC1.clone();
-		//	if (g_Render_method != "Saliency") {
-				saliency_32F = preGraph_main(sobel_8UC3);
-				saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-				gradient_Map_G = saliency_8UC1.clone();
-		//	}
+			gradient_Map_C = saliency_8UC1.clone();
+			//	if (g_Render_method != "Saliency") {
+			saliency_32F = preGraph_main(sobel_8UC3);
+			saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
+			gradient_Map_G = saliency_8UC1.clone();
+			//	}
 
 		}
 		else if (g_saliency_method == string("Itti")
@@ -495,12 +500,12 @@ int   RenderingImage(char * src_name, char * deploy_name)
 
 			saliency_32F = saliency_itti_main(x_srcImg, "C");
 			saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-			gradient_Map_C =  saliency_8UC1.clone();
-		//	if (g_Render_method != "Saliency") {
-				saliency_32F = saliency_itti_main(sobel_8UC3, "G");
-				saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-				gradient_Map_G = saliency_8UC1.clone();
-		//	}
+			gradient_Map_C = saliency_8UC1.clone();
+			//	if (g_Render_method != "Saliency") {
+			saliency_32F = saliency_itti_main(sobel_8UC3, "G");
+			saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
+			gradient_Map_G = saliency_8UC1.clone();
+			//	}
 		}
 		else if (g_saliency_method == string("Perazzi")) {
 
@@ -519,79 +524,88 @@ int   RenderingImage(char * src_name, char * deploy_name)
 			cout << "No Saliency method assigned" << endl;
 			return -1;
 		}
-
-		debug_image("0_Saliency_C_" + g_saliency_method, gradient_Map_C);
-		//if (g_Render_method != "Sobel") {
+		_render[RENDER_SOBEL]->add_gradient_map(Gradient_Sobel, sobel_8UC1);
+		if (g_saliency_method != string("Sobel")) {
+	
+			debug_image("0_Saliency_C_" + g_saliency_method, gradient_Map_C);
+			//if (g_Render_method != "Sobel") {
 			debug_image("0_Saliency_G_sobel", gradient_Map_G);
 			gradient_Union = saliency_union(gradient_Map_C, gradient_Map_G);
 			debug_image("0_Saliency_union_gra(sobel)_gra(" + g_saliency_method + ")", gradient_Union);
-		//}
+			//}
 
-			//return -12345;
-		_render[RENDER_SOBEL]->add_gradient_map(Gradient_Sobel, sobel_8UC1);
 
-		for(int i=RENDER_SALIENCY;i<RENDER_MAX;i++){
-			_render[i]->add_gradient_map(Gradient_Sobel, sobel_8UC1);
-			_render[i]->add_gradient_map(Gradient_Saliency_C,gradient_Map_C);
-		//	if (g_Render_method != "Sobel") {
+			for (int i = RENDER_SALIENCY; i < RENDER_MAX; i++) {
+				_render[i]->add_gradient_map(Gradient_Sobel, sobel_8UC1);
+				_render[i]->add_gradient_map(Gradient_Saliency_C, gradient_Map_C);
+				//	if (g_Render_method != "Sobel") {
 				_render[i]->add_gradient_map(Gradient_Saliency_G, gradient_Map_G);
 				_render[i]->add_gradient_map(Gradient_Union, gradient_Union);
 				_render[i]->add_gradient_map(Gradient_Twopass, gradient_Union);
-		//	}
-		}
-
-//	}// if != Sobel
+				//	}
+			}
+		}// if != Sobel
 		time(&s_e_time);
 		localtime_s(&s_t_e, &s_e_time);
 		strftime(s_e_buff, 20, "%Y-%m-%d %H:%M:%S", &s_t_e);
 		cout << "saliency End " << s_s_buff << " : " << s_e_buff << endl;
 		clog << "saliency End, " << s_s_buff << "," << s_e_buff << endl;
-	_render[RENDER_TWOPASS_ATTACH]->add_render(_render[0], _render[1]);
-	_render[RENDER_TWOPASS_MERGE]->add_render(_render[0], _render[1]);
-	for (int i = 0; i < RENDER_MAX; i++) {
-		time_t p_s_time, p_e_time;
-		tm p_t_s, p_t_e;
-		time(&p_s_time);
-		localtime_s(&p_t_s, &p_s_time);
+		int how_many_render;
+		if (g_saliency_method == string("Sobel")) {
+			how_many_render = 1;
+		}
+		else {
+			how_many_render = RENDER_MAX;
+			_render[RENDER_TWOPASS_ATTACH]->add_render(_render[0], _render[1]);
+			_render[RENDER_TWOPASS_MERGE]->add_render(_render[0], _render[1]);
+		}
 
-		char p_s_buff[20];
-		strftime(p_s_buff, 20, "%Y-%m-%d %H:%M:%S", &p_t_s);
-		char p_e_buff[20];
+		for (int i = 0; i < how_many_render; i++) {
+			time_t p_s_time, p_e_time;
+			tm p_t_s, p_t_e;
+			time(&p_s_time);
+			localtime_s(&p_t_s, &p_s_time);
 
-		_render[i]->prepare();
-		for(int j=0;j<_render[i]->mm_depth;j++)
-		cout << _render[i]->m_tag << " : " << _render[i]->mm_aStroke_set[j].size() << endl;
-		cout << "++++++++++++++++++ prepare "+_render[i]->m_tag+" ++++++++++++++++++++++++++++++++++++++++" << endl;
-		time(&p_e_time);
-		localtime_s(&p_t_e, &p_e_time);
-		strftime(p_e_buff, 20, "%Y-%m-%d %H:%M:%S", &p_t_e);
-		cout << "Prepare End " << _render[i]->m_tag <<p_s_buff << " : " << p_e_buff << endl;
-		clog << "Prepare End, " << _render[i]->m_tag << p_s_buff << ", " << p_e_buff << endl;
-	}
-	//return -997788;
+			char p_s_buff[20];
+			strftime(p_s_buff, 20, "%Y-%m-%d %H:%M:%S", &p_t_s);
+			char p_e_buff[20];
+
+			_render[i]->prepare();
+			for (int j = 0; j < _render[i]->mm_depth; j++)
+				cout << _render[i]->m_tag << " : " << _render[i]->mm_aStroke_set[j].size() << endl;
+			cout << "++++++++++++++++++ prepare " + _render[i]->m_tag + " ++++++++++++++++++++++++++++++++++++++++" << endl;
+			time(&p_e_time);
+			localtime_s(&p_t_e, &p_e_time);
+			strftime(p_e_buff, 20, "%Y-%m-%d %H:%M:%S", &p_t_e);
+			cout << "Prepare End " << _render[i]->m_tag << p_s_buff << " : " << p_e_buff << endl;
+			clog << "Prepare End, " << _render[i]->m_tag << p_s_buff << ", " << p_e_buff << endl;
+		}
+
+		//return -997788;
 #ifndef RUN_THREAD	
-	for (int i = 0; i < RENDER_MAX; i++) {
-		//for (int j = 0; j<_render[i]->mm_depth; j++){
-	//	cout << _render[i]->m_tag << " : " << _render[i]->mm_aStroke_set[j].size() << endl;
-	//}
-		_render[i]->success_or_fail= _render[i]->PainterlyRendering();
-		cout << "================= "<< _render[i]->m_tag<<" "<<_render[i]->success_or_fail<<" =========================================" << endl;
-	//	image_save(g_image_name + _render[i]->m_tag_, _render[i]->result_image, _render[i]->r_grid_map_1c_accu);
-	}
+		for (int i = 0; i < RENDER_MAX; i++) {
+			//for (int j = 0; j<_render[i]->mm_depth; j++){
+		//	cout << _render[i]->m_tag << " : " << _render[i]->mm_aStroke_set[j].size() << endl;
+		//}
+			_render[i]->success_or_fail = _render[i]->PainterlyRendering();
+			cout << "================= " << _render[i]->m_tag << " " << _render[i]->success_or_fail << " =========================================" << endl;
+			//	image_save(g_image_name + _render[i]->m_tag_, _render[i]->result_image, _render[i]->r_grid_map_1c_accu);
+		}
 #else
 
 		std::thread *p_render[RENDER_MAX];
 
-	p_render[0] = new thread(run_render,_render[RENDER_SOBEL]);
+		p_render[0] = new thread(run_render, _render[RENDER_SOBEL]);
 
-	
-		p_render[RENDER_SALIENCY] = new thread(run_render,_render[RENDER_SALIENCY]);
-		p_render[RENDER_UNION] = new thread(run_render,_render[RENDER_UNION]);
-	
+		if (g_saliency_method != string("Sobel")){
+			p_render[RENDER_SALIENCY] = new thread(run_render, _render[RENDER_SALIENCY]);
+		p_render[RENDER_UNION] = new thread(run_render, _render[RENDER_UNION]);
+		}
 	cout << "p_sobel    : " << p_render[RENDER_SOBEL]->get_id() << endl;
-	cout << "p_saliency : " << p_render[RENDER_SALIENCY]->get_id() << endl;
-	cout << "p_union    : " << p_render[RENDER_UNION]->get_id() << endl;
-	
+	if (g_saliency_method != string("Sobel")) {
+		cout << "p_saliency : " << p_render[RENDER_SALIENCY]->get_id() << endl;
+		cout << "p_union    : " << p_render[RENDER_UNION]->get_id() << endl;
+	}
 	
 	std::cout << "Number of threads = " 
 		<< std::thread::hardware_concurrency() << std::endl;
@@ -599,25 +613,26 @@ int   RenderingImage(char * src_name, char * deploy_name)
 
 
 		p_render[RENDER_SOBEL]->join();
-		p_render[RENDER_SALIENCY]->join();
-		p_render[RENDER_UNION]->join();
-	
-		
-		p_render[RENDER_TWOPASS_ATTACH] = new thread(run_render, _render[RENDER_TWOPASS_ATTACH]);
-		cout << "p_twopass  ATTACH: " << p_render[RENDER_TWOPASS_ATTACH]->get_id() << endl;
-		p_render[RENDER_TWOPASS_MERGE] = new thread(run_render, _render[RENDER_TWOPASS_MERGE]);
-		cout << "p_twopass MERGE : " << p_render[RENDER_TWOPASS_MERGE]->get_id() << endl;
-		std::cout << "Number of threads Twopass = "
-			<< std::thread::hardware_concurrency() << std::endl;
-		p_render[RENDER_TWOPASS_ATTACH]->join();
-		p_render[RENDER_TWOPASS_MERGE]->join();
-	
-			_render[RENDER_SOBEL]->post_process();
+		_render[RENDER_SOBEL]->post_process();
+		if (g_saliency_method != string("Sobel")) {
+			p_render[RENDER_SALIENCY]->join();
+			p_render[RENDER_UNION]->join();
+
+
+			p_render[RENDER_TWOPASS_ATTACH] = new thread(run_render, _render[RENDER_TWOPASS_ATTACH]);
+			cout << "p_twopass  ATTACH: " << p_render[RENDER_TWOPASS_ATTACH]->get_id() << endl;
+			p_render[RENDER_TWOPASS_MERGE] = new thread(run_render, _render[RENDER_TWOPASS_MERGE]);
+			cout << "p_twopass MERGE : " << p_render[RENDER_TWOPASS_MERGE]->get_id() << endl;
+			std::cout << "Number of threads Twopass = "
+				<< std::thread::hardware_concurrency() << std::endl;
+			p_render[RENDER_TWOPASS_ATTACH]->join();
+			p_render[RENDER_TWOPASS_MERGE]->join();
+
 			_render[RENDER_SALIENCY]->post_process();
 			_render[RENDER_UNION]->post_process();
 			_render[RENDER_TWOPASS_MERGE]->post_process();
 			_render[RENDER_TWOPASS_ATTACH]->post_process();
-		
+		}
 #endif
 	time(&e_time);
 	localtime_s(&t_e, &e_time);

@@ -122,9 +122,9 @@ extern int g_src_image_step1;
 extern int g_TH;
 extern int g_ET;//positive ET=-1 negative
 
-extern string saliency_method[MAX_DEPTH];// = { "Pregraph","Itti","Residual","Blackandwhite","Fine_grained" };
+//extern string saliency_method[MAX_DEPTH];// = { "Pregraph","Itti","Residual","Blackandwhite","Fine_grained" };
 //extern string _re[MAX_DEPTH];// = { "Sobel","Union","Saliency","Twopass" };
 //extern string _str_mm[MAX_DEPTH];// = { "Attach","Merge" };
-extern int saliency_method_cnt;// = 6;
+//extern int saliency_method_cnt;// = 6;
 //extern int _re_cnt;// = 4;
 //extern int _str_mm_cnt;// = 2;

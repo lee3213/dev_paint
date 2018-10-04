@@ -15,10 +15,15 @@ using namespace std;
 //	root["encoding"] = getCurrentEncoding();
 //	root["indent"]["length"] = getCurrentIndentLength();
 //	root["indent"]["use_space"] = getCurrentIndentUseSpace();
-int thresh[] = { 10,15 };
+int thresh[] = { 15 };
 int depth[] = { 7 };
 int _grid[] = { 5 };
 
+string saliency_method[] = { "Sobel", "Itti","Pregraph","Residual","Blackandwhite","Fine_grained","Perazzi"};
+//string _re[MAX_DEPTH] = { "Sobel","Saliency","Twopass" };
+//string _str_mm[MAX_DEPTH] = { "Attach","Merge" };
+
+int saliency_method_cnt = sizeof(saliency_method) / sizeof(string);
 int QT_N[] = { 1};
 //int _mm[] = { 1,2 };// "attach", tag_union
 ;
@@ -57,7 +62,7 @@ void get_render_name(string & bat_dir,string & file_name) {
 	get_render_para(render_name);
 	file_name = bat_dir+string("\\")+render_name+
 		//+ "_r" + _re[re] 
-		+ ".bat";
+		+ "_smAll.bat";
 
 }
 void get_render1_name(string & bat_dir,int _sm_, string & file_name) {
