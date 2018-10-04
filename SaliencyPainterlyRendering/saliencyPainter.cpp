@@ -448,11 +448,11 @@ int   RenderingImage(char * src_name, char * deploy_name)
 			//Mat saliency_residual_8UC1;
 			Ptr<StaticSaliencySpectralResidual> saliencyAlgorithm = StaticSaliencySpectralResidual::create();
 			saliencyAlgorithm->computeSaliency(x_srcImg, saliency_8UC1);
-			mat_print(saliency_8UC1, "Residual");
-			gradient_Map_C =  saliency_8UC1;
+		//	mat_print(saliency_8UC1, "Residual");
+			gradient_Map_C =  saliency_8UC1.clone();
 		//	if (g_Render_method != "Saliency") {
 				saliencyAlgorithm->computeSaliency(sobel_8UC3, saliency_8UC1);
-				gradient_Map_G = saliency_8UC1;
+				gradient_Map_G = saliency_8UC1.clone();
 		//	}
 
 		}
@@ -460,10 +460,10 @@ int   RenderingImage(char * src_name, char * deploy_name)
 			//	Mat saliency_finegrained_8UC1;
 			Ptr<StaticSaliencyFineGrained> saliencyAlgorithmG = StaticSaliencyFineGrained::create();
 			saliencyAlgorithmG->computeSaliency(x_srcImg, saliency_8UC1);
-			gradient_Map_C =  saliency_8UC1;
+			gradient_Map_C =  saliency_8UC1.clone();
 		//	if (g_Render_method != "Saliency") {
 				saliencyAlgorithmG->computeSaliency(sobel_8UC3, saliency_8UC1);
-				gradient_Map_G = saliency_8UC1;
+				gradient_Map_G = saliency_8UC1.clone();
 		//	}
 
 		}
@@ -471,21 +471,21 @@ int   RenderingImage(char * src_name, char * deploy_name)
 
 			//Mat saliency_blackandwhite_8UC1;
 			saliency_8UC1 = saliency_blackandwhite_main(x_srcImg);
-			gradient_Map_C =  saliency_8UC1;
+			gradient_Map_C =  saliency_8UC1.clone();
 		//	if (g_Render_method != "Saliency") {
 				saliency_8UC1 = saliency_blackandwhite_main(sobel_8UC3);
-				gradient_Map_G = saliency_8UC1;
+				gradient_Map_G = saliency_8UC1.clone();
 		//	}
 			}
 		else if (g_saliency_method == string("Pregraph")) {
 
 			saliency_32F = preGraph_main(x_srcImg);
 			saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-			gradient_Map_C =  saliency_8UC1;
+			gradient_Map_C =  saliency_8UC1.clone();
 		//	if (g_Render_method != "Saliency") {
 				saliency_32F = preGraph_main(sobel_8UC3);
 				saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-				gradient_Map_G = saliency_8UC1;
+				gradient_Map_G = saliency_8UC1.clone();
 		//	}
 
 		}
@@ -495,22 +495,22 @@ int   RenderingImage(char * src_name, char * deploy_name)
 
 			saliency_32F = saliency_itti_main(x_srcImg, "C");
 			saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-			gradient_Map_C =  saliency_8UC1;
+			gradient_Map_C =  saliency_8UC1.clone();
 		//	if (g_Render_method != "Saliency") {
 				saliency_32F = saliency_itti_main(sobel_8UC3, "G");
 				saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-				gradient_Map_G = saliency_8UC1;
+				gradient_Map_G = saliency_8UC1.clone();
 		//	}
 		}
 		else if (g_saliency_method == string("Perazzi")) {
 
 			saliency_32F = saliency_Perazzi_main(x_srcImg);
 			saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-			gradient_Map_C = saliency_8UC1;
+			gradient_Map_C = saliency_8UC1.clone();
 			//	if (g_Render_method != "Saliency") {
-			saliency_32F = preGraph_main(sobel_8UC3);
+			saliency_32F = saliency_Perazzi_main(sobel_8UC3);
 			saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-			gradient_Map_G = saliency_8UC1;
+			gradient_Map_G = saliency_8UC1.clone();
 			//	}
 
 		}

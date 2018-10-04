@@ -25,7 +25,7 @@ int QT_N[] = { 1};
 int _ps[] = { 6 };//"g_paint_area_scale"
 int _br[] = { 5 }; //g_BrushMinSize
 int _gs[] = { 1 };//grid skip 
-int _ts[] = { 100,150,200,230 };
+int _ts[] = { 230 };
 int br, th, de, gr, sm, qt, re, mm, gs, ps,ts;
 
 void get_json_name(string & file_name) {

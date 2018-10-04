@@ -12,99 +12,6 @@
 #include "time.h"
 
 
-cv::Rect safe_Rect_margin(Point s, Point e, int i_width, int i_height, Point &S, Point &E) {
-	Rect rr;
-/*	if (s.x < 0) { S.x = s.x; s.x = 0;
-	}
-	if (s.x >= i_width) { S.x = s.x - i_width; 
-	s.x = i_width - 1; 
-	}
-	if (e.x < 0) {
-		E.x = e.x;
-		e.x = 0;
-	}
-	if (e.x >= i_width) {
-		E.x = e.x - i_width;
-		e.x = i_width - 1;
-	}
-
-	if (s.y < 0) {
-	 S.y = s.y;	
-	 s.y = 0;
-	}
-	if (s.y >= i_height) {
-		S.y = s.y - i_height;
-		s.y = i_height - 1;
-	}
-	if (e.y < 0) {
-		E.y = e.y;
-		e.y = 0;
-	}
-	if (e.y >= i_height) {
-		E.y = e.y - i_height;
-		e.y = i_height - 1;
-	}
-	*/
-	rr = Rect(s, e);
-	return rr;
-}
-/*
-bool fetch_in_box(Point &s, int i_width, int i_height) {
-
-	Rect rr;
-	if (s.x < 0) return false;
-	if (s.x >= i_width) return false;
-
-
-	if (s.y < 0) return false;
-	if (s.y >= i_height) return false;
-	return true;
-
-}
-*/
-/*
-fetch_color_Point.x = St_srtPoint.x + random_x;
-fetch_color_Point.y = St_srtPoint.y + random_y;*/
-/*
-bool FixToInside(Point &b_SrtPoint, Point &b_EndPoint, Point &tryPoint, int image_width, int image_height,int bsize)
-{
-	if (b_SrtPoint.x < 0)
-	{
-		b_SrtPoint.x = 0;
-	//	tryPoint.x = (int)(bsize * 0.5) - 1;
-	//	bEndPoint.x = bsize - 1;
-	}
-	if (b_SrtPoint.x + bsize > image_width)
-		b_EndPoint.x = image_width - 1;
-
-	 if (b_EndPoint.x >= image_width)
-	{
-	//	bSrtPoint.x = width - bsize - 1;
-	//	tryPoint.x = width - (int)(bsize * 0.5) - 1;
-		b_EndPoint.x = image_width - 1;
-	}
-
-	if (b_SrtPoint.y < 0)
-	{
-		b_SrtPoint.y = 0;
-	//	tryPoint.y = (int)(bsize * 0.5) - 1;
-		//bEndPoint.y = bsize - 1;
-	}
-	if (b_SrtPoint.y + bsize > image_height)
-		b_EndPoint.y = image_height - 1;
-	if (b_EndPoint.y >= image_height)
-	{
-		//bSrtPoint.y = height - bsize - 1;
-	//	tryPoint.y = height - (int)(bsize * 0.5) - 1;
-		b_EndPoint.y = image_height - 1;
-	}
-	return true;
-}
-
-
-
-*/
-
 
 
 int   render_::PainterlyRendering()
@@ -137,15 +44,14 @@ int   render_::PainterlyRendering()
 	//Mat beforeImg_canvas;
 
 
-	cv::Mat rst_accu_canvas[MAX_DEPTH];
+
+#ifdef _DEBUG_RENDER
 	cv::Mat painting_area_canvas[MAX_DEPTH];
 	cv::Mat changed_map_canvas[MAX_DEPTH];
-	cv::Mat ing_canvas[MAX_DEPTH];
-
-	unsigned char * rst_accu_canvas_data[MAX_DEPTH];
-	unsigned char * ing_canvas_data[MAX_DEPTH];
+#endif
 	
-	Mat src_canvas;
+	
+	
 	src_canvas.create(canvas_size_height, canvas_size_width, CV_8UC3);
 	src_canvas.setTo(255);
 	Rect src_Rect_full(Point(canvas_size_bezel_size, canvas_size_bezel_size),
@@ -160,27 +66,27 @@ int   render_::PainterlyRendering()
 	rst_accu_canvas_data[0] = (unsigned char*)rst_accu_canvas[0].data;
 
 	for (int i = 0; i < MAX_DEPTH; i++) {
+		r_try_map_1c[i].create(image_height, image_width, CV_8UC1);
+		r_try_map_1c[i].setTo(255);
+		r_try_map_1c_data[i] = r_try_map_1c[i].data;
+
+		r_s_grid_painting_try[i] = 0;
+		r_s_changed_count[i] = 0;
 		ing_canvas[i].create(canvas_size_height, canvas_size_width, CV_8UC3);
 		ing_canvas_data[i] = (unsigned char*)ing_canvas[i].data;
 		ing_canvas[i].setTo(255);
 
-		
+#ifdef _DEBUG_RENDER
 		painting_area_canvas[i].create(canvas_size_height, canvas_size_width, CV_8UC3);
 		painting_area_canvas[i].setTo(255);
-
-
 
 		changed_map_canvas[i].create(canvas_size_height, canvas_size_width, CV_8UC3);
 		changed_map_canvas[i].setTo(255);
-		r_try_map_1c[i].create(image_height, image_width, CV_8UC1);
-		r_try_map_1c[i].setTo(255);
-		r_try_map_1c_data[i] = r_try_map_1c[i].data;
-	
-		r_s_grid_painting_try[i] = 0;
-		r_s_changed_count[i] = 0;
+
 		painting_area_canvas[i].create(canvas_size_height, canvas_size_width, CV_8UC3);
 		painting_area_canvas[i].setTo(255);
 		rectangle_canvas(painting_area_canvas[i], Rect(St_srtPoint, St_endPoint), Scalar(0, 0, 255));//RED QT outline
+#endif
 	}
 
 	for(int i=0;i<mm_depth;i++)
@@ -243,8 +149,9 @@ int   render_::PainterlyRendering()
 				}
 				continue;
 			}
+#ifdef _DEBUG_RENDER
 			rectangle_canvas(painting_area_canvas[astroke_depth], Rect(St_srtPoint, St_endPoint), Scalar(0, 0, 255));//RED QT outline
-
+#endif
 			brush_area_h_size = brush_size[astroke_depth];// brush size(painting area) per each depth
 			brush_area_w_size = brush_size[astroke_depth];// brush size(painting area) per each depth
 			int brush_area_h_size_half = brush_area_h_size / 2+brush_area_h_size%2;
@@ -333,8 +240,9 @@ int   render_::PainterlyRendering()
 				canvas_centered_EndPoint.x = centered_EndPoint.x + canvas_size_bezel_size ;
 				canvas_centered_EndPoint.y = centered_EndPoint.y + canvas_size_bezel_size ;
 				Rect canvas_centered_rect = Rect(canvas_centered_SrtPoint, canvas_centered_EndPoint);
+#ifdef _DEBUG_RENDER
 				rectangle(painting_area_canvas[astroke_depth], canvas_centered_rect, Scalar(0, 0, 0));//BLACK
-				
+#endif
 				cv::Mat src_ROI_canvas = src_canvas(canvas_centered_rect);
 				//	 mat_print(testImg_src, "testImg_Src", first_try);
 			
@@ -344,9 +252,9 @@ int   render_::PainterlyRendering()
 			//	unsigned char *before_canvas_data = beforeImg_canvas.data;
 				Mat before_ROI_canvas = rst_accu_canvas[astroke_depth](canvas_centered_rect);
 				Mat changed_ROI_clone = rst_accu_canvas[astroke_depth](canvas_centered_rect).clone();
+
 				Mat ing_ROI_canvas = ing_canvas[astroke_depth](canvas_centered_rect);
 				Mat ing_ROI_clone = ing_canvas[astroke_depth](canvas_centered_rect).clone();
-
 				int result = P_Rendering(//srcImg, 
 					//srcData, 
 					src_ROI_canvas,
@@ -375,9 +283,12 @@ int   render_::PainterlyRendering()
 				else {//result==1/CHANGED_BETTER, 
 					changed_ROI_clone.copyTo(before_ROI_canvas);
 					r_s_changed_count[astroke_depth]++;
-					rectangle(changed_map_canvas[astroke_depth], canvas_centered_rect, Scalar(0, 0, 255));//RED
-
+					rst_accu_canvas[astroke_depth](canvas_centered_rect).clone();
 					ing_ROI_clone.copyTo(ing_ROI_canvas);
+
+#ifdef _DEBUG_RENDER
+					rectangle(changed_map_canvas[astroke_depth], canvas_centered_rect, Scalar(0, 0, 255));//RED
+#endif					
 				}
 
 			//	beforeImg_canvas.release();
@@ -412,22 +323,30 @@ int   render_::PainterlyRendering()
 	cout << "size mismatch " << size_mismatch << endl;
 	for (int i = 0; i < mm_depth; i++) {
 		static int called = 0;
-		debug_image("ing/painting_area" + to_string(i) + "_" + m_tag+to_string(called), painting_area_canvas[i]);
 		debug_image("ing/ing_" + to_string(i) + "_" + m_tag + to_string(called), ing_canvas[i]);
+#ifdef _DEBUG_RENDER
+		debug_image("ing/painting_area" + to_string(i) + "_" + m_tag+to_string(called), painting_area_canvas[i]);
+		
+		debug_image("ing/changed_" + m_tag + to_string(called), i, changed_map_canvas[i]);
+		
+#endif
+
 		debug_image("ing/accu_" + to_string(i) + "_" + m_tag + to_string(called), rst_accu_canvas[i]);
 		debug_image("ing/try_map_" + to_string(i) + "_" + m_tag + to_string(called), r_try_map_1c[i]);
 
-
-		debug_image("ing/changed_" + m_tag + to_string(called), i, changed_map_canvas[i]);
 		called++;
+		
 	}
+#ifdef _DEBUG_RENDER	
 	for (int i = 0; i < mm_depth; i++) {
 		static int called = 0;
 		//debug_image("ing/painting_area" + to_string(i) + "f_" + m_tag + to_string(called), painting_area_canvas[i](src_Rect_full));
 	//	debug_image("ing/ing_" + to_string(i) + "f_" + m_tag + to_string(called), ing_canvas[i](src_Rect_full));
 		debug_image("ing/accu_" + to_string(i) + "_f_" + m_tag + to_string(called), rst_accu_canvas[i](src_Rect_full));
 	}
-	result_image=rst_accu_canvas[mm_depth-1].clone();
+#endif
+	result_image=rst_accu_canvas[mm_depth-1];
+
 	time((&e_time));
 	char s_buff[20];
 	localtime_s(&t_e, &e_time);

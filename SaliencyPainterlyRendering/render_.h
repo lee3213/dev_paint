@@ -24,15 +24,19 @@ public:
 	unsigned char * m_srcData;
 	//cv::Mat Quad_TreeMap;
 	cv::Mat result_image;
-	int  BrushMaxSize;						//1024size에는 130, 3072size에는 400으로 설정했습니다..
-	int  BrushMinSize;
-	int brush_step;
-
+	
+	Mat src_canvas;
+	cv::Mat rst_accu_canvas[MAX_DEPTH];
+	cv::Mat ing_canvas[MAX_DEPTH];
+	unsigned char * rst_accu_canvas_data[MAX_DEPTH];
+	unsigned char * ing_canvas_data[MAX_DEPTH];
 	
 	int canvas_size_width;
 	int canvas_size_height;
 	int canvas_size_bezel_size;
-
+	int  BrushMaxSize;						//1024size에는 130, 3072size에는 400으로 설정했습니다..
+	int  BrushMinSize;
+	int brush_step;
 	int grid_map_sum = 0, grid_count_sum = 0;
 	Mat r_grid_map_1c[MAX_DEPTH];
 	Mat r_grid_map_1c_accu;
@@ -178,6 +182,25 @@ public:
 		return (*it)->brush_gray;
 	}
 	*/
+
+
+	inline void p_poke(unsigned char * p, int index, int p_0) {
+		p[index] = p_0;
+	}
+	inline void p_poke(unsigned char * p, int index, int p_0, int p_1, int p_2) {
+		p[index] = p_0;
+		p[index + 1] = p_1;
+		p[index + 2] = p_2;
+	}
+	inline void p_peek(unsigned char * p, int index, int &p_0, int &p_1, int &p_2) {
+		p_0 = p[index];
+		p_1 = p[index + 1];
+		p_2 = p[index + 2];
+	}
+	inline void p_peek_1c(unsigned char * p, int index, int &p_0) {
+		p_0 = p[index];
+	}
+
 	}
 
 

@@ -76,6 +76,99 @@ void p_peek(unsigned char * p, int index, int &p_0, int &p_1, int &p_2) {
 
 
 
+ cv::Rect safe_Rect_margin(Point s, Point e, int i_width, int i_height, Point &S, Point &E) {
+	 Rect rr;
+	 /*	if (s.x < 0) { S.x = s.x; s.x = 0;
+	 }
+	 if (s.x >= i_width) { S.x = s.x - i_width;
+	 s.x = i_width - 1;
+	 }
+	 if (e.x < 0) {
+	 E.x = e.x;
+	 e.x = 0;
+	 }
+	 if (e.x >= i_width) {
+	 E.x = e.x - i_width;
+	 e.x = i_width - 1;
+	 }
+
+	 if (s.y < 0) {
+	 S.y = s.y;
+	 s.y = 0;
+	 }
+	 if (s.y >= i_height) {
+	 S.y = s.y - i_height;
+	 s.y = i_height - 1;
+	 }
+	 if (e.y < 0) {
+	 E.y = e.y;
+	 e.y = 0;
+	 }
+	 if (e.y >= i_height) {
+	 E.y = e.y - i_height;
+	 e.y = i_height - 1;
+	 }
+	 */
+	 rr = Rect(s, e);
+	 return rr;
+ }
+ /*
+ bool fetch_in_box(Point &s, int i_width, int i_height) {
+
+ Rect rr;
+ if (s.x < 0) return false;
+ if (s.x >= i_width) return false;
+
+
+ if (s.y < 0) return false;
+ if (s.y >= i_height) return false;
+ return true;
+
+ }
+ */
+ /*
+ fetch_color_Point.x = St_srtPoint.x + random_x;
+ fetch_color_Point.y = St_srtPoint.y + random_y;*/
+ /*
+ bool FixToInside(Point &b_SrtPoint, Point &b_EndPoint, Point &tryPoint, int image_width, int image_height,int bsize)
+ {
+ if (b_SrtPoint.x < 0)
+ {
+ b_SrtPoint.x = 0;
+ //	tryPoint.x = (int)(bsize * 0.5) - 1;
+ //	bEndPoint.x = bsize - 1;
+ }
+ if (b_SrtPoint.x + bsize > image_width)
+ b_EndPoint.x = image_width - 1;
+
+ if (b_EndPoint.x >= image_width)
+ {
+ //	bSrtPoint.x = width - bsize - 1;
+ //	tryPoint.x = width - (int)(bsize * 0.5) - 1;
+ b_EndPoint.x = image_width - 1;
+ }
+
+ if (b_SrtPoint.y < 0)
+ {
+ b_SrtPoint.y = 0;
+ //	tryPoint.y = (int)(bsize * 0.5) - 1;
+ //bEndPoint.y = bsize - 1;
+ }
+ if (b_SrtPoint.y + bsize > image_height)
+ b_EndPoint.y = image_height - 1;
+ if (b_EndPoint.y >= image_height)
+ {
+ //bSrtPoint.y = height - bsize - 1;
+ //	tryPoint.y = height - (int)(bsize * 0.5) - 1;
+ b_EndPoint.y = image_height - 1;
+ }
+ return true;
+ }
+
+
+
+ */
+
 
 void mat_print(cv::Mat &amat, cv::String matname, int d) {
 	cout << matname << endl;

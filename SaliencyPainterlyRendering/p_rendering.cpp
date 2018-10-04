@@ -47,7 +47,7 @@ int   render_::P_Rendering(//cv::Mat srcImg,
 Mat & _src_ROI_canvas,
 	Mat & _before_ROI_canvas,
 	cv::Mat & _changed_ROI_clone,
-	cv::Mat & _ing_ROI_clone,
+	cv::Mat & _ing_ROI_clone_q,
 	//vector <Brush*> &_brush_set,
 	Point _fetch_color_Point,
 	Point _centered_SrtPoint,
@@ -74,7 +74,7 @@ Mat & _src_ROI_canvas,
 	Mat alpha_channel;
 	Mat hsv_v;
 	unsigned char * src_ROI_canvas_data = _src_ROI_canvas.data;
-	unsigned char * ing_ROI_clone_data = _ing_ROI_clone.data;
+	unsigned char * ing_ROI_clone_q_data = _ing_ROI_clone_q.data;
 	unsigned char *before_ROI_canvas_data = _before_ROI_canvas.data;
 	unsigned char * changed_ROI_clone_data = _changed_ROI_clone.data;
 	
@@ -260,7 +260,7 @@ Mat & _src_ROI_canvas,
 					br_BGR_R = bestBrush_data_resized[bIndex_3c + _BGR_R];
 					br_BGR_G = bestBrush_data_resized[bIndex_3c + _BGR_G];
 					br_BGR_B = bestBrush_data_resized[bIndex_3c + _BGR_B];
-					p_poke(ing_ROI_clone_data, bIndex_3c, br_BGR_B, br_BGR_G, br_BGR_R);
+					p_poke(ing_ROI_clone_q_data, bIndex_3c, br_BGR_B, br_BGR_G, br_BGR_R);
 				}
 
 			}//for x
