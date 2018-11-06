@@ -26,6 +26,7 @@ int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, vector
 	string f_path;
 	int brush_no;
 
+	//colorDis.reserve(g_BrushNumber);
 	int nth = 0;
 	for (vector <Brush*>::iterator it = _brush_set.begin(); it != _brush_set.end(); it++, nth++)
 	{

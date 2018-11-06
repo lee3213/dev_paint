@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClInclude Include="brush.h" />
     <ClInclude Include="bsShowImage.h" />
+    <ClInclude Include="cvQuiver.h" />
     <ClInclude Include="debug_define.h" />
     <ClInclude Include="debug_image.h" />
     <ClInclude Include="debug_image_compare.h" />
@@ -206,6 +207,7 @@
     <ClCompile Include="brush_adjust.cpp" />
     <ClCompile Include="brush_resize.cpp" />
     <ClCompile Include="bsShowImage.cpp" />
+    <ClCompile Include="cvQuiver.cpp" />
     <ClCompile Include="debug_image.cpp" />
     <ClCompile Include="debug_image_compare.cpp" />
     <ClCompile Include="dir.cpp" />

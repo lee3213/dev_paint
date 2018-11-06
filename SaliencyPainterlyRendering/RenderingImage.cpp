@@ -270,7 +270,7 @@ int   render_::PainterlyRendering()
 					//m_tag,
 					//stroke_no, 
 					astroke_depth, painting_count, 
-					color_BGR_B, color_BGR_G, color_BGR_R
+					color_BGR_B, color_BGR_G, color_BGR_R				
 				);
 
 				//	current_fetched_map_data,fetched_color_data,r,g,b);

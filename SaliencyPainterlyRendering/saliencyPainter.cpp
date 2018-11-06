@@ -32,12 +32,14 @@ using namespace saliency;
 
 #include "render_.h"
 #include "time.h"
+#include "cvQuiver.h"
+
 Mat Sgrid_grid_map_1c[MAX_DEPTH];
 Mat gradient_Map_C;
 Mat gradient_Map_G;
-string tag[] = { "0_sobel","1_saliency","2_union","3_two_attach","4_two_merge" };
-string tag_[] = { "0_sobel_", "1_saliency_", "2_union_", "3_twoattach_","4_two_merge_" };
-string _tag[] = { "_0_sobel", "_1_saliency", "_2_union", "_3_twopass","_4_twopass" };
+std::string tag[] = { "0_sobel","1_saliency","2_union","3_two_attach","4_two_merge" };
+std::string tag_[] = { "0_sobel_", "1_saliency_", "2_union_", "3_twoattach_","4_two_merge_" };
+std::string _tag[] = { "_0_sobel", "_1_saliency", "_2_union", "_3_twopass","_4_twopass" };
 
 
 
@@ -78,11 +80,177 @@ cv::Mat get_canny_map(Mat & srcImg) {
 	return canny_map;
 }
 
+void func_gradient_orientation(Mat org_8UC1_Map, Mat sobeld_16S_x, Mat sobeld_16S_y,std::string label) {
+	int gray_map_width = org_8UC1_Map.size().width;
+	int		gray_map_height = org_8UC1_Map.size().height;
+	int flowResolution = 1;
+	//Mat g_img(gray_map_height, gray_map_width, CV_8UC3);
+	Mat g_img[101];
+	int mag_histo[101];
+	int mag_histogram[101];
+	//g_img_solid = org_Gaussian_Map.clone();
+	int mag = 100;
+	for (int i = 0; i < (mag + 1); i++) {
+		mag_histo[i] = 0;
+		mag_histogram[i] = 0;
+		cv::cvtColor(org_8UC1_Map.clone(), g_img[i], CV_GRAY2BGR);
+	}
+	//cvtColor(org_Gaussian_Map.clone(), g_img_solid, CV_GRAY2BGR);
+	mat_print(g_img, "g_img");
+	int mag_max = 0;
+	Mat gradient_field = Mat::zeros(gray_map_height, gray_map_width, CV_32SC2);
+	for (int i = 0; i < gray_map_height; i++) {
+		for (int j = 0; j < gray_map_width; j++) {
+			int xval = sobeld_16S_x.at<short>(i, j);
+			int yval = sobeld_16S_y.at<short>(i, j);
+			gradient_field.at<Point>(i, j) = Point(xval, xval);
+			int xy = abs((int)xval) + abs((int)xval);
+			if (mag_max < xy) mag_max = xy;
+			}
+	}
+	cout << label << "   Mag MAX= " << mag_max << endl;
+	int histo_step = (mag_max / mag)-1;
 
+	for (int i = 0; i < gray_map_height; i++) {
+		for (int j = 0; j < gray_map_width; j++) {
+			int xval = sobeld_16S_x.at<short>(i, j);
+			int yval = sobeld_16S_y.at<short>(i, j);
+		
+			int xy = abs((int)xval) + abs((int)xval);
+			if (xy == 0)
+				mag_histo[0]++;
+			else {
+				int his_loc = (xy / histo_step) + 1;
+				if (his_loc < 100)
+					mag_histo[his_loc]++;
+				else
+					mag_histo[100]++;
+			}
+		}
+	}
+	int histo_sum = 0;
+	int histo_thresh = int ((gray_map_height*gray_map_width- mag_histo[0])*0.1);
+	int back;
+
+	for (back = 100; back > 0; back--) {
+		cout << back << ", " << mag_histo[back] <<
+			" back*step = " << back*histo_step
+			<<endl;
+		histo_sum += mag_histo[back];
+		if (histo_sum > histo_thresh)
+			break;
+	}
+	int mag2 = (back)*histo_step;
+	int histo_step2 =  (mag2/100)+1;
+
+	cout << "gray_map_height*gray_map_width = " << gray_map_height*gray_map_width <<
+		"gray_map_height*gray_map_width - mag_histo[0] "<<
+		gray_map_height*gray_map_width - mag_histo[0]<<
+		" histo_thresh= " << histo_thresh << " back = " << back
+		<< " histo_step= " << histo_step << endl
+		<<" mag_histo[back]= "<<mag_histo[back]
+		<<" histo_Step2 = "<<histo_step2
+		<<" mag2 ="<<mag2
+		<< endl;
+	unsigned char * ptr;
+	ptr = (unsigned char *)g_img[0].data;
+	Mat direction_map;
+	direction_map.create(gray_map_height, gray_map_width, CV_8UC3);
+	direction_map.setTo(0);
+	//debug_image("direction_map_o", direction_map);
+	int flow_Resolution_dir = 8;
+
+	unsigned char * ptr_direction = (unsigned char *)direction_map.data;
+	Point p2, p2_n;
+	Point2f v;
+	int length;
+	Point C, n;
+	for (int i = 0; i < gray_map_height; i += flowResolution) {
+		for (int j = 0; j < gray_map_width; j += flowResolution) {
+			Point p(j, i);
+		//	Point p2(gradient_field.at<Point>(p) + p);
+
+		//	Point dir;
+			int dx = (gradient_field.at<Point>(p).x);
+			int dy = (gradient_field.at<Point>(p).y);
+			int mag_dx = abs(gradient_field.at<Point>(p).x);
+			int mag_dy = abs(gradient_field.at<Point>(p).y);
+			int xy = mag_dx + mag_dy;
+
+			//direction vector
+			//normalize
+			float v_mag = (float)sqrt(dx*dx + dy*dy);
+			v.x = dx / v_mag; v.y = dy / v_mag;
+			if (xy <= histo_step2*(mag - 1)) {
+				length = xy / histo_step2 + 2;
+			}
+			else length = 6;
+
+			//arrow_size = 3;
+			if (xy == 0)
+			{
+				*(ptr + (i*gray_map_width + j) * 3) = 255;
+				*(ptr + (i*gray_map_width + j) * 3 + 1) = 0;
+				*(ptr + (i*gray_map_width + j) * 3 + 2) = 0;
+				//mag_histogram[0]++;
+				if (! (i %	flow_Resolution_dir) || !(j %	flow_Resolution_dir)) {
+					*(ptr_direction + (i*gray_map_width + j) * 3) = 255;
+					*(ptr_direction + (i*gray_map_width + j) * 3 + 1) = 0;
+					*(ptr_direction + (i*gray_map_width + j) * 3 + 2) = 0;
+				}
+			}
+			else {
+				
+				C.x = (int)(v.x * length); C.y = (int)( v.y * length);
+				p2 = p + C;
+			
+				//rotate
+				float temp = v.x; v.x = -v.y; v.y = temp;
+			
+				p2_n.x = p.x + (int)(v.x *6); p2_n.y = p.y + (int)(v.y * 6);
+
+				if (xy >= histo_step2*(mag - 1)) {
+					arrowedLine(g_img[mag], p, p2, Scalar(0, 0, 255), 1, 8, 0, 0.1);//thickness=1 linetype=8 shift=0 tiplength=0.1
+					arrowedLine(g_img[mag], p, p2_n, Scalar(0, 255, 255), 1, 8, 0, 0.1);
+					if (!(i %	flow_Resolution_dir) && !(j %	flow_Resolution_dir)) {
+						arrowedLine(direction_map, p, p2, Scalar(0, 0, 255), 1, 8, 0, 0.1);
+						arrowedLine(direction_map, p, p2_n, Scalar(0, 255, 255), 1, 8, 0, 0.1);
+					}
+
+				}
+				else {
+					int step = (xy / histo_step2) + 1;
+					arrowedLine(g_img[step], p, p2, Scalar(0, 0, 255), 1, 8, 0, 0.1);
+					arrowedLine(g_img[step], p, p2_n, Scalar(0, 255, 255), 1, 8, 0, 0.1);
+					if (!(i %	flow_Resolution_dir) && !(j %	flow_Resolution_dir)) {
+						arrowedLine(direction_map, p, p2, Scalar(0, 0, 255), 1, 8, 0, 0.1);
+						arrowedLine(direction_map, p, p2_n, Scalar(0, 255, 255), 1, 8, 0, 0.1);
+					}
+				}
+
+			}
+		}
+	}
+
+	for (int i = 0; i < 101; i++) {
+		cout << i << " , " << mag_histogram[i] << 
+			", "<< i*histo_step2<<" , "<< (i + 1)*histo_step2<< " ";
+		
+		cv::String str=cv::format("%s_g_field_%03d_%05d_%05d",label.c_str(),i, i*histo_step2,(i+1)*histo_step2);
+	
+		cout << str.c_str() << endl;
+		std::string s = str.c_str();
+		debug_image(s, g_img[i]);
+	}
+
+
+	debug_image("_direction_map_"+label, direction_map);
+}
 cv::Mat get_sobel_map(Mat & srcImg) {
 	cv::Mat gray_Map;
 	cv::Mat org_Gaussian_Map;
 	cv::Mat sobel_map;
+	cv::Mat sobel_bi_map;
 	//Take GradientImg from source Image
 	static int called = 0;
 	cv::cvtColor(srcImg, gray_Map, CV_BGR2GRAY);							//3ch -> 1ch
@@ -93,24 +261,66 @@ cv::Mat get_sobel_map(Mat & srcImg) {
 	int gray_map_height = gray_Map.size().height;
 
 	//	org_Gaussian_Map = bsShowImage::TakeGaussianBlurImg(gray_Map);
-
+	cv::Mat bilaterial_Map;
+	cv::bilateralFilter(gray_Map, bilaterial_Map, 10, 10, 10);
+	debug_image("src_bilaterial_10_10_10", bilaterial_Map);
 	cv::GaussianBlur(gray_Map, org_Gaussian_Map, Size(3, 3), 0);
 	debug_image("src_take_blur" + to_string(called), org_Gaussian_Map);
 	int ddepth = CV_16S;
+	double scale = 1.0;
+	int delta = 0;
 	//org_sobeldient_Map = bsShowImage::TakeGradient(org_Gaussian_Map);
 
 	cv::Mat grad_x, grad_y, abs_sobeld_x, abs_sobeld_y;
-
-	cv::Sobel(org_Gaussian_Map, grad_x, ddepth, 1, 0);
+	cv::Mat grad_bi_x, grad_bi_y, abs_sobeld_bi_x, abs_sobeld_bi_y;
+	//org_Gaussian_Map=
+	cv::Sobel(org_Gaussian_Map, grad_x, ddepth,1,0,3, scale, delta);
 	cv::convertScaleAbs(grad_x, abs_sobeld_x);
-	/// Gradient Y
-	//Scharr( src_gray, grad_y, ddepth, 0, 1, scale, delta, BORDER_DEFAULT );
-	cv::Sobel(org_Gaussian_Map, grad_y, ddepth, 0, 1);
+	cv::Sobel(org_Gaussian_Map, grad_y, ddepth,0,1,3,scale,delta);
 	cv::convertScaleAbs(grad_y, abs_sobeld_y);
+	cv::Sobel(bilaterial_Map, grad_bi_x, ddepth, 1, 0, 3, scale, delta);
+	cv::convertScaleAbs(grad_bi_x, abs_sobeld_bi_x);
+	cv::Sobel(bilaterial_Map, grad_bi_y, ddepth, 0, 1, 3, scale, delta);
+	cv::convertScaleAbs(grad_bi_y, abs_sobeld_bi_y);
 
+	mat_print(grad_x,"grad_x");
+	mat_print(abs_sobeld_y, "abs_sobeld_y");
+	func_gradient_orientation(org_Gaussian_Map, grad_x,grad_y,"gausian");
+	func_gradient_orientation(bilaterial_Map, grad_bi_x, grad_bi_y,"bilaterial");
+	/*
+	Mat gradient_vector(gray_map_height, gray_map_width, CV_8UC1);
+	gradient_vector.setTo(0);
+	char buf[100]; 
+	int k = 0;
+	for(int y=0;y<gray_map_height;y++)
+		for (int x = 0; x < gray_map_width; x++) {
+		//	if (!(x % 10) && !(y % 10)) {
+			if ( !(k%37)){
+				int u =(int)( grad_x.at<uchar>(y, x));
+				int v = (int)(grad_y.at<uchar>(y, x));
+				if (u != 0 && v != 0) {
+					cvQuiver(gradient_vector, x, y, u, v
+						,//int u, int v,
+						cvScalar(255, 255, 255),
+						1,//int Size,
+						1//int Thickness
+					);
+					//sprintf_s(buf, "gradient_vector_%3d_%3d.jpg", 1, 1);
+					//debug_image(buf, gradient_vector);
+
+				}
+			
+			}
+			k++;
+		}
+	debug_image("gradient_vector.jpg", gradient_vector);
+	*/
 	/// Total Gradient (approximate)
+
 	cv::addWeighted(abs_sobeld_x, 0.5, abs_sobeld_y, 0.5, 0, sobel_map);
-	called++;
+	cv::addWeighted(abs_sobeld_bi_x, 0.5, abs_sobeld_bi_y, 0.5, 0, sobel_bi_map);
+	debug_image("sobel_bilaterial", sobel_bi_map);
+	debug_image("sobel_gaussian", sobel_map);
 	return sobel_map;
 }
 
@@ -522,7 +732,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 
 		else {
 			cout << "No Saliency method assigned" << endl;
-			return -1;
+			return -5555;
 		}
 		_render[RENDER_SOBEL]->add_gradient_map(Gradient_Sobel, sobel_8UC1);
 		if (g_saliency_method != string("Sobel")) {

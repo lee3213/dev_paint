@@ -15,7 +15,8 @@ int draw_grid_2(Mat _Quad_TreeMap,
 
 class render_ {
 public:
-
+	Mat *paint_map;
+	unsigned char * paint_map_data;
 	int success_or_fail;
 	int render_method;
 	//Mat render_::PainterlyRendering();
@@ -118,7 +119,7 @@ public:
 		int astroke_depth, int painting_count,
 		int color_BGR_B, int color_BGR_G, int color_BGR_R//BGR order
 														  //unsigned char * _ing_canvas_data
-
+		
 		);
 
 	void brush_resize();

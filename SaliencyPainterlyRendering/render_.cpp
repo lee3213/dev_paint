@@ -397,13 +397,14 @@ int render_::prepare() {
 	else
 		BrushMaxSize = g_src_image_height / 10;
 
-	canvas_size_bezel_size = BrushMaxSize;
+	canvas_size_bezel_size = BrushMaxSize; 
 
 	//Rendering
 	canvas_size_width = g_src_image_width + canvas_size_bezel_size * 2;
 	canvas_size_height = g_src_image_height + canvas_size_bezel_size * 2;
-
-
+	paint_map = new Mat(canvas_size_height, canvas_size_width, CV_8UC3);
+		paint_map_data = paint_map->data;
+		paint_map->setTo(255);
 	cout << "************* prepare start >" << m_tag << " <********************************************" << endl;
 	r_grid_map_1c_accu = gradient_map[render_method];
 	//m_aStroke_set = new list<Img_node*>();

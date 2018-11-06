@@ -60,7 +60,7 @@ Mat & _src_ROI_canvas,
 	int astroke_depth, int painting_count, 
 	int color_BGR_B, int color_BGR_G, int color_BGR_R//BGR order
 	//unsigned char * _ing_canvas_data
-	
+
 	)
 	
 {
@@ -261,6 +261,7 @@ Mat & _src_ROI_canvas,
 					br_BGR_G = bestBrush_data_resized[bIndex_3c + _BGR_G];
 					br_BGR_B = bestBrush_data_resized[bIndex_3c + _BGR_B];
 					p_poke(ing_ROI_clone_q_data, bIndex_3c, br_BGR_B, br_BGR_G, br_BGR_R);
+					p_poke(paint_map_data, bIndex_3c, astroke_depth, astroke_depth, astroke_depth);
 				}
 
 			}//for x
