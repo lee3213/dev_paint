@@ -3,15 +3,15 @@
 #include "define.h"
 #include "brush.h"
 #include "QuadTree.h"
-#include "opencv2\opencv.hpp"
-#include "opencv2\core.hpp"
+#include "opencv2\\opencv.hpp"
+#include "opencv2\\core.hpp"
 #include "define.h"
 #include "extern.h"
 
 using namespace std;
 using namespace cv;
-int draw_grid_2(Mat _Quad_TreeMap,
-	list<Img_node*> *aStroke_set, string tag, int  depth, int draw_depth, int c, string _tag);
+//int draw_grid_2(Mat _Quad_TreeMap,
+	//list<Img_node*> *aStroke_set, string tag, int  depth, int draw_depth, int c, string _tag);
 
 class render_ {
 public:
@@ -202,7 +202,6 @@ public:
 		p_0 = p[index];
 	}
 
-	}
+int render_::lbph();
+	};
 
-
-;

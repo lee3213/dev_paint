@@ -3,8 +3,9 @@
 
 #include "p_rendering.h"
 #include "util.h"
-#include "rgb2hsv.h"
 #include "render_.h"
+#include "rgb2hsv.h"
+
 void proof_box(Point &s, int i_width, int i_height) {
 	Rect rr;
 	if (s.x < 0)

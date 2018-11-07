@@ -248,6 +248,9 @@
     <ClCompile Include="cvQuiver.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="LBPH.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SaliencyPainterlyRendering.rc">

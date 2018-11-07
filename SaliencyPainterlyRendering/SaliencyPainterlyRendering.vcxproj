@@ -219,6 +219,7 @@
     <ClCompile Include="jsonwriter.cpp" />
     <ClCompile Include="json_read.cpp" />
     <ClCompile Include="Judgement.cpp" />
+    <ClCompile Include="LBPH.cpp" />
     <ClCompile Include="permutohedral.cpp" />
     <ClCompile Include="pregraph\saliency_pregraph_main.cpp" />
     <ClCompile Include="pregraph\saliency_PreGraph.cpp" />
