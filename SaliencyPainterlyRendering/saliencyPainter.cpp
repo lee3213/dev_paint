@@ -236,7 +236,7 @@ void func_gradient_orientation(Mat org_8UC1_Map, Mat sobeld_16S_x, Mat sobeld_16
 		cout << i << " , " << mag_histogram[i] << 
 			", "<< i*histo_step2<<" , "<< (i + 1)*histo_step2<< " ";
 		
-		cv::String str=cv::format("%s_g_field_%03d_%05d_%05d",label.c_str(),i, i*histo_step2,(i+1)*histo_step2);
+		cv::String str=cv::format("grad_ori\\%s_g_field_%03d_%05d_%05d",label.c_str(),i, i*histo_step2,(i+1)*histo_step2);
 	
 		cout << str.c_str() << endl;
 		std::string s = str.c_str();

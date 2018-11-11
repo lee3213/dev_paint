@@ -26,7 +26,7 @@
 }
 
 	void set_result_path(std::string para_path,string method_path,int depth) {
-		string dirs[] = { "ing","sobel","saliency" ,"br","grid","br2"};
+		string dirs[] = { "ing","sobel","saliency" ,"br","grid","br2","grad_ori"};
 		string sub_dirs;
 		string dir;
 		dir = g_root_path_win + string("\\") + para_path ;

@@ -89,13 +89,16 @@ int stroke_dump(list<Img_node*> *_aStroke_set, string tag,  int  depth) {
 	return depth;
 }
 int render_::draw_grid_2(Mat _Quad_TreeMap,
-	list<Img_node*> aStroke_set[], string ftag, int  depth, int draw_depth, int c,string _tag) {
+	list<Img_node*> aStroke_set[], string ftag, int  depth, 
+	//int draw_depth, 
+	int c,string _tag) {
 	int __saved_depth = -1;
 	Mat overlay_grid_map[MAX_DEPTH];
 	
 	static int called_cnt = 0;
 	if (aStroke_set->size() == 0) {
-		cout << "aStroke_Set size() = 0 " + _tag << +": " << ftag << " : " << to_string(draw_depth) << endl;
+		cout << "aStroke_Set size() = 0 " + _tag << +": " << ftag << " : "// << to_string(draw_depth) 
+			<< endl;
 		return depth;
 	}
 
@@ -105,22 +108,22 @@ int render_::draw_grid_2(Mat _Quad_TreeMap,
 	for (int i = 0; i < depth; i++) {
 		for (list<Img_node*>::iterator St_it = aStroke_set[i].begin(); St_it != aStroke_set[i].end(); St_it++)
 		{
-			if (draw_depth != -1 && __saved_depth != draw_depth) {
-				continue;
-			}
+		//	if (draw_depth != -1 && __saved_depth != draw_depth) {
+		//		continue;
+		//	}
 			__saved_depth = (*St_it)->depth;
 
-			if (draw_depth == -1 || __saved_depth == draw_depth)
+			//if (draw_depth == -1 || __saved_depth == draw_depth)
 			rectangle_canvas(overlay_grid_map[__saved_depth], Rect((*St_it)->info.srtPoint,
 				(*St_it)->info.endPoint), Scalar(c, c, c));
 
 		}//end of QuadTree dump
 	}// for depth
 	for (int i = 0; i <= __saved_depth; i++) {
-		if (draw_depth == -1 || i == draw_depth) {
+	//	if (draw_depth == -1 || i == draw_depth) {
 			debug_image("ing/"+to_string(called_cnt)+"_o_" + ftag, i, overlay_grid_map[i]);
 			called_cnt++;
-		}
+	//	}
 	}
 	return depth;
 }
@@ -133,8 +136,12 @@ int draw_grid_depth(Mat  _grid_map_1c[], Mat _grid_map_1c_accu,
 
 	for (int i = 0; i < MAX_DEPTH; i++) {
 		overlay_grid_map[i] = _grid_map_1c[MAX_DEPTH].clone();
+		
+		//	debug_image("ing/_ok_grid_" + tag +
+			//	"_" + to_string(called_cnt) + "_", i, overlay_grid_map[i]);
+		
 	}
-
+	
 	for (int i = 0; i < MAX_DEPTH; i++) {
 		int ssize=(int) aStroke_set[i].size();
 		//cout << "z : stroke " << i<<" : "<<__saved_depth <<" , "<<aStroke_set[i].size() << endl;
@@ -161,9 +168,12 @@ int draw_grid_depth(Mat  _grid_map_1c[], Mat _grid_map_1c_accu,
 	}//end of for i
 	for (int i = 0; i <= __saved_depth; i++) {
 		if (draw_depth == -1 || i == draw_depth) {
-			debug_image("ing/_o_grid_" + tag, i, overlay_grid_map[i]);
+			debug_image("ing/_od_grid_" + tag+
+				"_"+to_string(called_cnt)+"_", i, overlay_grid_map[i]);
 			debug_image("_grid_" + tag, i, _grid_map_1c[i]);
-			called_cnt++;
+			debug_image("ing/_grid_" + tag, i, _grid_map_1c[i]);
+
+			cout << tag<<" "<<setw(6) << i << " : " << setw(10)<<_QT_grid_count[i] << endl;
 		}
 	//	cout << " y depth " + tag << setw(5) << i << " : " << __saved_depth<<", "<<_QT_grid_count[i] << endl;
 		if (do_grid_cnt) {
@@ -178,7 +188,7 @@ int draw_grid_depth(Mat  _grid_map_1c[], Mat _grid_map_1c_accu,
 	int depth = __saved_depth + 1;
 	cout << "finalized Depth : " << depth << " : " << _QT_grid_count[__saved_depth] << endl;
 	cout << tag + " grid sum " << grid_map_sum << endl;
-
+	called_cnt++;
 	return depth;
 }
 void render_::func_(){
@@ -333,7 +343,8 @@ void  render_::post_process() {
 		image_save(g_image_name + m_tag_, result_image, r_grid_map_1c_accu);
 
 		
-			ret = draw_grid_2(result_image.clone(), mm_aStroke_set, "prst_" + m_tag, mm_depth, -1, 255, m_tag);
+			ret = draw_grid_2(result_image.clone(), mm_aStroke_set, "prst_" + m_tag, mm_depth, //-1, 
+				255, m_tag);
 
 		func_();
 	}
@@ -356,7 +367,7 @@ render_::render_(int _render_method,std::string tag, std::string tag_, std::stri
 	m_srcData = _srcImg.data;
 	QT_depth = g_depth_limit;
 	;
-	for (int i = 0; i < MAX_DEPTH; i++) {
+	for (int i = 0; i <= MAX_DEPTH; i++) {
 		QT_grid_count[i] = 0;
 		r_s_grid_painting_try[i] = 0;
 		brush_size[i]=0;
@@ -406,7 +417,8 @@ int render_::prepare() {
 		paint_map_data = paint_map->data;
 		paint_map->setTo(255);
 	cout << "************* prepare start >" << m_tag << " <********************************************" << endl;
-	r_grid_map_1c_accu = gradient_map[render_method];
+	r_grid_map_1c_accu = gradient_map[render_method].clone();
+	r_grid_map_1c[MAX_DEPTH] = gradient_map[render_method].clone();
 	//m_aStroke_set = new list<Img_node*>();
 	//for (int i = 0; i < MAX_DEPTH; i++)
 	//	cout << "aStroke_set[" << setw(2) << to_string(i) + "]->size().initialize = " + m_tag << ", " << mm_aStroke_set[i].size() << endl;
@@ -457,7 +469,7 @@ int render_::prepare() {
 		stroke_dump(mm_aStroke_set, m_tag, mm_depth);
 		kk = 0;
 		k_depth = 0;
-		for (int i = 0; i < render_saliency->mm_depth; i++) {
+		for (int i = 5; i < render_saliency->mm_depth; i++) {
 			//cout << "astroke.size()= " + m_tag << ", " << mm_aStroke_set[i].size() << endl;
 			int mod = 0;
 			for (list<Img_node*>::iterator St_it = stroke_set_saliency[i]->begin(); St_it != stroke_set_saliency[i]->end(); St_it++) {
@@ -523,8 +535,14 @@ int render_::prepare() {
 	}
 	cout << m_tag + " Sort check _aStrokeset_size() : " << k_depth<<": "<<mm_aStroke_set[i].size() << endl;
 	}
+	/*for (int i = 0; i <= MAX_DEPTH; i++) {
 	
-	
+
+		debug_image("ing/_or_grid_" + m_tag +
+			"_" +  "_", i, r_grid_map_1c[i]);
+
+	}
+	*/
 	mm_depth=draw_grid_depth(r_grid_map_1c, r_grid_map_1c_accu,mm_aStroke_set, m_tag,
 		grid_map_sum, QT_grid_count, true, -1, 0);
 	QT_depth = mm_depth;

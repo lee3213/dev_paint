@@ -39,9 +39,9 @@ public:
 	int  BrushMinSize;
 	int brush_step;
 	int grid_map_sum = 0, grid_count_sum = 0;
-	Mat r_grid_map_1c[MAX_DEPTH];
+	Mat r_grid_map_1c[MAX_DEPTH+1];
 	Mat r_grid_map_1c_accu;
-	Mat r_try_map_1c[MAX_DEPTH];
+	Mat r_try_map_1c[MAX_DEPTH+1];
 	unsigned char * r_try_map_1c_data[MAX_DEPTH];
 	int mm_depth;
 
@@ -97,7 +97,8 @@ public:
 	};
 	//void  render_::p_peek_canvas(unsigned char * p, int p_x, int p_y, int &p_0, int &p_1, int &p_2);
 	int draw_grid_2(Mat _Quad_TreeMap,
-		list<Img_node*> aStroke_set[], string ftag, int  depth, int draw_depth, int c, string _tag);
+		list<Img_node*> aStroke_set[], string ftag, int  depth,// int draw_depth, 
+		int c, string _tag);
 	int render_::calc_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth,
 		int _brush_size[], string tag);
 	int   render_::P_Rendering(//cv::Mat srcImg,

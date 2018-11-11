@@ -111,4 +111,5 @@ for (int num_components = min(W.cols, 10); num_components < min(W.cols, 300); nu
 	
 		imwrite(format("%s/eigenface_reconstruction_%d.png", output_folder.c_str(), num_components), reconstruction);
 	}
+return 0;
 }
