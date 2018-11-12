@@ -15,8 +15,14 @@ using namespace cv;
 
 class render_ {
 public:
-	Mat *paint_map;
-	unsigned char * paint_map_data;
+	fstream r_cout;
+//	streambuf* r_stream_cout;
+	fstream r_clog;
+//	streambuf* r_stream_clog;
+	fstream r_cstat;
+//	streambuf* r_stream_cstat;
+	//Mat *paint_map;
+	//unsigned char * paint_map_data;
 	int success_or_fail;
 	int render_method;
 	//Mat render_::PainterlyRendering();
@@ -68,11 +74,18 @@ public:
 	std::string m_tag_;
 
 	//int get_depth;
-	render_(int _render_method, std::string tag, std::string tag_, std::string _tag, Mat _srcImg);
+	render_(int _render_method, Mat _srcImg);
 	~render_();
 	void render_::func_();
 	int  PainterlyRendering();
-
+	int stroke_dump(list<Img_node*> *_aStroke_set[], string tag, int  depth);
+	int stroke_dump(list<Img_node*> *_aStroke_set, string tag, int  depth);
+	int draw_grid_depth(Mat  _grid_map_1c[], Mat _grid_map_1c_accu,
+		list<Img_node*> aStroke_set[], string tag, int & grid_map_sum,
+		int _QT_grid_count[]//, bool do_grid_cnt//, int draw_depth, int c
+	);
+	void proof_box(Point &s, int i_width, int i_height, char * p);
+	void proof_box(Point &s, int i_width, int i_height);
 	list<Img_node*> *get_stroke_set_ptr(int i) {
 		return &mm_aStroke_set[i];
 	}

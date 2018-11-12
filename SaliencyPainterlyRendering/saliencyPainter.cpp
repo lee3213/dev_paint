@@ -22,6 +22,7 @@ using namespace std;
 using namespace cv;
 
 using namespace saliency;
+render_ *_render[RENDER_MAX];
 #include "RenderingImage.h"
 
 #include "json_read.h"
@@ -33,14 +34,6 @@ using namespace saliency;
 #include "render_.h"
 #include "time.h"
 #include "cvQuiver.h"
-
-Mat Sgrid_grid_map_1c[MAX_DEPTH];
-Mat gradient_Map_C;
-Mat gradient_Map_G;
-std::string tag[] = { "0_sobel","1_saliency","2_union","3_two_attach","4_two_merge" };
-std::string tag_[] = { "0_sobel_", "1_saliency_", "2_union_", "3_twoattach_","4_two_merge_" };
-std::string _tag[] = { "_0_sobel", "_1_saliency", "_2_union", "_3_twopass","_4_twopass" };
-
 
 
 cv::Mat get_canny_map(Mat & srcImg) {
@@ -133,9 +126,9 @@ void func_gradient_orientation(Mat org_8UC1_Map, Mat sobeld_16S_x, Mat sobeld_16
 	int back;
 
 	for (back = 100; back > 0; back--) {
-		cout << back << ", " << mag_histo[back] <<
-			" back*step = " << back*histo_step
-			<<endl;
+	//	cout << back << ", " << mag_histo[back] <<
+	//		" back*step = " << back*histo_step
+	//		<<endl;
 		histo_sum += mag_histo[back];
 		if (histo_sum > histo_thresh)
 			break;
@@ -231,7 +224,7 @@ void func_gradient_orientation(Mat org_8UC1_Map, Mat sobeld_16S_x, Mat sobeld_16
 			}
 		}
 	}
-
+/*
 	for (int i = 0; i < 101; i++) {
 		cout << i << " , " << mag_histogram[i] << 
 			", "<< i*histo_step2<<" , "<< (i + 1)*histo_step2<< " ";
@@ -242,7 +235,7 @@ void func_gradient_orientation(Mat org_8UC1_Map, Mat sobeld_16S_x, Mat sobeld_16
 		std::string s = str.c_str();
 		debug_image(s, g_img[i]);
 	}
-
+	*/
 
 	debug_image("_direction_map_"+label, direction_map);
 }
@@ -505,7 +498,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 
 	//	cv::Mat org_saliency_sobeld_Map;
 		//, org_QuadTreeMap, org_DensityMap, org_rstImg;
-	render_ *_render[RENDER_MAX];
+	
 	Mat x_srcImg;
 
 	Mat sobel_8UC1;
@@ -581,7 +574,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 
 	debug_image("src_image", x_srcImg);
 	for (int i = 0; i < RENDER_MAX; i++) {
-		_render[i] = new  render_(i, tag[i], tag_[i], _tag[i], x_srcImg);
+		_render[i] = new  render_(i, x_srcImg);
 	}
 
 	//Brush initialization
@@ -758,15 +751,15 @@ int   RenderingImage(char * src_name, char * deploy_name)
 		time(&s_e_time);
 		localtime_s(&s_t_e, &s_e_time);
 		strftime(s_e_buff, 20, "%Y-%m-%d %H:%M:%S", &s_t_e);
-		cout << "saliency End " << s_s_buff << " : " << s_e_buff << endl;
-		clog << "saliency End, " << s_s_buff << "," << s_e_buff << endl;
+		cout << "saliency finished " << s_s_buff << " : " << s_e_buff << endl;
+		clog << "saliency finished " << s_s_buff << " , " << s_e_buff << endl;
 		int how_many_render;
 		if (g_saliency_method == string("Sobel")) {
 			how_many_render = 1;
 		}
 		else {
 			how_many_render = RENDER_MAX;
-			_render[RENDER_TWOPASS_ATTACH]->add_render(_render[0], _render[1]);
+			_render[RENDER_TWOPASS_ATTACH]->add_render(_render[0], _render[1]);//render_sobel, render_saliency
 			_render[RENDER_TWOPASS_MERGE]->add_render(_render[0], _render[1]);
 		}
 
@@ -787,8 +780,8 @@ int   RenderingImage(char * src_name, char * deploy_name)
 			time(&p_e_time);
 			localtime_s(&p_t_e, &p_e_time);
 			strftime(p_e_buff, 20, "%Y-%m-%d %H:%M:%S", &p_t_e);
-			cout << "Prepare End " << _render[i]->m_tag << p_s_buff << " : " << p_e_buff << endl;
-			clog << "Prepare End, " << _render[i]->m_tag << p_s_buff << ", " << p_e_buff << endl;
+			cout << " Prepare Finished " << _render[i]->m_tag << " "<<p_s_buff << " : " << p_e_buff << endl;
+			clog << " Prepare Finished, " << _render[i]->m_tag << " "<<p_s_buff << ", " << p_e_buff << endl;
 		}
 
 		//return -997788;
@@ -809,7 +802,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 
 		if (g_saliency_method != string("Sobel")){
 			p_render[RENDER_SALIENCY] = new thread(run_render, _render[RENDER_SALIENCY]);
-		p_render[RENDER_UNION] = new thread(run_render, _render[RENDER_UNION]);
+			p_render[RENDER_UNION] = new thread(run_render, _render[RENDER_UNION]);
 		}
 	cout << "p_sobel    : " << p_render[RENDER_SOBEL]->get_id() << endl;
 	if (g_saliency_method != string("Sobel")) {

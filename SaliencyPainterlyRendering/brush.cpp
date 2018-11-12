@@ -60,7 +60,7 @@ int BrushInitialization(vector <Brush*> &_brush_set,int _brush_depth,int brush_s
 			cout << fname << endl;
 			continue;
 		}
-		int _brush_Ts[] = { 100,150,200,230 };
+		
 		unsigned char * temp_brush_data = temp_brush.data;
 		bsize_w = temp_brush.size().width;
 		bsize_h = temp_brush.size().height;
@@ -69,6 +69,7 @@ int BrushInitialization(vector <Brush*> &_brush_set,int _brush_depth,int brush_s
 		unsigned char * brush_gray_x_data[4];
 
 		if (run_once) {
+			int _brush_Ts[] = { 100,150,200,230 };
 			for (int i = 0; i < 4; i++) {
 				brush_gray_x[i] = new Mat(bsize_h, bsize_w, CV_8UC3);
 				brush_gray_x_data[i] = brush_gray_x[i]->data;
@@ -87,6 +88,7 @@ int BrushInitialization(vector <Brush*> &_brush_set,int _brush_depth,int brush_s
 				debug_image(string("/br/g_") + fn+to_string(i), *brush_gray_x[i]);
 			}
 		}
+
 		 cv::cvtColor(temp_brush, brush_gray, COLOR_RGB2GRAY);
 		
 		 unsigned char * bestBrush_data_gray_resized = brush_gray.data;

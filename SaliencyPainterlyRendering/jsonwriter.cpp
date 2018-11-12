@@ -17,8 +17,7 @@ using namespace std;
 //	root["indent"]["use_space"] = getCurrentIndentUseSpace();
 int thresh[] = { 15 };
 int depth[] = { 7 };
-int _grid[] = { 5 };
-
+int _grid[] = { 15 };
 string saliency_method[] = { "Sobel", "Itti","Pregraph","Residual","Blackandwhite","Fine_grained","Perazzi"};
 //string _re[MAX_DEPTH] = { "Sobel","Saliency","Twopass" };
 //string _str_mm[MAX_DEPTH] = { "Attach","Merge" };
@@ -28,9 +27,11 @@ int QT_N[] = { 1};
 //int _mm[] = { 1,2 };// "attach", tag_union
 ;
 int _ps[] = { 6 };//"g_paint_area_scale"
-int _br[] = { 5 }; //g_BrushMinSize
+int _br[] = { 15 }; //g_BrushMinSize
+int _at[] = { 5 };
+
 int _gs[] = { 1 };//grid skip 
-int _ts[] = { 230 };
+int _ts[] = { 230 };//threshold
 int br, th, de, gr, sm, qt, re, mm, gs, ps,ts;
 
 void get_json_name(string & file_name) {
@@ -40,7 +41,7 @@ void get_json_name(string & file_name) {
 		//+ "_r" + _re[re] 
 		 + "_gs" + to_string(_gs[gs])
 		 + "_ts" + to_string(_ts[ts])
-		
+	
 		//+ "_m" + _str_mm[mm]  
 		 + "_copy.json";
 	
@@ -86,7 +87,7 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 
 	Json::StreamWriterBuilder wbuilder;
 	Json::Value root;
-	int n_br = sizeof(_br) / sizeof(int);
+//	int n_br = sizeof(_br) / sizeof(int);
 	int n_th = sizeof(thresh) / sizeof(int);
 	int n_de = sizeof(depth) / sizeof(int);
 	int n_gr = sizeof(_grid) / sizeof(int);
@@ -97,7 +98,7 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 	int n_ps = sizeof(_ps) / sizeof(int);
 	int n_gs= sizeof(_gs) / sizeof(int);
 	int n_ts = sizeof(_ts) / sizeof(int);
-	int howmany = n_br  *n_th * n_de * n_gr*n_sm*n_qt*n_ps*n_gs*n_ts;
+	int howmany = n_th * n_de * n_gr*n_sm*n_qt*n_ps*n_gs*n_ts;
 	
 	int f_count = 0;
 	string deploy_name[300];
@@ -115,7 +116,7 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 			for (th = 0; th < n_th; th++) //s
 				for (de = 0; de < n_de; de++) //d
 					for (gr = 0; gr < n_gr; gr++) //g
-						for (br = 0; br < n_br; br++) //b
+					//	for (br = 0; br < n_br; br++) //b
 							for (qt = 0; qt < n_qt; qt++) //N QTn{
 								for (ps = 0; ps < n_ps; ps++){//ps //scale
 									std::ofstream file_ts;
@@ -136,7 +137,8 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 												root["root_path"] = "/rst";
 												root["root_path_win"] = "\\rst";
 												root["g_paint_method"] = "copy";//copy alpha
-												root["g_BrushMinSize"] = _br[br]; //5,10
+												root["g_BrushMinSize"] = _br[0]; //15
+												root["g_BrushAttachSize"] = _at[0];//5
 												root["g_Ts"] = _ts[ts];
 												root["end"] = "end";
 												root["g_paint_area_scale"] = _ps[ps];//

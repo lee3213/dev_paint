@@ -119,12 +119,10 @@ int  set_global(string src_name,string deploy_name) {
 
 	string f_path_stat = g_root_path_win + string("\\cstat\\cstat_")+g_image_name+".csv";
 	cout << f_path_stat << endl;
-
+		
 	g_file_cstat.open(f_path_stat.c_str(), ios::app);
-	
-	// Get the streambuffer of the file
-
-	g_stream_buffer_file_cstat = g_file_cstat.rdbuf();
+		// Get the streambuffer of the file
+		g_stream_buffer_file_cstat = g_file_cstat.rdbuf();
 
 	
 	//	file_redirection_clog(g_para_method_path+"/clog.txt");
@@ -152,6 +150,7 @@ int  set_global(string src_name,string deploy_name) {
 	cout << "g_min_gridsize = " << g_min_gridsize <<endl;
 	cout << "g_QT_avgSThreshold = " << g_QT_avgSThreshold << endl;
 	cout << "g_Scale = " << g_paint_area_scale << endl;
+	cout << "g_Scale_0 = " << g_paint_area_scale_0 << endl;
 	cout << "g_BrushMinSize = " << g_BrushMinSize << endl;
 	cout << "g_brush_thumbnail_size = " << g_brush_thumbnail_size << endl;
 	cout << endl;

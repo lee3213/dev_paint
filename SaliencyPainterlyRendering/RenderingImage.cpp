@@ -90,9 +90,9 @@ int   render_::PainterlyRendering()
 	}
 
 	for(int i=0;i<mm_depth;i++)
-	cout << m_tag << " : "<<mm_depth<<" size: "<< mm_aStroke_set[i].size()<<endl;
+	r_cout << m_tag << " : "<<mm_depth<<" size: "<< mm_aStroke_set[i].size()<<endl;
 //	for (int i = 0; i < mm_depth; i++) {
-//		cout << "0 "<<i << ", " << brush_size[i] << endl;
+//		r_cout << "0 "<<i << ", " << brush_size[i] << endl;
 //	}
 
 //	saved_depth = -1;
@@ -116,7 +116,7 @@ int   render_::PainterlyRendering()
 			if (astroke_depth != saved_depth) {
 				if (astroke_depth != 0) {
 					if (saved_depth > astroke_depth) {
-						cout << "<< " << m_tag << " " << saved_depth << " : " << astroke_depth << endl;
+						r_cout << "<< " << m_tag << " " << saved_depth << " : " << astroke_depth << endl;
 						return -1;
 					}
 					else {
@@ -134,16 +134,16 @@ int   render_::PainterlyRendering()
 
 			if (astroke_depth > MAX_DEPTH) {
 				cerr << "astroke depth >" << MAX_DEPTH << " : " << (*St_it)->no << endl;
-				cout << "astroke depth >" << MAX_DEPTH << " : " << (*St_it)->no << endl;
+				r_cout << "astroke depth >" << MAX_DEPTH << " : " << (*St_it)->no << endl;
 
 				continue;
 			}
 			if (brush_size[astroke_depth] < 0) {
 				cerr << "m_brush[" << astroke_depth << "]" << brush_size[astroke_depth] << endl;
-				cout << "m_brush[" << astroke_depth << "]" << brush_size[astroke_depth] << endl;
-				cout << "stroke =" << (*St_it)->no << endl;
+				r_cout << "m_brush[" << astroke_depth << "]" << brush_size[astroke_depth] << endl;
+				r_cout << "stroke =" << (*St_it)->no << endl;
 				for (int i = 0; i < mm_depth; i++) {
-					cout << "1 " << i << ", " << brush_size[i] << endl;
+					r_cout << "1 " << i << ", " << brush_size[i] << endl;
 					cerr << i << ", " << brush_size[i] << endl;
 
 				}
@@ -157,13 +157,16 @@ int   render_::PainterlyRendering()
 			int brush_area_h_size_half = brush_area_h_size / 2+brush_area_h_size%2;
 			int brush_area_w_size_half = brush_area_w_size / 2 + brush_area_w_size % 2;
 
-
+			if (astroke_depth == 0)
+				paint_area_brush_count = (st_w_size * st_h_size *g_paint_area_scale_0) /
+				(brush_area_h_size * brush_area_w_size);
+			else
 			 paint_area_brush_count = (st_w_size * st_h_size *g_paint_area_scale) /
 				(brush_area_h_size * brush_area_w_size);
 			//(brush_size[astroke_depth] * brush_size[astroke_depth]);
 
 			if (paint_area_brush_count == 0) {
-				cout << "paint_area_brush_count == 0 depth " << astroke_depth
+				r_cout << "paint_area_brush_count == 0 depth " << astroke_depth
 					<< " st_size : " << st_w_size << ", " << st_h_size << " g_paint_area_Scale " <<
 					g_paint_area_scale << (st_w_size * st_h_size *g_paint_area_scale) << " m_brush_size " << brush_size[astroke_depth] <<
 					" : " <<
@@ -307,7 +310,7 @@ int   render_::PainterlyRendering()
 		strftime(s_buff, 20, "%Y-%m-%d %H:%M:%S",&t_s );
 		char e_buff[20];
 		strftime(e_buff, 20, "%Y-%m-%d %H:%M:%S",&t_e );
-		cout << setw(15)<<m_tag << " :: d "<<setw(3)<<uu<<" ,size "<< setw(5) << mm_aStroke_set[uu].size()<<
+		r_cout << setw(15)<<m_tag << " :: d "<<setw(3)<<uu<<" ,size "<< setw(5) << mm_aStroke_set[uu].size()<<
 			"  "<< setw(4)<<paint_area_brush_count<<
 			" " << s_buff << " : " << e_buff << endl;
 		clog << m_tag << " ," << setw(3) << uu << " ,size, " << mm_aStroke_set[uu].size() <<
@@ -318,9 +321,9 @@ int   render_::PainterlyRendering()
 
 //	int ret = draw_grid_2(rst_accu_canvas[mm_depth-1].clone(), mm_aStroke_set, string("rst_") + m_tag, mm_depth, -1, 255, m_tag);
 	//ret = draw_grid_2(r_try_map_1c[mm_depth-1], mm_aStroke_set, string("try_") + m_tag, mm_depth, -1, 255, m_tag);
-	cout << "Merge SKIP count : " << g_merge_skip_count << endl;
-	cout << " depth : " << mm_depth << endl;
-	cout << "size mismatch " << size_mismatch << endl;
+	r_cout << "Merge SKIP count : " << g_merge_skip_count << endl;
+	r_cout << " depth : " << mm_depth << endl;
+	r_cout << "size mismatch " << size_mismatch << endl;
 	for (int i = 0; i < mm_depth; i++) {
 		static int called = 0;
 		debug_image("ing/ing_" + to_string(i) + "_" + m_tag + to_string(called), ing_canvas[i]);
@@ -353,7 +356,7 @@ int   render_::PainterlyRendering()
 	strftime(s_buff, 20, "%Y-%m-%d %H:%M:%S", &t_s);
 	char e_buff[20];
 	strftime(e_buff, 20, "%Y-%m-%d %H:%M:%S", &t_e);
-	cout << setw(15) << m_tag<<"-->"<<s_buff << " : "<<e_buff << endl;
+	r_cout << setw(15) << m_tag<<"-->"<<s_buff << " : "<<e_buff << endl;
 	clog << "R End, "<<m_tag << "," << s_buff << "," << e_buff << endl;
 		return 0;
 

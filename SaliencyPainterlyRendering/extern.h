@@ -7,6 +7,10 @@
 #include "opencv2\core.hpp"
 #include <random>
 #include "render_.h"
+
+using namespace std;
+using namespace cv;
+//extern render_ *_render[];
 //extern CWinApp theApp;
 
 //using namespace cv;
@@ -66,12 +70,15 @@ extern string g_para_method_image_path;
 //extern string g_win_path;
 extern string g_root_image_path;
 extern int g_paint_area_scale;
+extern int g_paint_area_scale_0;
+
 extern int g_QT_method_N;//N
 //extern string g_Render_method;//Union, Only
 
 extern int  g_BrushNumber;							//basic:64    expansion:48
 //extern int  g_BrushMaxSize;						//1024size에는 130, 3072size에는 400으로 설정했습니다..
 extern int  g_BrushMinSize;
+extern int g_BrushAttachSize;
 //extern int m_brush_size_x;
 //extern int m_brush_size_y;
 
@@ -103,9 +110,9 @@ extern unsigned char * g_touch_data;
 //extern int g_canvas_size_bezel_size;
 
 //extern cv::Mat grid_map[MAX_DEPTH]; //
+extern fstream g_file_cout;
 extern streambuf* g_stream_buffer_file_cout;
 extern streambuf* g_stream_buffer_file_clog;
-extern fstream g_file_cout;
 extern fstream g_file_clog;
 extern streambuf* g_stream_buffer_file_cstat;
 extern fstream g_file_cstat;
@@ -122,9 +129,18 @@ extern int g_src_image_step1;
 extern int g_TH;
 extern int g_ET;//positive ET=-1 negative
 
+extern Mat Sgrid_grid_map_1c[];
+extern Mat gradient_Map_C;
+extern Mat gradient_Map_G;
+extern std::string tag[];// = { "0_sobel","1_saliency","2_union","3_two_attach","4_two_merge" };
+extern std::string tag_[]; //= { "0_sobel_", "1_saliency_", "2_union_", "3_twoattach_","4_two_merge_" };
+extern std::string _tag[];//= { "_0_sobel", "_1_saliency", "_2_union", "_3_twopass","_4_twopass" };
+
+
 //extern string saliency_method[MAX_DEPTH];// = { "Pregraph","Itti","Residual","Blackandwhite","Fine_grained" };
 //extern string _re[MAX_DEPTH];// = { "Sobel","Union","Saliency","Twopass" };
 //extern string _str_mm[MAX_DEPTH];// = { "Attach","Merge" };
 //extern int saliency_method_cnt;// = 6;
 //extern int _re_cnt;// = 4;
 //extern int _str_mm_cnt;// = 2;
+extern float g_BrushMax_scale;

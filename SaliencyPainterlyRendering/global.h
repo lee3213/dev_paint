@@ -65,9 +65,18 @@ int g_brush_style;
 int  g_BrushNumber ;						//basic:64    expansion:48
 int g_brush_thumbnail_size;
 int g_BrushMinSize;
+int g_BrushAttachSize;
 unsigned char *g_org_DensityMap_data;
 int g_INDEX_BRUSH_SIZE_WIDTH ;
 int g_INDEX_BRUSH_SIZE_HEIGHT;
+
+Mat Sgrid_grid_map_1c[MAX_DEPTH];
+Mat gradient_Map_C;
+Mat gradient_Map_G;
+std::string tag[] = { "0_sobel","1_saliency","2_union","3_two_attach","4_two_merge" };
+std::string tag_[] = { "0_sobel_", "1_saliency_", "2_union_", "3_twoattach_","4_two_merge_" };
+std::string _tag[] = { "_0_sobel", "_1_saliency", "_2_union", "_3_twoattach_","_4_two_merge_" };
+
 
 //int m_brush_size_x;
 //int m_brush_size_y;
@@ -96,7 +105,7 @@ string g_paint_method;
 
 int g_paint_area_scale;
 int g_QT_method_N;//N
-
+int g_paint_area_scale_0;
 
 
 
@@ -117,6 +126,6 @@ fstream g_file_cerr;
 int g_TH = 240;
 int g_ET = 1;//positive ET=-1 negative
 int g_merge_skip_count;
-
+float  g_BrushMax_scale = 2.0;
 //int _re_cnt = 3;
 //int _str_mm_cnt = 2;

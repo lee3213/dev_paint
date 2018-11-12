@@ -6,35 +6,35 @@
 #include "render_.h"
 #include "rgb2hsv.h"
 
-void proof_box(Point &s, int i_width, int i_height) {
+void render_::proof_box(Point &s, int i_width, int i_height) {
 	Rect rr;
 	if (s.x < 0)
-		cout << "error 1:" << s.x << endl;
+		r_cout << "error 1:" << s.x << endl;
 	if (s.x >= i_width)
-		cout << "error 2:" << s.x << endl;
+		r_cout << "error 2:" << s.x << endl;
 
 
 
-	if (s.y < 0) cout << "error 3:" << s.y << endl;
+	if (s.y < 0) r_cout << "error 3:" << s.y << endl;
 
 	if (s.y >= i_height)
-		cout << "error 4:" << s.y << endl;
+		r_cout << "error 4:" << s.y << endl;
 
 }
 
-void proof_box(Point &s, int i_width, int i_height, char * p) {
+void render_::proof_box(Point &s, int i_width, int i_height, char * p) {
 	//Rect rr;
 	if (s.x < 0)
-		cout << "error 1:" << p << s.x << endl;
+		r_cout << "error 1:" << p << s.x << endl;
 	if (s.x >= i_width)
-		cout << "error 2:" << p << s.x << endl;
+		r_cout << "error 2:" << p << s.x << endl;
 
 
 
-	if (s.y < 0) cout << "error 3:" << p << s.y << endl;
+	if (s.y < 0) r_cout << "error 3:" << p << s.y << endl;
 
 	if (s.y >= i_height)
-		cout << "error 4:" << p << s.y << endl;
+		r_cout << "error 4:" << p << s.y << endl;
 
 }
 
@@ -262,7 +262,7 @@ Mat & _src_ROI_canvas,
 					br_BGR_G = bestBrush_data_resized[bIndex_3c + _BGR_G];
 					br_BGR_B = bestBrush_data_resized[bIndex_3c + _BGR_B];
 					p_poke(ing_ROI_clone_q_data, bIndex_3c, br_BGR_B, br_BGR_G, br_BGR_R);
-					p_poke(paint_map_data, bIndex_3c, astroke_depth, astroke_depth, astroke_depth);
+//					p_poke(paint_map_data, bIndex_3c, astroke_depth, astroke_depth, astroke_depth);
 				}
 
 			}//for x
