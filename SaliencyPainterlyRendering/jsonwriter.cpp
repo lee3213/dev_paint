@@ -209,19 +209,9 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 									std::cout << f_name_para_method_cfg << ":: File opening failed\n";
 									return -1;
 								}
-
 								else file_para_method_cfg[mf_loc] << from_jsonfolderPath + "\\" + json_file_name << endl;
 								
 								if ( file_para_cfg[f_loc].is_open()) {
-									file_para_cfg[f_loc] << from_jsonfolderPath + "\\" + json_file_name << endl;
-								}
-								else {
-									cout << "[" << f_name_para_cfg[f_loc] << "] not open" << endl;
-									fail_flag--;
-									break;
-								}
-
-								if (file_para_cfg[f_loc].is_open()) {
 									file_para_cfg[f_loc] << from_jsonfolderPath + "\\" + json_file_name << endl;
 								}
 								else {

@@ -108,19 +108,34 @@ int call_file_write(string f_name, string image_file[], int file_image_cnt,
 	file_write(f_name, f_str, f_cnt);
 	return f_cnt;
 }
+
+
+string image_csv_file[100];
+int image_csv_cnt = 0;
+int find_image_idx(string lst_name)
+{
+	int i;
+	for (i = 0; i < image_csv_cnt; i++) {
+		if (lst_name == image_csv_file[i])
+			break;
+	}
+	if (i == image_csv_cnt) return -1;
+	return i;
+}
 string method_para_cfg_file[1000];
 int make_batches(string image_list_csv_path, string  deploy_path, string list_cfg_path,
 	string batch_render_method_path,
 	string batch_render_para_path,
 	string batch_render_para_method_path,
-	string batch_render_call_path,
+	string batch_render_file_path,
+	string batch_render_file_para_path,
+	string batch_render_file_method_path,
 	string _render_src,
 	string exe_path)
 
  {
 	int ret;
-	string image_csv_file[100];
-	int image_csv_cnt=0;
+
 	string f_name_list_csv = image_list_csv_path + "\\image_lst.csv";
 	ret=file_read( f_name_list_csv, image_csv_file,image_csv_cnt);
 	
@@ -155,7 +170,7 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
 //		ret = file_read(f_name_image, image_file, image_file_cnt);
 //	}
 	
-	int file_method_json_cnt = 0;
+	int method_json_cnt = 0;
 	string f_name_method_json;
 	string method_json_file[1000];
 //	for (int method_json_file_idx = 0; method_json_file_idx < file_meta_cnt; method_json_file_idx++) {
@@ -195,7 +210,7 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
 
 	for (int method_file_idx = 0; method_file_idx < file_method_cnt; method_file_idx++) {
 		f_name_method_json = list_cfg_path + "\\" + method_cfg_file[method_file_idx];
-				ret = file_read(f_name_method_json, method_json_file, file_method_json_cnt);
+				ret = file_read(f_name_method_json, method_json_file, method_json_cnt);
 		
 			for (int image_idx = 0; image_idx < image_csv_cnt; image_idx++) {
 				f_name_image = image_list_csv_path + "\\" + image_csv_file[image_idx];
@@ -205,7 +220,7 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
 
 
 				int flag = bat_file_write(f_name_method_bat, image_file, image_file_cnt, exe_path,
-					file_method_json_cnt, method_json_file,
+					method_json_cnt, method_json_file,
 					_render_src);
 			}
 	
@@ -214,7 +229,6 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
 	string f_name_para_method_cfg;
 	for (int para_method_idx = 0; para_method_idx < method_para_cnt; para_method_idx++) {
 
-	
 		f_name_para_method_cfg = list_cfg_path + "\\" + method_para_cfg_file[para_method_idx];
 
 		ret = file_read(f_name_para_method_cfg, para_method_json_file, para_method_json_cnt);
@@ -230,7 +244,69 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
 				_render_src);
 
 		}
+		int find = find_image_idx("paper.lst");
+		if (find != -1) {
+			f_name_image = image_list_csv_path + "\\" + image_csv_file[find];
+			ret = file_read(f_name_image, image_file, image_file_cnt);
+			string image_file_1[1];
+			
+			string f_name_para_method_cfg;
+			for (int para_method_idx = 0; para_method_idx < method_para_cnt; para_method_idx++) {
 
+				f_name_para_method_cfg = list_cfg_path + "\\" + method_para_cfg_file[para_method_idx];
+
+				ret = file_read(f_name_para_method_cfg, para_method_json_file, para_method_json_cnt);
+
+		
+				for (int k = 0; k < image_file_cnt; k++) {
+					f_name_para_bat = batch_render_file_path + "\\" + image_file[k] 
+						+ "_" + method_para_cfg_file[para_method_idx] + ".bat";
+					image_file_1[0] = image_file[k];
+					int flag = bat_file_write(f_name_para_bat, image_file_1, 1, exe_path,
+						para_method_json_cnt, para_method_json_file,
+						_render_src);
+
+				}
+
+			}
+		//	string f_name_para_method_cfg;
+			for (int para_idx = 0; para_idx < file_meta_cnt; para_idx++) {
+
+				f_name_json = list_cfg_path + "\\" + meta_cfg_file[para_idx];
+
+				ret = file_read(f_name_json, meta_json_file, meta_json_cnt);
+				
+
+				for (int k = 0; k < image_file_cnt; k++) {
+					f_name_para_bat = batch_render_file_para_path + "\\" + image_file[k]
+						+ "_" + meta_cfg_file[para_idx] + ".bat";
+					image_file_1[0] = image_file[k];
+					int flag = bat_file_write(f_name_para_bat, image_file_1, 1, exe_path,
+						meta_json_cnt, meta_json_file,
+						_render_src);
+
+				}
+
+			}
+			for (int method_idx = 0; method_idx < file_method_cnt; method_idx++) {
+
+				f_name_json = list_cfg_path + "\\" + method_cfg_file[method_idx];
+
+				ret = file_read(f_name_json, method_json_file, method_json_cnt);
+
+
+				for (int k = 0; k < image_file_cnt; k++) {
+					f_name_method_bat = batch_render_file_method_path + "\\" + image_file[k]
+						+ "_" + method_cfg_file[method_idx] + ".bat";
+					image_file_1[0] = image_file[k];
+					int flag = bat_file_write(f_name_method_bat, image_file_1, 1, exe_path,
+						method_json_cnt, method_json_file,
+						_render_src);
+
+				}
+
+			}
+		}//find 
 	}
 	
 
