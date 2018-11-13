@@ -10,10 +10,7 @@ int  set_global(string src_name,string deploy_name) {
 	//g_method = "org";
 	//g_method_path = "/"+g_method;
 	//g_method_revision = "1";
-
-
-
-
+	
 	//m_brush_size_x = 200;
 	//m_brush_size_y = 200;
 	g_INDEX_BRUSH_SIZE_WIDTH = 20;//changed by cwlee from 10 to same as thumbnail
@@ -54,10 +51,10 @@ int  set_global(string src_name,string deploy_name) {
 	g_image_name = string(buf);
 	cout << g_image_name << endl;
 
-	 g_para = string("s") + to_string(g_QT_avgSThreshold) + "d" + to_string(g_depth_limit)
-	+"g" + to_string(g_min_gridsize) + "_b" + to_string(g_BrushMinSize) + 
-		 "_N" + to_string(g_QT_method_N)+"_ps"+to_string(g_paint_area_scale)+"_ts"+to_string(g_brush_Ts)
-		 + "_gs" + to_string(g_merge_skip_count);
+	g_para = string("s") + to_string(g_QT_avgSThreshold) + "d" + to_string(g_depth_limit)
+		+ "g" + to_string(g_min_gridsize) + "_b" + to_string(g_BrushMinSize) +
+		"_N" + to_string(g_QT_method_N) + "_ps" + to_string(g_paint_area_scale) + "_ts" + to_string(g_brush_Ts);
+		// + "_gth" + to_string(g_grid_threshold);
 
 	 cout << "g_para " << g_para << endl;
 
@@ -97,7 +94,11 @@ int  set_global(string src_name,string deploy_name) {
 
 	string f_path_cout = g_root_path_win + string("\\cout\\")+g_para+ "\\cout_"+g_para_method +"_"+ g_image_name+string(".txt");
 	cout << f_path_cout << endl;
-
+	
+	//g_stream_buffer_file_cout_backup=cout.rdbuf();
+	//g_file_cout_backup.tie = cout.tie;
+	//g_file_cout_backup.rdbuf(g_stream_buffer_file_cout_backup);
+	//g_file_cout_backup << f_path_cout << endl;
 	g_file_cout.open(f_path_cout.c_str(), ios::out);
 	// Get the streambuffer of the file
 	 g_stream_buffer_file_cout = g_file_cout.rdbuf();
@@ -149,6 +150,7 @@ int  set_global(string src_name,string deploy_name) {
 	cout << "g_Depth_Limit = " << g_depth_limit << endl;
 	cout << "g_min_gridsize = " << g_min_gridsize <<endl;
 	cout << "g_QT_avgSThreshold = " << g_QT_avgSThreshold << endl;
+	//cout << "g_grid_threshold = " << g_grid_threshold << endl;
 	cout << "g_Scale = " << g_paint_area_scale << endl;
 	cout << "g_Scale_0 = " << g_paint_area_scale_0 << endl;
 	cout << "g_BrushMinSize = " << g_BrushMinSize << endl;

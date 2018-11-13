@@ -15,200 +15,288 @@ using namespace std;
 //	root["encoding"] = getCurrentEncoding();
 //	root["indent"]["length"] = getCurrentIndentLength();
 //	root["indent"]["use_space"] = getCurrentIndentUseSpace();
-int thresh[] = { 15 };
-int depth[] = { 7 };
-int _grid[] = { 15 };
-string saliency_method[] = { "Sobel", "Itti","Pregraph","Residual","Blackandwhite","Fine_grained","Perazzi"};
+int sthresh[] = { 60,70,80 };
+int _grid[] = { 10,20 };
+int depth[] = { 10 };
+int _br[] = { 10 }; //g_BrushMinSize
+int _at[] = { 5 }; //attach brush size
+
 //string _re[MAX_DEPTH] = { "Sobel","Saliency","Twopass" };
 //string _str_mm[MAX_DEPTH] = { "Attach","Merge" };
 
-int saliency_method_cnt = sizeof(saliency_method) / sizeof(string);
+//int saliency_method_cnt = sizeof(g_saliency_method_str) / sizeof(string);
 int QT_N[] = { 1};
 //int _mm[] = { 1,2 };// "attach", tag_union
 ;
-int _ps[] = { 6 };//"g_paint_area_scale"
-int _br[] = { 15 }; //g_BrushMinSize
-int _at[] = { 5 };
+int _ps[] = { 10 };//"g_paint_area_scale"
 
-int _gs[] = { 1 };//grid skip 
-int _ts[] = { 230 };//threshold
-int br, th, de, gr, sm, qt, re, mm, gs, ps,ts;
+
+
+//int _bts[] = {250 };//brush transparecy threshold
+int br, th, de, gr, sm, qt, re, mm, gth, ps;// , bts;
 
 void get_json_name(string & file_name) {
-	 file_name = "S" + saliency_method[sm]+"_s" + to_string(thresh[th]) + "_d" + to_string(depth[de]) +
+	 file_name = "M" + g_saliency_method_str[sm]+"_s" + to_string(sthresh[th]) + "_d" + to_string(depth[de]) +
 		"_g" + to_string(_grid[gr]) + "_b" + to_string(_br[br]) + "_N" + to_string(QT_N[qt])
 		+ "_ps" + to_string(_ps[ps])
-		//+ "_r" + _re[re] 
-		 + "_gs" + to_string(_gs[gs])
-		 + "_ts" + to_string(_ts[ts])
-	
-		//+ "_m" + _str_mm[mm]  
+		//	 + "_ts" + to_string(_bts[bts])
 		 + "_copy.json";
 	
 }
-void get_render_para_ps(string &render_name) {
-	render_name = "render_s" + to_string(thresh[th]) + "_d" + to_string(depth[de]) +
-		"_g" + to_string(_grid[gr]) + "_b" + to_string(_br[br]) + "_N" + to_string(QT_N[qt])
-		+ "_ps" + to_string(_ps[ps]);
-//		+ "_ts" + to_string(_ts[ts]);
-}
-void get_render_para(string &render_name) {
-	render_name = "render_s" + to_string(thresh[th]) + "_d" + to_string(depth[de]) +
-		"_g" + to_string(_grid[gr]) + "_b" + to_string(_br[br]) + "_N" + to_string(QT_N[qt])
-		+ "_ps" + to_string(_ps[ps])
-		+ "_ts" + to_string(_ts[ts]);
-}
-void get_render_name(string & bat_dir,string & file_name) {
-	string render_name;
-	get_render_para(render_name);
-	file_name = bat_dir+string("\\")+render_name+
-		//+ "_r" + _re[re] 
-		+ "_smAll.bat";
+#define MAX_PARA 100
+int howmany;
+string json_file_name;
+int f_count=0;
+int write_json_content(string from_jsonfolderPath) {
+	Json::StreamWriterBuilder wbuilder;
+	Json::Value root;
+	
+	//int f_count;
+	string f_path_name;
+	
+	root["root_path"] = "/rst";
+	root["root_path_win"] = "\\rst";
+	root["g_paint_method"] = "copy";//copy alpha
+	root["g_BrushMinSize"] = _br[0]; //15
+	root["g_BrushAttachSize"] = _at[0];//5
+									   //		root["g_brush_Ts"] = _bts[bts];//brush tranparency threshold brush
+	root["end"] = "end";
+	root["g_paint_area_scale"] = _ps[ps];//
+										 //root["g_merge_method"] = _str_mm[mm];
+										 //	root["g_grid_threshold"] = _gth[gth];
+	root["QT_avgSThreshold"] = sthresh[th];//15, 25  used in divide for  AvgS
+	root["g_depth_Threshhold"] = depth[de]; //5,7
+	root["g_gridsize"] = _grid[gr];	//5,10 used in divide
 
-}
-void get_render1_name(string & bat_dir,int _sm_, string & file_name) {
-	string render_name;
-	get_render_para(render_name);
-	file_name = bat_dir +string("\\") + render_name + 
-	+ "_sm" + saliency_method[_sm_] 
-		+ ".bat";
+	root["g_saliency_method"] = g_saliency_method_str[sm];//wo saliency pregraph 
 
+	root["g_QT_method_N"] = QT_N[qt]; //1,2,3,4...6
+	std::string outputConfig = Json::writeString(wbuilder, root);
+	f_path_name = from_jsonfolderPath + "\\" + json_file_name;
+	std::ofstream file_json;
+	file_json.open(f_path_name.c_str());
+	file_json << outputConfig;
+	f_count++;
+	if (!(f_count % 100)) {
+		std::cout << g_saliency_method_str[sm] << " " << f_count << " / " << howmany << " : " << f_count / howmany*100. << endl;
+	}//percent
+	file_json.close();
+	return 1;
 }
 //int br, th, de, gr, sm, qt, re, mm, gs, ps;
 int  json_write_method(string from_jsonfolderPath,//render/deployument
-	string batch_render_dir, //batch/render 
-	string exe_path, //exe
-	string list_path 
+	string list_cfg_path)
+ {
+	string cfg_file_name;
 
-	) {
-	string f_name;
-	string file_name;
-	string render_batch_fname;
+	int fail_flag = 0;
 
-	Json::StreamWriterBuilder wbuilder;
-	Json::Value root;
-//	int n_br = sizeof(_br) / sizeof(int);
-	int n_th = sizeof(thresh) / sizeof(int);
+	int n_bth = sizeof(_br) / sizeof(int);
+	int n_sth = sizeof(sthresh) / sizeof(int);
 	int n_de = sizeof(depth) / sizeof(int);
 	int n_gr = sizeof(_grid) / sizeof(int);
-	int n_sm = saliency_method_cnt;;
+
 	int n_qt = sizeof(QT_N) / sizeof(int);
 	//int n_re = _re_cnt;
 //	int n_mm = 1;//_str_mm_cnt;
 	int n_ps = sizeof(_ps) / sizeof(int);
-	int n_gs= sizeof(_gs) / sizeof(int);
-	int n_ts = sizeof(_ts) / sizeof(int);
-	int howmany = n_th * n_de * n_gr*n_sm*n_qt*n_ps*n_gs*n_ts;
+
+	howmany = MAX_SALIENCY* n_sth * n_de * n_gr*n_qt*n_ps*n_bth;
+	int Max_PARA = n_sth*n_gr;
+	if (Max_PARA > MAX_PARA) {
+		cout << "Max PAra " << Max_PARA << "Exceeded " << MAX_PARA << endl;
+		return -1;
+
+
+	}
+	std::ofstream file_all_cfg;
+	string f_name_all_cfg;
 	
-	int f_count = 0;
-	string deploy_name[300];
-	int n_deploy=0;
-	//for (re = 0; re < n_re; re++) {
-	string render_para;
-	std::ofstream file_para;
-	string para_f_name;
-	para_f_name = list_path+string("para.lst");
-	file_para.open(para_f_name.c_str());
-	std::ofstream file_para_meta;
-	string f_name_para_meta;
-	f_name_para_meta = list_path + string("para_meta.lst");
-	file_para_meta.open(f_name_para_meta.c_str());
-			for (th = 0; th < n_th; th++) //s
-				for (de = 0; de < n_de; de++) //d
-					for (gr = 0; gr < n_gr; gr++) //g
-					//	for (br = 0; br < n_br; br++) //b
-							for (qt = 0; qt < n_qt; qt++) //N QTn{
-								for (ps = 0; ps < n_ps; ps++){//ps //scale
-									std::ofstream file_ts;
-									string f_name_ts;
-									string t;
-									get_render_para_ps(t);
-									file_para_meta << t << endl;
-									f_name_ts = batch_render_dir +"\\para_"+t+ string(".bat");
-									file_ts.open(f_name_ts.c_str());
+	std::ofstream file_para_meta_cfg;
+	string f_name_para_meta_cfg;
 
-									for (ts = 0; ts < n_ts; ts++) { //
-										get_render_para(render_para);
-										file_para << render_para << endl;
-										for (sm = 0; sm < n_sm; sm++) //saliency method
-											for (gs = 0; gs < n_gs; gs++) {//grid skip
+	std::ofstream file_method_meta_cfg;
+	string f_name_method_meta_cfg;
 
-												//root.append("revision","1");
-												root["root_path"] = "/rst";
-												root["root_path_win"] = "\\rst";
-												root["g_paint_method"] = "copy";//copy alpha
-												root["g_BrushMinSize"] = _br[0]; //15
-												root["g_BrushAttachSize"] = _at[0];//5
-												root["g_Ts"] = _ts[ts];
-												root["end"] = "end";
-												root["g_paint_area_scale"] = _ps[ps];//
-												//root["g_merge_method"] = _str_mm[mm];
-												root["g_merge_skip_count"] = _gs[gs];
-												root["QT_avgSThreshold"] = thresh[th];//15, 25
-												root["g_depth_Threshhold"] = depth[de]; //5,7
-												root["g_gridsize"] = _grid[gr];	//5,10
+	std::ofstream file_para_method_meta_cfg;
+	string f_name_method_para_meta_cfg;
 
-												root["g_saliency_method"] = saliency_method[sm];//wo saliency pregraph 
+	f_name_all_cfg = list_cfg_path + "\\" + string("para_all_cfg.cfg");
+	file_all_cfg.open(f_name_all_cfg.c_str());
+	if (!file_all_cfg.is_open()) {
+		return -1;
+	}
+	f_name_para_meta_cfg = list_cfg_path + "\\"+string("para_meta.cfg");
+	file_para_meta_cfg.open(f_name_para_meta_cfg.c_str());
+	if (!file_para_meta_cfg.is_open()) {
+		return - 1;
+	}
 
-												root["g_QT_method_N"] = QT_N[qt]; //1,2,3,4...6
-										//		root["g_Render_method"] = _re[re];// Union or Only
+	
+	f_name_method_meta_cfg = list_cfg_path + "\\" + string("method_meta.cfg");
+	file_method_meta_cfg.open(f_name_method_meta_cfg.c_str());
+	if (!file_method_meta_cfg.is_open()) {
+		return -1;
+	}
+	int method_para_cnt = 0;
+	f_name_method_para_meta_cfg = list_cfg_path + "\\method_para_meta.cfg";
+	file_para_method_meta_cfg.open(f_name_method_para_meta_cfg.c_str());
+	if (!file_para_method_meta_cfg.is_open()) {
+		return -1;
+	}
 
-											//	cout << "path" << path << " = " << root << endl;
+	int f_loc;
+
+	std::ofstream file_para_cfg[MAX_PARA];
+	string f_name_para_cfg[MAX_PARA];
+
+	std::ofstream file_para_method_cfg[MAX_PARA];
+	string f_name_para_method_cfg[MAX_PARA];
+
+	int f_max = n_sth*n_gr;//
+
+	for (th = 0; th < n_sth; th++) //avg S thresh
+		for (gr = 0; gr < n_gr; gr++) {
+			f_loc = th*n_gr + gr;
+			f_name_para_cfg[f_loc] ="s_" + to_string(sthresh[th]) +
+				"_g" + to_string(_grid[gr]) + ".cfg";
+			file_para_cfg[f_loc].open(list_cfg_path +"\\"+ f_name_para_cfg[f_loc]);
+			cout << setw(5)<<f_loc<<" : "<<list_cfg_path + "\\" + f_name_para_cfg[f_loc] << endl;
+			if (!file_para_cfg[f_loc].is_open())  // operator! is used here
+			{
+				std::cout << f_name_para_cfg << ":: File opening failed\n";
+				return -1;
+			}
+			else file_para_meta_cfg << f_name_para_cfg[f_loc] << endl;
 
 
-												get_json_name(file_name);
-												// Make a new JSON document for the configuration. Preserve original comments.
-													//std::string outputConfig = writer.write(root);
-												std::string outputConfig = Json::writeString(wbuilder, root);
-												//	cout << "outputConfig " << outputConfig << endl;
+			for (sm = 0; sm < MAX_SALIENCY; sm++) {
+				int mf_loc = th*n_gr*MAX_SALIENCY + gr*MAX_SALIENCY+sm;
+				f_name_para_method_cfg[mf_loc] = "M"+g_saliency_method_str[sm]+"s_" + to_string(sthresh[th]) +
+					"_g" + to_string(_grid[gr]) + ".cfg";
+				file_para_method_cfg[mf_loc].open(list_cfg_path + "\\" + f_name_para_method_cfg[mf_loc]);
+				cout << setw(5) << mf_loc << " : " << list_cfg_path + "\\" + f_name_para_method_cfg[mf_loc] << endl;
+				if (!file_para_method_cfg[mf_loc].is_open())  // operator! is used here
+				{
+					std::cout << f_name_para_method_cfg << ":: File opening failed\n";
+					return -1;
+				}
+				else file_para_method_meta_cfg << f_name_para_method_cfg[mf_loc] << endl;
 
-												f_name = from_jsonfolderPath + "\\" + file_name;
-												std::ofstream file_id;
-												file_id.open(f_name.c_str());
-												file_id << outputConfig;
-												f_count++;
-												if (!(f_count % 100)) {
-													std::cout << "method " << f_count << " / " << howmany << " : " << f_count / howmany*100. << endl;
-												}
-												file_id.close();
-												deploy_name[n_deploy] = f_name;
-												n_deploy++;
-											}
-										//cout << "n_deploy= " << n_deploy << endl;
-									//	std::cout << batch_fname << endl;
-										std::ofstream file_id;
-										string bat_f_name;
-										std::ofstream file_id_1;
-										//string bat_f_name;
-										string bat_f1_name;
-										get_render_name(batch_render_dir, bat_f_name);
-										//	cout << "bat " << bat_f_name << endl;
 
-										file_id.open(bat_f_name.c_str());
-										for (int i = 0; i < n_deploy; i++) {
-											get_render_name(batch_render_dir, bat_f_name);
-											//cout << "bat " << bat_f_name << endl;
+			}
 
-											string str = exe_path + " %1 " + deploy_name[i];
-											file_id << str << endl;
-											if (i == 0)
-												file_ts << str << endl;
-											get_render1_name(batch_render_dir, i, bat_f1_name);
-											file_id_1.open(bat_f1_name.c_str());
-												file_id_1 << str << endl;
-											//cout << "bat1 " << bat_f1_name << endl;
-											file_id_1.close();
 
-										}
-										file_id.close();
-										n_deploy = 0;
-									}
-									file_ts.close();
+
+
+
+	}
+
+	for (th = 0; th < n_sth; th++) //avg S thresh
+		for (gr = 0; gr < n_gr; gr++)  //grid min size
+		{
+			f_loc = th*n_gr + gr;
+			for (de = 0; de < n_de; de++) //depth
+				for (br = 0; br < n_bth; br++)//brush min size
+					for (qt = 0; qt < n_qt; qt++) //N QTn{
+						for (ps = 0; ps < n_ps; ps++) {//ps //scale
+							for (sm = 0; sm < MAX_SALIENCY; sm++) { //saliency method
+								get_json_name(json_file_name);
+								int mf_loc = th*n_gr*MAX_SALIENCY + gr*MAX_SALIENCY + sm;
+
+								if (!file_para_method_cfg[mf_loc].is_open())  // operator! is used here
+								{
+									std::cout << f_name_para_method_cfg << ":: File opening failed\n";
+									return -1;
 								}
-			file_para.close();
-			file_para_meta.close();
-		std::cout << "method " << f_count<<endl;
-	return 0;
+
+								else file_para_method_cfg[mf_loc] << from_jsonfolderPath + "\\" + json_file_name << endl;
+								
+								if ( file_para_cfg[f_loc].is_open()) {
+									file_para_cfg[f_loc] << from_jsonfolderPath + "\\" + json_file_name << endl;
+								}
+								else {
+									cout << "[" << f_name_para_cfg[f_loc] << "] not open" << endl;
+									fail_flag--;
+									break;
+								}
+
+								if (file_para_cfg[f_loc].is_open()) {
+									file_para_cfg[f_loc] << from_jsonfolderPath + "\\" + json_file_name << endl;
+								}
+								else {
+									cout << "[" << f_name_para_cfg[f_loc] << "] not open" << endl;
+									fail_flag--;
+									break;
+								}
+
+							}
+						}
+
+		}
+	for (th = 0; th < n_sth; th++) //avg S thresh
+		for (gr = 0; gr < n_gr; gr++) {
+			f_loc = th*n_gr + gr;
+			
+			file_para_cfg[f_loc].close();
+			for (sm = 0; sm < MAX_SALIENCY; sm++) {
+				int mf_loc = th*n_gr*MAX_SALIENCY + gr*MAX_SALIENCY + sm;
+				file_para_method_cfg[mf_loc].close();
+			}
+		}
+	std::ofstream file_method_cfg;
+	//clock deployment 
+	for (sm = 0; sm < MAX_SALIENCY; sm++) { //saliency method
+		string f_name_method_cfg = list_cfg_path + "\\" + g_saliency_method_str[sm] + ".cfg";
+	
+		file_method_cfg.open(f_name_method_cfg.c_str());
+
+		file_method_meta_cfg << g_saliency_method_str[sm] +".cfg"<< endl;//MAY BE REMOED
+		for (th = 0; th < n_sth; th++) //avg S thresh
+			for (gr = 0; gr < n_gr; gr++) { 
+			
+				for (de = 0; de < n_de; de++) //depth
+						for (br = 0; br < n_bth; br++)//brush min size
+						for (qt = 0; qt < n_qt; qt++) //N QTn{
+							for (ps = 0; ps < n_ps; ps++) {//ps //scale
+								
+								get_json_name(json_file_name);
+							
+								if (file_all_cfg.is_open()) {
+									file_all_cfg << from_jsonfolderPath+"\\"+json_file_name << endl;
+									
+								}
+								else {
+									cout << "[" << f_name_all_cfg << "] not open" << endl;
+									fail_flag--;
+									break;
+								}
+								
+								get_json_name(json_file_name);
+								if (file_method_cfg.is_open()) {
+									file_method_cfg << from_jsonfolderPath+"\\"+json_file_name << endl;
+								}
+								else {
+									cout << "[" << f_name_method_cfg << "] not open" << endl;
+									fail_flag--;
+									break;
+								}
+								
+								write_json_content(from_jsonfolderPath);
+					
+
+							
+							}// rest of parameter
+			}//for dth and gid min
+			file_method_cfg.close();
+		}//for sm
+			//file_all_para.close();
+			//file_para_meta.close();
+	file_all_cfg.close();
+	file_para_meta_cfg.close();
+	file_method_meta_cfg.close();
+	std::cout << __FUNCTION__<<"    method " <<f_count<<endl;
+	return fail_flag;
 }
 void add_batch_a(string batch_path, string b_render_path,string  list_name2, string para[], int para_cnt) {
 

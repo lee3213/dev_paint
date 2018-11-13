@@ -7,7 +7,9 @@
 #include "opencv2\core.hpp"
 #include <random>
 #include "render_.h"
-
+#include <ios>
+#include <iostream>
+#include <streambuf>
 using namespace std;
 using namespace cv;
 //extern render_ *_render[];
@@ -28,12 +30,12 @@ using namespace cv;
 extern int g_merge_method;
 
 extern int g_QT_avgSThreshold;
-
+//extern int g_grid_threshold;
 extern int g_depth_limit;
 // int g_saliency_depth;
 // int g_union_depth;
 extern int g_min_gridsize;
-extern int g_merge_skip_count;
+//extern int g_merge_skip_count;
 //extern int g_RetryTime;
 extern int g_brush_Ts;
 extern int g_debug_level;
@@ -118,7 +120,8 @@ extern streambuf* g_stream_buffer_file_cstat;
 extern fstream g_file_cstat;
 extern streambuf* g_stream_buffer_file_cerr;
 extern fstream g_file_cerr;
-
+//extern ostream g_file_cout_backup;
+//extern streambuf *g_stream_buffer_file_cout_backup;
 extern int g_src_image_width;
 extern int g_src_image_height;
 extern int g_src_image_channels;
@@ -132,9 +135,9 @@ extern int g_ET;//positive ET=-1 negative
 extern Mat Sgrid_grid_map_1c[];
 extern Mat gradient_Map_C;
 extern Mat gradient_Map_G;
-extern std::string tag[];// = { "0_sobel","1_saliency","2_union","3_two_attach","4_two_merge" };
-extern std::string tag_[]; //= { "0_sobel_", "1_saliency_", "2_union_", "3_twoattach_","4_two_merge_" };
-extern std::string _tag[];//= { "_0_sobel", "_1_saliency", "_2_union", "_3_twopass","_4_twopass" };
+extern std::string tag[];// 
+extern std::string tag_[]; //
+extern std::string _tag[];//
 
 
 //extern string saliency_method[MAX_DEPTH];// = { "Pregraph","Itti","Residual","Blackandwhite","Fine_grained" };
@@ -144,3 +147,8 @@ extern std::string _tag[];//= { "_0_sobel", "_1_saliency", "_2_union", "_3_twopa
 //extern int _re_cnt;// = 4;
 //extern int _str_mm_cnt;// = 2;
 extern float g_BrushMax_scale;
+extern int g_qt_s_scale;
+extern int g_brush_choice;
+extern int g_trace_depth ;
+extern string g_saliency_method_str[MAX_SALIENCY];// = { "Sobel", "Itti","Pregraph","Residual","Blackandwhite","Fine_grained","Perazzi" };
+extern int g_max_f_cnt;

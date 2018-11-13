@@ -181,6 +181,7 @@
     <ClInclude Include="json_read.h" />
     <ClInclude Include="json_write.h" />
     <ClInclude Include="Judgement.h" />
+    <ClInclude Include="make_batch.h" />
     <ClInclude Include="permutohedral.h" />
     <ClInclude Include="pregraph\saliency_PreGraph.h" />
     <ClInclude Include="pregraph\SLIC.h" />
@@ -221,6 +222,7 @@
     <ClCompile Include="json_read.cpp" />
     <ClCompile Include="Judgement.cpp" />
     <ClCompile Include="LBPH.cpp" />
+    <ClCompile Include="make_batch.cpp" />
     <ClCompile Include="permutohedral.cpp" />
     <ClCompile Include="pregraph\saliency_pregraph_main.cpp" />
     <ClCompile Include="pregraph\saliency_PreGraph.cpp" />

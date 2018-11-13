@@ -50,7 +50,10 @@ int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, vector
 		colorDis.insert(it2, newDistance);
 		//cout << " distance " << setw(10)<<cDis<< "b no "<<(*it).brush_no << " nth " << nth << endl;
 	}
-	nth = rand() % 5;
+	if (g_brush_choice == 0) {
+		nth = rand() % 5;
+	}
+	else nth = 0;
 	brush_no = colorDis.at(nth).nth;
 	return brush_no;
 }

@@ -55,7 +55,7 @@ public:
 	//list<Img_node*> *m_aStroke_set_merge;
 
 	//list<QuadTree::Img_node*>aStroke_set_Sgrad;
-	int depth_sobel, depth_saliency, depth_attach;
+	int depth_sobel, depth_saliency;//, depth_attach;
 	vector <Brush*> brush_set;
 	vector <Brush*> brush_resized_set[MAX_DEPTH];
 	int QT_depth;
@@ -74,7 +74,7 @@ public:
 	std::string m_tag_;
 
 	//int get_depth;
-	render_(int _render_method, Mat _srcImg);
+	render_(int _render_method, Mat &_srcImg);
 	~render_();
 	void render_::func_();
 	int  PainterlyRendering();

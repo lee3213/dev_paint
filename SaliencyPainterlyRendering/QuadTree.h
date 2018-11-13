@@ -60,7 +60,8 @@ public:
 
 
 	//static Img_node *copyImageTree(Imginfo info, int depth, int S);
-	static int  TakeQuadTree(cv::Mat &SaliencyMap, std::list<Img_node*> aStroke[],string tag);
+	static int  TakeQuadTree_grid(cv::Mat &SaliencyMap, std::list<Img_node*> aStroke[],string tag);
+	static int  TakeQuadTree(cv::Mat &SaliencyMap, std::list<Img_node*> aStroke[], string tag);
 	static cv::Mat TakeDensity(cv::Mat &srcImg, std::list<Img_node*> *aStroke);
 	static Img_node *newImageTree(Imginfo info, int depth, double S);
 	static Img_node *copyImageTree(Imginfo info, int depth, int avgS);

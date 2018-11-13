@@ -7,7 +7,7 @@
 using namespace std;
 using namespace cv;
 
-
+double TakeAvgS(cv::Mat &srcImg, Point srtPoint, Point endPoint, int depth,string quad);
 Img_node * QuadTree::copyImageTree(Imginfo info, int depth, int avgS)
 {
 
@@ -82,25 +82,7 @@ void DrawEdgeLine(cv::Mat &srcImg, Imginfo info)
 	}
 }
 
-double TakeAvgS(cv::Mat &srcImg, Point srtPoint, Point endPoint)
-{
-	double avgS, S = 0;
-	unsigned char *srcData = (unsigned char*)srcImg.data;
-	int width = srcImg.size().width, height = srcImg.size().height;
-	int s1 =(int) srcImg.step1();
-	int sc=srcImg.channels();
-	for (int y = (int)srtPoint.y; y <= (int)endPoint.y && y <= height; y++)
-	{
-		for (int x = (int)srtPoint.x; x <= (int)endPoint.x && x<= width; x++)
-		{
-			size_t index = y * s1+ x * sc;
-			S += srcData[index];
-		}
-	}
-	avgS = S / (width + height);
 
-	return avgS;
-}
 double double_array_min_at(double a[], int n) {
 	double min_v = a[0];
 	int loc = 0;
@@ -169,7 +151,7 @@ int get_selected(double *_D, int n,int divider, int &selected_x, int &selected_y
 	int bias = 1;
 	int x, y;
 	double v = 0.0;
-	selected_x = 0; selected_y = 0;
+	selected_x = 1; selected_y = 1;
 	for(x =bias;x<divider;x++)
 		for (y = bias; y <= divider; y++) {
 		//	cout << x << "," << y << " : " << *(_D + (y*n + x)) << endl;
@@ -180,7 +162,7 @@ int get_selected(double *_D, int n,int divider, int &selected_x, int &selected_y
 		}
 	return 1;
 };
-Point get_midPoint(cv::Mat &srcImg,Point s, Point e, double *D,int d) {
+Point get_midPoint(cv::Mat &srcImg,Point s, Point e, double *D,int d, int child_QT_depth) {
 	int divider = g_QT_method_N +1;
 	Point midPoint;
 	Point candidate[10][10];
@@ -211,9 +193,10 @@ Point get_midPoint(cv::Mat &srcImg,Point s, Point e, double *D,int d) {
 		candidate[0][0] = s;
 
 		//std::cout << "l " << setw(4) << length_width << " ," << setw(4) << length_height << endl;
-
+/*
 		if (length_width < g_min_gridsize) size_err = true;
 		if (length_height < g_min_gridsize) size_err = true;
+		*/
 		/*
 		s,s     s+w,s    s+2w,s     s+3w,s    s+4w=e,s
 		s,s+h   s+w.s+h  s+2w,s+h   s+2w,s+h  s+4w,s+h
@@ -249,10 +232,10 @@ Point get_midPoint(cv::Mat &srcImg,Point s, Point e, double *D,int d) {
 				
 				for (int w = 1; w < divider; w++) {
 					if (h >= 1 && w >= 1) {//clock wise
-						P[h][w].S[0] = TakeAvgS(srcImg, candidate[0][0]/*s*/, candidate[h][w]/*p*/);//LU
-						P[h][w].S[1] = TakeAvgS(srcImg, candidate[0][w], candidate[h][divider]);//RU
-						P[h][w].S[2] = TakeAvgS(srcImg, candidate[h][w], candidate[divider][divider]);//RD
-						P[h][w].S[3] = TakeAvgS(srcImg, candidate[h][0], candidate[divider][w]);//LD
+						P[h][w].S[0] = TakeAvgS(srcImg, candidate[0][0]/*s*/, candidate[h][w]/*p*/, child_QT_depth,"KK");//LU
+						P[h][w].S[1] = TakeAvgS(srcImg, candidate[0][w], candidate[h][divider], child_QT_depth,"KK");//RU
+						P[h][w].S[2] = TakeAvgS(srcImg, candidate[h][w], candidate[divider][divider], child_QT_depth,"KK");//RD
+						P[h][w].S[3] = TakeAvgS(srcImg, candidate[h][0], candidate[divider][w], child_QT_depth,"KK");//LD
 
 						min_s = double_array_min(P[h][w].S, 4);
 						max_s = double_array_max(P[h][w].S, 4);
@@ -262,45 +245,47 @@ Point get_midPoint(cv::Mat &srcImg,Point s, Point e, double *D,int d) {
 				}
 			
 			}
-#ifdef _PRINT
-			std::cout << setw(7) << "w\\h" << ": ";
 
-			for (int w = 0; w < divider; w++)
-				std::cout << setw(12) << w;
-			std::cout << endl;
-			for (int h = 1; h < divider; h++) {
-				std::cout << h << ": ";
-				for (int w = 1; w < divider; w++) {
-					std::cout << "("<<setw(4) << candidate[h][w].x << ", " << setw(4) << candidate[h][w].y<<")";
-		
-				}
-				std::cout << endl;
-			}
-			std::cout << endl;
-			std::cout << setw(7) << "w\\h" << ": ";
-		
-				for (int k = 0; k < 4; k++)
-					std::cout << setw(13) << k  ;
-				std::cout << endl;
-			for (int h = 1; h < divider; h++) {
-			
-				for (int w = 1; w < divider; w++) {
-					std::cout << setw(3) << w <<","<< setw(3)<<h<<": ";
-					for (int k = 0; k < 4; k++)
-						std::cout << setw(11) << P[h][w].S[k] << ", ";
-
-					std::cout << setw(11) << _D[h][w];
-					std::cout << endl ;
-				}
-
-				std::cout << endl;
-
-			}//h
-			std::cout << endl;
-#endif
 			get_selected(&_D[0][0],10,divider, selected_x, selected_y);
 			midPoint = candidate[selected_x][selected_y];
-		
+			if (midPoint == s) {
+
+				std::cout << setw(7) << "w\\h" << ": ";
+
+				for (int w = 0; w < divider; w++)
+					std::cout << setw(12) << w;
+				std::cout << endl;
+				for (int h = 1; h < divider; h++) {
+					std::cout << h << ": ";
+					for (int w = 1; w < divider; w++) {
+						std::cout << "(" << setw(4) << candidate[h][w].x << ", " << setw(4) << candidate[h][w].y << ")";
+
+					}
+					std::cout << endl;
+				}
+				std::cout << endl;
+				std::cout << setw(7) << "w\\h" << ": ";
+
+				for (int k = 0; k < 4; k++)
+					std::cout << setw(13) << k;
+				std::cout << endl;
+				for (int h = 1; h < divider; h++) {
+
+					for (int w = 1; w < divider; w++) {
+						std::cout << setw(3) << w << "," << setw(3) << h << ": ";
+						for (int k = 0; k < 4; k++)
+							std::cout << setw(11) << P[h][w].S[k] << ", ";
+
+						std::cout << setw(11) << _D[h][w];
+						std::cout << endl;
+					}
+
+					std::cout << endl;
+
+			}//h
+				std::cout << endl;
+
+			}
 		}//size_err
 	} //epth < 4
 	//D=_D[?]
@@ -315,9 +300,39 @@ Point get_midPoint(cv::Mat &srcImg,Point s, Point e, double *D,int d) {
 	return midPoint;
 }
 
+double TakeAvgS(cv::Mat &srcImg, Point srtPoint, Point endPoint, int depth,string quad)
+{
+	double avgS, S = 0;
+	unsigned char *srcData = (unsigned char*)srcImg.data;
+	int width = srcImg.size().width, height = srcImg.size().height;
+	int s1 = (int)srcImg.step1();
+	int sc = srcImg.channels();
+	int s_w = endPoint.x - srtPoint.x;
+	int s_h = endPoint.y - srtPoint.y;
+	for (int y = (int)srtPoint.y; y <= (int)endPoint.y && y <= height; y++)
+	{
+		for (int x = (int)srtPoint.x; x <= (int)endPoint.x && x <= width; x++)
+		{
+			size_t index = y * s1 + x * sc;
+			S += srcData[index];
+		}
+	}
+	avgS = S / (g_qt_s_scale*(s_w + s_h));
+	if (depth >= g_trace_depth) {
+		if (quad != "KK") {
+			cout << "depth " << depth << " :" << quad << ": (x,y) " << setw(5) << srtPoint.x << " " << srtPoint.y <<
+				" :e( "<<endPoint.x << " " << endPoint.y ;
 
+			cout << " s_ : " << setw(5) << s_w << setw(5) << s_h << " 2*w*h= " << g_qt_s_scale*(s_w + s_h)
+				<< " S " << setw(15) << S << setw(15) << " avgS : " << avgS << endl;
+		}
+		}
+	return avgS;
+}
 int DivideImage(cv::Mat &SaliencyMap, Img_node* me_node, list<Img_node*> aStroke_set[],
-	 string  quad,Mat & gradient_src,Mat stageMap,int depth,string tag)
+	 string  quad,
+	Mat & gradient_src,
+	Mat stageMap,int depth,string tag)
 {
 	Point srtPoint, endPoint, midPoint;
 	double D[4];
@@ -325,6 +340,7 @@ int DivideImage(cv::Mat &SaliencyMap, Img_node* me_node, list<Img_node*> aStroke
 	int get_depth=depth;
 		Imginfo child_Info, my_Info;
 		Img_node* BL, *BR, *TL, *TR;
+	
 	//	cout << "----" << quad << "  --------------------------------------------------------" << endl;
 		if (me_node == NULL)
 		{
@@ -332,17 +348,11 @@ int DivideImage(cv::Mat &SaliencyMap, Img_node* me_node, list<Img_node*> aStroke
 			return -1;
 		}
 		my_Info = me_node->info;
-	//	DrawEdgeLine(Quadtree_map, my_Info);
-	//	rectangle(Quadtree_map, Rect(my_Info.srtPoint,my_Info.endPoint),RGB(255, 255, 255));
-
-
-		//Depth의 값을 오름차순으로 저장
-		//list<Img_node*>::iterator Qt_it = lower_bound(aStroke_set->begin(), aStroke_set->end(), me_node, compareDepth);
 		aStroke_set[me_node->depth].push_back(me_node);
 
 		srtPoint = my_Info.srtPoint;
 		endPoint = my_Info.endPoint;
-		rectangle(stageMap, srtPoint, endPoint, RGB(255, 255, 255));
+	
 	/*
 		g_QT_grid_size[parent_node->depth].width = endPoint.x - srtPoint.x;
 		g_QT_grid_size[parent_node->depth].height = endPoint.y - srtPoint.y;
@@ -350,11 +360,13 @@ int DivideImage(cv::Mat &SaliencyMap, Img_node* me_node, list<Img_node*> aStroke
 		//double avgS = TakeAvgS(SaliencyMap, parent_node->info.srtPoint, parent_node->info.endPoint);
 	//	me->avgS = (int)parent_S;
 		string called_str=std::string(3, '0').append(to_string(called));
-		if ( called < 30)
-				debug_image(string("grid/stage_"+tag) + called_str+string("_")+to_string(me_node->depth) +
-					string("_") + quad ,
-					stageMap);
-		stageMap = gradient_src;
+		if (called < 30) {
+			rectangle(stageMap, srtPoint, endPoint, RGB(255, 255, 255));
+			debug_image(string("grid/stage_" + tag) + called_str + string("_") + to_string(me_node->depth) +
+				string("_") + quad,
+				stageMap);
+			stageMap = gradient_src;
+		}
 		called++;
 
 		int child_QT_depth=me_node->depth+1;
@@ -364,25 +376,42 @@ int DivideImage(cv::Mat &SaliencyMap, Img_node* me_node, list<Img_node*> aStroke
 		BL 3 | 4 BR
 		*/
 		
-		if (child_QT_depth < g_depth_limit) {
+		if (child_QT_depth <= g_depth_limit) {
 
-			midPoint = get_midPoint(SaliencyMap, srtPoint, endPoint, D, child_QT_depth);
+			midPoint = get_midPoint(SaliencyMap, srtPoint, endPoint, D, child_QT_depth, child_QT_depth);
+
 			//	cout << "r no : "<<resultinfo->no <<", "<<info.srtPoint.x<<", "<<info.srtPoint.y<< endl;
 			if (midPoint.x != 0 && midPoint.y != 0) {
+			/*	if (child_QT_depth >= g_trace_depth) {
+					cout << "depth " << depth << " XX->  " << child_QT_depth<<" : s("<<
+					srtPoint.x<<", "<< srtPoint.y << " e(" <<
+						endPoint.x << ", " << endPoint.y << " : m(" <<
+						midPoint.x << ", " << midPoint.y << " " <<
+						 endl;
+				}
+				*/
+				//2사분면
 				child_Info.srtPoint = srtPoint;
 				child_Info.endPoint = midPoint;
-				//2사분면
-			
+				
 				if ((child_Info.endPoint.y - child_Info.srtPoint.y) >= g_min_gridsize
 					&& (child_Info.endPoint.x - child_Info.srtPoint.x) >= g_min_gridsize)
 				{
 
-					double avgS = TakeAvgS(SaliencyMap, child_Info.srtPoint, child_Info.endPoint);
+					double avgS = TakeAvgS(SaliencyMap, child_Info.srtPoint, child_Info.endPoint, child_QT_depth,quad);
+					if (child_QT_depth >= g_trace_depth) {
+						cout <<"depth "<< depth<<" TL->  "<<child_QT_depth <<" avgS : " << avgS << " x,y( " << 
+							(child_Info.endPoint.x - child_Info.srtPoint.x) <<" "<<
+							(child_Info.endPoint.y - child_Info.srtPoint.y) << " " <<
+							 ")  g_size= "<<g_min_gridsize<<" g_S_th "<< g_QT_avgSThreshold<<
+							endl;
+					}
+				
 					if (avgS > g_QT_avgSThreshold ) {
 						TL = QuadTree::newImageTree(child_Info, child_QT_depth, avgS);
 
 						get_depth=DivideImage(SaliencyMap,TL, aStroke_set,
-							string("TL") + to_string(child_QT_depth),stageMap, gradient_src,depth,tag);
+							string("TL") + to_string(child_QT_depth),stageMap, gradient_src, child_QT_depth,tag);
 						if (get_depth > depth)
 							get_depth = depth;
 
@@ -399,11 +428,18 @@ int DivideImage(cv::Mat &SaliencyMap, Img_node* me_node, list<Img_node*> aStroke
 					&& child_Info.endPoint.x - child_Info.srtPoint.x >= g_min_gridsize)
 				{
 
-					double avgS = TakeAvgS(SaliencyMap, child_Info.srtPoint, child_Info.endPoint);
+					double avgS = TakeAvgS(SaliencyMap, child_Info.srtPoint, child_Info.endPoint, child_QT_depth,quad);
+					if (child_QT_depth >= g_trace_depth) {
+						cout << depth << " TR " << child_QT_depth << " avgS : " << avgS << " x,y( " <<
+							(child_Info.endPoint.x - child_Info.srtPoint.x) << " " <<
+							(child_Info.endPoint.y - child_Info.srtPoint.y) << " " <<
+							")  g_size= " << g_min_gridsize << " g_S_th " << g_QT_avgSThreshold <<
+							endl;
+					}
 					if (avgS > g_QT_avgSThreshold) {
 						TR = QuadTree::newImageTree(child_Info, child_QT_depth, avgS);
 						DivideImage(SaliencyMap, TR, aStroke_set,
-							string("TR") + to_string(child_QT_depth), stageMap, gradient_src,depth,tag);
+							string("TR") + to_string(child_QT_depth), stageMap, gradient_src, child_QT_depth,tag);
 						if (get_depth > depth)
 							get_depth = depth;
 					}
@@ -418,11 +454,18 @@ int DivideImage(cv::Mat &SaliencyMap, Img_node* me_node, list<Img_node*> aStroke
 					&& child_Info.endPoint.x - child_Info.srtPoint.x >= g_min_gridsize)
 				{
 
-					double avgS = TakeAvgS(SaliencyMap, child_Info.srtPoint, child_Info.endPoint);
+					double avgS = TakeAvgS(SaliencyMap, child_Info.srtPoint, child_Info.endPoint, child_QT_depth,quad);
+					if (child_QT_depth >= g_trace_depth) {
+						cout << depth << "  BL " << child_QT_depth << " avgS : " << avgS << " x,y( " <<
+							(child_Info.endPoint.x - child_Info.srtPoint.x) << " " <<
+							(child_Info.endPoint.y - child_Info.srtPoint.y) << " " <<
+							")  g_size= " << g_min_gridsize << " g_S_th " << g_QT_avgSThreshold <<
+							endl;
+					}
 					if (avgS > g_QT_avgSThreshold) {
 						BL = QuadTree::newImageTree(child_Info, child_QT_depth, avgS);
 						DivideImage(SaliencyMap, BL, aStroke_set,
-							string("BL") + to_string(child_QT_depth), stageMap, gradient_src,depth,tag);
+							string("BL") + to_string(child_QT_depth), stageMap, gradient_src, child_QT_depth,tag);
 						if (get_depth > depth)
 							get_depth = depth;
 					}
@@ -437,11 +480,18 @@ int DivideImage(cv::Mat &SaliencyMap, Img_node* me_node, list<Img_node*> aStroke
 					&& child_Info.endPoint.x - child_Info.srtPoint.x >= g_min_gridsize)
 				{
 
-					double avgS = TakeAvgS(SaliencyMap, child_Info.srtPoint, child_Info.endPoint);
+					double avgS = TakeAvgS(SaliencyMap, child_Info.srtPoint, child_Info.endPoint, child_QT_depth,quad);
+					if (child_QT_depth >= g_trace_depth) {
+						cout << depth << " BR " << child_QT_depth << " avgS : " << avgS << " x,y( " <<
+							(child_Info.endPoint.x - child_Info.srtPoint.x) << " " <<
+							(child_Info.endPoint.y - child_Info.srtPoint.y) << " " <<
+							")  g_size= " << g_min_gridsize << " g_S_th " << g_QT_avgSThreshold <<
+							endl;
+					}
 					if (avgS > g_QT_avgSThreshold) {
 						BR = QuadTree::newImageTree(child_Info, child_QT_depth, avgS);
 						DivideImage(SaliencyMap, BR, aStroke_set,
-							string("BR") + to_string(child_QT_depth), stageMap, gradient_src,depth,tag);
+						string("BR") + to_string(child_QT_depth), stageMap, gradient_src, child_QT_depth,tag);
 						if (get_depth > depth)
 							get_depth = depth;
 					}
@@ -473,7 +523,8 @@ int DivideImage(cv::Mat &SaliencyMap, Img_node* me_node, list<Img_node*> aStroke
 	 root_Info.srtPoint.y = 0;
 	 root_Info.endPoint.x = width-1 ; 
 	 root_Info.endPoint.y = height-1;
-	 double avgS = TakeAvgS(SaliencyMap, root_Info.srtPoint, root_Info.endPoint);
+	 string quad = "0_whole";
+	 double avgS = TakeAvgS(SaliencyMap, root_Info.srtPoint, root_Info.endPoint,0,quad);
 	 root = newImageTree(root_Info, 0,avgS);
 	
 	 last_depth=DivideImage(SaliencyMap, root, aStroke_set, string("root") + to_string(0), Quad_treeMap, stageMap,0,tag);
@@ -485,6 +536,58 @@ int DivideImage(cv::Mat &SaliencyMap, Img_node* me_node, list<Img_node*> aStroke
 	//return Quad_treeMap;
 	 return last_depth;
 }
+
+	int  QuadTree::TakeQuadTree_grid(cv::Mat &SaliencyMap, list<Img_node*> aStroke_set[], string tag)
+	{
+		//cv::Mat Quad_treeMap;
+		Mat Quad_treeMap = SaliencyMap.clone();
+		Mat stageMap = SaliencyMap.clone();
+		int last_depth = 0;
+		string quad = "0_grid";
+		int width = SaliencyMap.size().width, height = SaliencyMap.size().height;
+		unsigned char* srcData = (unsigned char*)SaliencyMap.data;
+		Img_node* root;
+		Imginfo block_x;
+	//	root_Info.srtPoint.x = 0;
+		//root_Info.srtPoint.y = 0;
+		//root_Info.endPoint.x = width - 1;
+		//root_Info.endPoint.y = height - 1;
+		int step_x = 30;
+		int step_y = 30;
+		int block_count_x = (width / step_x);
+		int block_count_y = (height / step_y);
+		for(int y=0;y<=block_count_y;y++)
+			for (int x = 0; x <=block_count_x; x++) {
+				block_x.srtPoint.x = x*step_x;
+				block_x.srtPoint.y = y*step_y;
+				block_x.endPoint.x = (x+1)*step_x;
+				block_x.endPoint.y = (y+1)*step_y;
+				if (block_x.endPoint.x > width)
+					block_x.endPoint.x = width;
+				if (block_x.endPoint.y > height)
+					block_x.endPoint.y = height;
+				double avgS = TakeAvgS(SaliencyMap, block_x.srtPoint, block_x.endPoint, 0,quad);
+				if (avgS > 250) {
+					root = newImageTree(block_x, 0, avgS);
+					aStroke_set[root->depth].push_back(root);
+
+				}
+			}
+		
+		
+		//double avgS = TakeAvgS(SaliencyMap, root_Info.srtPoint, root_Info.endPoint, 0);
+	//	root = newImageTree(root_Info, 0, avgS);
+
+		//last_depth = DivideImage(SaliencyMap, root, aStroke_set, string("root") + to_string(0), 
+			//Quad_treeMap, stageMap, 0, tag);
+		//	cout		<< "after  aStroke size" << aStroke.size() << endl;
+
+
+		//cv::String f_path = cv::format("%s/org_quad_tree.ppm", g_para_method_path.c_str());//1ch
+		//cv::imwrite(f_path, Quad_treeMap);
+		//return Quad_treeMap;
+		return last_depth;
+	}
 
 cv::Mat QuadTree::TakeDensity(cv::Mat &srcImg, list<Img_node*> *aStroke)
 {

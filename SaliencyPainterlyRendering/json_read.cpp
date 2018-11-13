@@ -46,6 +46,9 @@ int  json_deployment(string path) {
 
 	g_min_gridsize = root.get("g_gridsize", 10).asInt();
 	g_QT_avgSThreshold =root.get("QT_avgSThreshold",23).asInt();
+//	g_grid_threshold = root.get("g_grid_threshold",20).asInt();
+
+
 	g_BrushMinSize = root.get("g_BrushMinSize", 10).asInt();
 	g_saliency_method = root.get("g_saliency_method", "wo").asString();
 	g_brush_Ts = root.get("g_Ts", 230).asInt();
@@ -53,7 +56,7 @@ int  json_deployment(string path) {
 	g_paint_method = root.get("g_paint_method", "copy").asString();
 	g_paint_area_scale = root.get("g_paint_area_scale", 8).asInt();
 	cout << "g_paint_area_scale  "<<g_paint_area_scale << endl;
-	g_paint_area_scale = 8;
+	//g_paint_area_scale = 8;
 	g_paint_area_scale_0=g_paint_area_scale*2;
 
 	g_QT_method_N= root.get("g_QT_method_N",1).asInt();
@@ -66,7 +69,7 @@ int  json_deployment(string path) {
 	//	g_merge_method = DEF_MERGE;
 //
 	g_BrushAttachSize = root.get("g_BrushAttachSize", 5).asInt();
-	g_merge_skip_count = root.get("g_merge_skip_count", 1).asInt();
+//	g_merge_skip_count = root.get("g_merge_skip_count", 1).asInt();
 	// And you can write to a stream, using the StyledWriter automatically.
 	//std::cout << root<<endl;
 	return 0;

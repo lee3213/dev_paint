@@ -90,7 +90,7 @@ int   render_::PainterlyRendering()
 	}
 
 	for(int i=0;i<mm_depth;i++)
-	r_cout << m_tag << " : "<<mm_depth<<" size: "<< mm_aStroke_set[i].size()<<endl;
+		r_cout << m_tag << " : "<<mm_depth<<" size: "<< mm_aStroke_set[i].size()<<endl;
 //	for (int i = 0; i < mm_depth; i++) {
 //		r_cout << "0 "<<i << ", " << brush_size[i] << endl;
 //	}
@@ -179,8 +179,9 @@ int   render_::PainterlyRendering()
 		
 				uniform_int_distribution<int> dist_x(0, (int)(st_w_size));
 				uniform_int_distribution<int> dist_y(0, (int)(st_h_size));
-				uniform_int_distribution<int> dist_x_0(0, (int)(st_w_size)-brush_area_w_size_half);
-				uniform_int_distribution<int> dist_y_0(0, (int)(st_h_size)-brush_area_w_size_half);
+
+				//uniform_int_distribution<int> dist_x_0(0, (int)(st_w_size)-brush_area_w_size_half);
+				//uniform_int_distribution<int> dist_y_0(0, (int)(st_h_size)-brush_area_w_size_half);
 				
 		
 			for (int painting_count = 0; painting_count < paint_area_brush_count; painting_count++)
@@ -316,38 +317,50 @@ int   render_::PainterlyRendering()
 		clog << m_tag << " ," << setw(3) << uu << " ,size, " << mm_aStroke_set[uu].size() <<
 			"," << setw(4) << paint_area_brush_count <<
 			"," << s_buff << " , " << e_buff << endl;
+		debug_image("ing/ing_" + to_string(uu) + "_" + m_tag ,  ing_canvas[uu]);
+#ifdef _DEBUG_RENDER
+		debug_image("ing/painting_area" + to_string(i) + "_" + m_tag + to_string(called), painting_area_canvas[i]);
+
+		debug_image("ing/changed_" + m_tag + to_string(called), i, changed_map_canvas[i]);
+
+#endif
+
+		debug_image("ing/accu_" + to_string(uu) + "_" + m_tag , rst_accu_canvas[uu]);
+		debug_image("ing/try_map_" + to_string(uu) + "_" + m_tag , r_try_map_1c[uu]);
+
 	}//end of for depth uu
 	
 
 //	int ret = draw_grid_2(rst_accu_canvas[mm_depth-1].clone(), mm_aStroke_set, string("rst_") + m_tag, mm_depth, -1, 255, m_tag);
 	//ret = draw_grid_2(r_try_map_1c[mm_depth-1], mm_aStroke_set, string("try_") + m_tag, mm_depth, -1, 255, m_tag);
-	r_cout << "Merge SKIP count : " << g_merge_skip_count << endl;
+//	r_cout << "Merge SKIP count : " << g_merge_skip_count << endl;
 	r_cout << " depth : " << mm_depth << endl;
 	r_cout << "size mismatch " << size_mismatch << endl;
 	for (int i = 0; i < mm_depth; i++) {
 		static int called = 0;
+	
+		called++;
+		
+	}
+	/*
+#ifdef _DEBUG_RENDER	
+	for (int i = 0; i < mm_depth; i++) {
+		static int called = 0;
 		debug_image("ing/ing_" + to_string(i) + "_" + m_tag + to_string(called), ing_canvas[i]);
 #ifdef _DEBUG_RENDER
-		debug_image("ing/painting_area" + to_string(i) + "_" + m_tag+to_string(called), painting_area_canvas[i]);
-		
+		debug_image("ing/painting_area" + to_string(i) + "_" + m_tag + to_string(called), painting_area_canvas[i]);
+
 		debug_image("ing/changed_" + m_tag + to_string(called), i, changed_map_canvas[i]);
-		
+
 #endif
 
 		debug_image("ing/accu_" + to_string(i) + "_" + m_tag + to_string(called), rst_accu_canvas[i]);
 		debug_image("ing/try_map_" + to_string(i) + "_" + m_tag + to_string(called), r_try_map_1c[i]);
 
-		called++;
 		
 	}
-#ifdef _DEBUG_RENDER	
-	for (int i = 0; i < mm_depth; i++) {
-		static int called = 0;
-		//debug_image("ing/painting_area" + to_string(i) + "f_" + m_tag + to_string(called), painting_area_canvas[i](src_Rect_full));
-	//	debug_image("ing/ing_" + to_string(i) + "f_" + m_tag + to_string(called), ing_canvas[i](src_Rect_full));
-		debug_image("ing/accu_" + to_string(i) + "_f_" + m_tag + to_string(called), rst_accu_canvas[i](src_Rect_full));
-	}
 #endif
+*/
 	result_image=rst_accu_canvas[mm_depth-1];
 
 	time((&e_time));

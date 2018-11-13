@@ -277,9 +277,10 @@ cv::Mat get_sobel_map(Mat & srcImg) {
 	cv::convertScaleAbs(grad_bi_y, abs_sobeld_bi_y);
 
 	mat_print(grad_x,"grad_x");
-	mat_print(abs_sobeld_y, "abs_sobeld_y");
+	mat_print(abs_sobeld_y, "abs_sobeld_y");/*
 	func_gradient_orientation(org_Gaussian_Map, grad_x,grad_y,"gausian");
 	func_gradient_orientation(bilaterial_Map, grad_bi_x, grad_bi_y,"bilaterial");
+	*/
 	/*
 	Mat gradient_vector(gray_map_height, gray_map_width, CV_8UC1);
 	gradient_vector.setTo(0);
@@ -498,7 +499,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 
 	//	cv::Mat org_saliency_sobeld_Map;
 		//, org_QuadTreeMap, org_DensityMap, org_rstImg;
-	
+
 	Mat x_srcImg;
 
 	Mat sobel_8UC1;
@@ -729,7 +730,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 		}
 		_render[RENDER_SOBEL]->add_gradient_map(Gradient_Sobel, sobel_8UC1);
 		if (g_saliency_method != string("Sobel")) {
-	
+
 			debug_image("0_Saliency_C_" + g_saliency_method, gradient_Map_C);
 			//if (g_Render_method != "Sobel") {
 			debug_image("0_Saliency_G_sobel", gradient_Map_G);
@@ -762,29 +763,37 @@ int   RenderingImage(char * src_name, char * deploy_name)
 			_render[RENDER_TWOPASS_ATTACH]->add_render(_render[0], _render[1]);//render_sobel, render_saliency
 			_render[RENDER_TWOPASS_MERGE]->add_render(_render[0], _render[1]);
 		}
-
+		time_t p_s_time[RENDER_MAX], p_e_time[RENDER_MAX];
+		tm p_t_s[RENDER_MAX], p_t_e[RENDER_MAX];
+		char p_s_buff[100];
+		char p_e_buff[100];
 		for (int i = 0; i < how_many_render; i++) {
-			time_t p_s_time, p_e_time;
-			tm p_t_s, p_t_e;
-			time(&p_s_time);
-			localtime_s(&p_t_s, &p_s_time);
-
-			char p_s_buff[20];
-			strftime(p_s_buff, 20, "%Y-%m-%d %H:%M:%S", &p_t_s);
-			char p_e_buff[20];
+			time(&p_s_time[i]);
+			localtime_s(&p_t_s[i], &p_s_time[i]);
 
 			_render[i]->prepare();
-			for (int j = 0; j < _render[i]->mm_depth; j++)
-				cout << _render[i]->m_tag << " : " << _render[i]->mm_aStroke_set[j].size() << endl;
-			cout << "++++++++++++++++++ prepare " + _render[i]->m_tag + " ++++++++++++++++++++++++++++++++++++++++" << endl;
-			time(&p_e_time);
-			localtime_s(&p_t_e, &p_e_time);
-			strftime(p_e_buff, 20, "%Y-%m-%d %H:%M:%S", &p_t_e);
-			cout << " Prepare Finished " << _render[i]->m_tag << " "<<p_s_buff << " : " << p_e_buff << endl;
-			clog << " Prepare Finished, " << _render[i]->m_tag << " "<<p_s_buff << ", " << p_e_buff << endl;
+
+			time(&p_e_time[i]);
+			localtime_s(&p_t_e[i], &p_e_time[i]);
+		}
+		for (int i = 0; i < how_many_render; i++) {
+			cout << "++++++++++++++++++ prepare " + _render[i]->m_tag +
+				" ++++++++++++++++++++++++++++++++++++++++" << endl;
+			int tot = 0;
+			for (int j = 0; j < _render[i]->mm_depth; j++){
+				cout << _render[i]->m_tag << " : "
+					<<_render[i]->mm_aStroke_set[j].size() << endl;
+				tot += (int)_render[i]->mm_aStroke_set[j].size();
+			}
+			cout << _render[i]->mm_depth << "  " << tot << endl;
+			strftime(p_s_buff, 20, "%Y-%m-%d %H:%M:%S", &p_t_s[i]);
+			strftime(p_e_buff, 20, "%Y-%m-%d %H:%M:%S", &p_t_e[i]);
+			cout << " Prepare Finished " << _render[i]->m_tag << " " << p_s_buff << " : " << p_e_buff << endl;
+			clog << " Prepare Finished, " << _render[i]->m_tag << " " << p_s_buff << ", " << p_e_buff << endl;
 		}
 
-		//return -997788;
+		cout <<" ++++++++++++++++++++++++++++++++++++++++" << endl;
+		//return 997788;
 #ifndef RUN_THREAD	
 		for (int i = 0; i < RENDER_MAX; i++) {
 			//for (int j = 0; j<_render[i]->mm_depth; j++){
@@ -800,34 +809,33 @@ int   RenderingImage(char * src_name, char * deploy_name)
 
 		p_render[0] = new thread(run_render, _render[RENDER_SOBEL]);
 
-		if (g_saliency_method != string("Sobel")){
-			p_render[RENDER_SALIENCY] = new thread(run_render, _render[RENDER_SALIENCY]);
-			p_render[RENDER_UNION] = new thread(run_render, _render[RENDER_UNION]);
-		}
-	cout << "p_sobel    : " << p_render[RENDER_SOBEL]->get_id() << endl;
-	if (g_saliency_method != string("Sobel")) {
-		cout << "p_saliency : " << p_render[RENDER_SALIENCY]->get_id() << endl;
-		cout << "p_union    : " << p_render[RENDER_UNION]->get_id() << endl;
-	}
+	
+	cout << "p_sobel  t_id : " << p_render[RENDER_SOBEL]->get_id() << endl;
+	
 	
 	std::cout << "Number of threads = " 
 		<< std::thread::hardware_concurrency() << std::endl;
 	
 
 
-		p_render[RENDER_SOBEL]->join();
-		_render[RENDER_SOBEL]->post_process();
+		
 		if (g_saliency_method != string("Sobel")) {
-			p_render[RENDER_SALIENCY]->join();
-			p_render[RENDER_UNION]->join();
-
-
-			p_render[RENDER_TWOPASS_ATTACH] = new thread(run_render, _render[RENDER_TWOPASS_ATTACH]);
-			cout << "p_twopass  ATTACH: " << p_render[RENDER_TWOPASS_ATTACH]->get_id() << endl;
+			p_render[RENDER_SALIENCY] = new thread(run_render, _render[RENDER_SALIENCY]);
+			p_render[RENDER_UNION] = new thread(run_render, _render[RENDER_UNION]);
+			
 			p_render[RENDER_TWOPASS_MERGE] = new thread(run_render, _render[RENDER_TWOPASS_MERGE]);
-			cout << "p_twopass MERGE : " << p_render[RENDER_TWOPASS_MERGE]->get_id() << endl;
+		
+			p_render[RENDER_TWOPASS_ATTACH] = new thread(run_render, _render[RENDER_TWOPASS_ATTACH]);
+			
+			cout << "p_saliency t_id: " << p_render[RENDER_SALIENCY]->get_id() << endl;
+			cout << "p_union    t_id: " << p_render[RENDER_UNION]->get_id() << endl;
+			cout << "p_twopass MERGE t_id: " << p_render[RENDER_TWOPASS_MERGE]->get_id() << endl;
+			cout << "p_twopass  ATTACH t_id: " << p_render[RENDER_TWOPASS_ATTACH]->get_id() << endl;
 			std::cout << "Number of threads Twopass = "
 				<< std::thread::hardware_concurrency() << std::endl;
+			p_render[RENDER_SOBEL]->join();
+			p_render[RENDER_SALIENCY]->join();
+			p_render[RENDER_UNION]->join();
 			p_render[RENDER_TWOPASS_ATTACH]->join();
 			p_render[RENDER_TWOPASS_MERGE]->join();
 
@@ -836,6 +844,8 @@ int   RenderingImage(char * src_name, char * deploy_name)
 			_render[RENDER_TWOPASS_MERGE]->post_process();
 			_render[RENDER_TWOPASS_ATTACH]->post_process();
 		}
+		_render[RENDER_SOBEL]->post_process();
+
 #endif
 	time(&e_time);
 	localtime_s(&t_e, &e_time);

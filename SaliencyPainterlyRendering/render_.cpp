@@ -187,8 +187,8 @@ int render_::draw_grid_depth(Mat  _grid_map_1c[], Mat _grid_map_1c_accu,
 	}//end of for i
 	for (int i = 0; i <= __saved_depth; i++) {
 		
-			debug_image("ing/_od_grid_" + tag+
-				"_"+to_string(called_cnt)+"_", i, overlay_grid_map[i]);
+			debug_image("ing/_od_grid_" +tag+
+				"_r"+to_string(render_method)+"_", i, overlay_grid_map[i]);
 			debug_image("_grid_" + tag, i, _grid_map_1c[i]);
 			debug_image("ing/_grid_" + tag, i, _grid_map_1c[i]);
 
@@ -309,17 +309,24 @@ int render_::calc_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth
 		}
 
 		 int _B = _brush_size[k_depth-1];
+		 int _brush_step;
 		
-		int _brush_step = (_B - g_BrushAttachSize )/ (depth_attach - k_depth);
-
-		for (int i = 0; i < (depth_attach-k_depth); i++)
+			 if ((mm_depth - k_depth) == 0)
+				 _brush_step = (_B - g_BrushAttachSize);
+			 else
+				 _brush_step = (_B - g_BrushAttachSize) / (mm_depth - k_depth);
+	
+		for (int i = 0; i < (mm_depth-k_depth); i++)
 		{
 			_brush_size[i+k_depth] = (int)(_B - (i+1)* _brush_step);
 		}
 	//	r_cout << "_brush_step " << _brush_step << endl;
 	}
 	else {// except for attach
-	 brush_step = (int)((_BrushMaxSize - _BrushMinSize) / (_depth-1));
+		if (_depth == 1)
+			brush_step = (int)(_BrushMinSize) ;
+		else 
+			brush_step = (int)((_BrushMaxSize - _BrushMinSize) / (_depth-1));
 	 _brush_size[0] = (int)(_BrushMaxSize*g_BrushMax_scale);
 	 for (int i = 1; i < _depth; i++)
 		{
@@ -375,7 +382,7 @@ void  render_::post_process() {
 void  render_::add_gradient_map(int render_method, Mat a_map) {
 	gradient_map[render_method] = a_map;
 }
-render_::render_(int _render_method, cv::Mat _srcImg) {
+render_::render_(int _render_method, cv::Mat &_srcImg) {
 	string r_cout_fname = g_root_path_win + string("\\cout\\") + g_para
 		+ "\\cout_" + g_para_method + "_" + g_image_name + _tag[_render_method] + string(".txt");
 	cout << " file name " << _tag[_render_method] <<" "<< r_cout_fname<< endl;
@@ -431,9 +438,6 @@ int render_::prepare() {
 	
 	int k_depth;
 
-	
-	
-
 	if (g_src_image_width < g_src_image_height)
 		BrushMaxSize = g_src_image_width / 10;
 	else
@@ -455,7 +459,10 @@ int render_::prepare() {
 	//	r_cout << "aStroke_set[" << setw(2) << to_string(i) + "]->size().initialize = " + m_tag << ", " << mm_aStroke_set[i].size() << endl;
 
 	if (render_method != RENDER_TWOPASS_ATTACH && render_method != RENDER_TWOPASS_MERGE) {
-
+		//if (render_method != RENDER_SOBEL) {
+		//	ret = QuadTree::TakeQuadTree_grid(gradient_map[render_method], mm_aStroke_set, m_tag);
+		//}
+		//else
 		ret = QuadTree::TakeQuadTree(gradient_map[render_method], mm_aStroke_set, m_tag);
 	}
 	else {
@@ -511,8 +518,9 @@ int render_::prepare() {
 				if (render_method == RENDER_TWOPASS_MERGE)
 					k_depth = (*St_it)->depth;
 				else { //RENDER_TWOPASS_ATTACH
-							k_depth = s_depth + ((*St_it)->depth -4) ;
+							k_depth = (*St_it)->depth+1 ;
 				}
+
 				info = (*St_it)->info;
 				S = (*St_it)->avgS;
 				me_node = QuadTree::newImageTree(info, k_depth, S);
@@ -522,8 +530,9 @@ int render_::prepare() {
 		}
 		r_cout << " saliency added " << kk << ": " << k_depth << endl;
 
-		depth_saliency = render_saliency->mm_depth;
-		mm_depth=depth_attach = k_depth+1;
+		//depth_saliency = render_saliency->mm_depth;
+		//mm_depth=depth_attach = k_depth+1;
+		mm_depth = k_depth + 1;
 		for (int i = 0; i < mm_depth; i++) {
 			r_cout << m_tag + "  _aStrokeset_size() : " <<i << ": " << mm_aStroke_set[i].size() << endl;
 		}

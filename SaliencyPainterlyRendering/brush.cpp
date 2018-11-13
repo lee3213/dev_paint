@@ -33,9 +33,6 @@ int BrushInitialization(vector <Brush*> &_brush_set,int _brush_depth,int brush_s
 	int bsize_w, bsize_h;
 	Size sz;
 	
-
-	
-
 	nth = 0;
 	Mat brush_gray;
 	Mat *brush_gray_x[4];
@@ -67,7 +64,7 @@ int BrushInitialization(vector <Brush*> &_brush_set,int _brush_depth,int brush_s
 		s_step1 = b_step1 = (int)temp_brush.step1();
 		s_channels = b_channels = temp_brush.channels();
 		unsigned char * brush_gray_x_data[4];
-
+#ifdef BRUSH_BR2
 		if (run_once) {
 			int _brush_Ts[] = { 100,150,200,230 };
 			for (int i = 0; i < 4; i++) {
@@ -88,9 +85,8 @@ int BrushInitialization(vector <Brush*> &_brush_set,int _brush_depth,int brush_s
 				debug_image(string("/br/g_") + fn+to_string(i), *brush_gray_x[i]);
 			}
 		}
-
+#endif
 		 cv::cvtColor(temp_brush, brush_gray, COLOR_RGB2GRAY);
-		
 		 unsigned char * bestBrush_data_gray_resized = brush_gray.data;
 		//mat_print(temp_brush, "temp_brush");
 	
@@ -145,6 +141,7 @@ int BrushInitialization(vector <Brush*> &_brush_set,int _brush_depth,int brush_s
 		__brush->bump=temp_bump.clone();
 		__brush->index_brush=temp_index_brush.clone();
 		_brush_set.push_back(__brush);
+#ifdef BRUSH_BR2
 		if ( run_once){
 			if (_brush_depth > 0)
 			{
@@ -287,11 +284,11 @@ int BrushInitialization(vector <Brush*> &_brush_set,int _brush_depth,int brush_s
 					*/
 				}//for color_B
 				debug_image("br2/alpha_channel_" + to_string(color_BGR_B), nth, alpha_channel);
-				
+				}//if > 0
 			}//run once
-			}//if > 0
+		
 		//mat_print(temp_thumbnail,"temp_thumbnail");
-			
+#endif
 #ifdef DEBUG_BRUSH_IMAGE
 		if (nth == 0)
 		{
