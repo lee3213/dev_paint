@@ -218,6 +218,7 @@ void render_::func_(){
 	r_cout << m_tag_+"    g_Scale = " << g_paint_area_scale << endl;
 	r_cout << endl <<
 		setw(6) << "[]" <<
+		setw(12)<<"tag "<<
 		setw(7) << "QT_cnt" <<
 		setw(6) << "try" <<
 		setw(11) << "try/QT" <<
@@ -231,7 +232,7 @@ void render_::func_(){
 		endl;
 	for (int i = 0; i < mm_depth; i++) {
 		if (r_s_grid_painting_try[i] != 0 && r_s_painting_area[i] !=0  && QT_grid_count[i] !=0){
-		r_cout << setw(15) << i << "," <<
+		r_cout << setw(15) << i << "," <<m_tag<<
 			setw(6) << QT_grid_count[i] << ", " <<
 			setw(6) << r_s_grid_painting_try[i] << ", " <<
 
@@ -255,19 +256,19 @@ void render_::func_(){
 				setw(6) << QT_grid_count[i] << ", " <<
 				setw(6) << r_s_grid_painting_try[i] << ", " <<
 
-				setw(8) << "****"//(int)(grid_painting_try[i] / QT_grid_count[i])
+				setw(8) << "**/0"//(int)(grid_painting_try[i] / QT_grid_count[i])
 				<<
 				setw(8) << r_s_changed_count[i] << ",  " <<
 				std::fixed <<
-				std::setw(7) << std::setprecision(2) <<"********"<<
+				std::setw(9) << std::setprecision(2) <<"******/0"<<
 				//(int)((float)changed_count[i] / (float)(grid_painting_try[i])* 100.) <<
 				setw(6) << brush_size[i] <<
 				setw(6) << brush_size[i] * brush_size[i] <<
 				setw(10) << brush_size[i] * brush_size[i] * r_s_grid_painting_try[i]
 				<< setw(17) << r_s_painting_area[i]
-				<< setw(15) << "****"//nt)((painting_area[i] / grid_painting_try[i])*100.)
+				<< setw(15) << "**/0"//nt)((painting_area[i] / grid_painting_try[i])*100.)
 
-				<< setw(12) <<"****"// (int)(brush_size[i] * brush_size[i] * grid_painting_try[i] / painting_area[i])
+				<< setw(12) <<"**/0"// (int)(brush_size[i] * brush_size[i] * grid_painting_try[i] / painting_area[i])
 				<< endl;
 		}
 		Qt_sum += QT_grid_count[i];

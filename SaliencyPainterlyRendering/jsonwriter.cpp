@@ -15,7 +15,7 @@ using namespace std;
 //	root["encoding"] = getCurrentEncoding();
 //	root["indent"]["length"] = getCurrentIndentLength();
 //	root["indent"]["use_space"] = getCurrentIndentUseSpace();
-int sthresh[] = { 60,70,80 };
+int sthresh[] = {110,120,130 };
 int _grid[] = { 10,20 };
 int depth[] = { 10 };
 int _br[] = { 10 }; //g_BrushMinSize
@@ -28,7 +28,7 @@ int _at[] = { 5 }; //attach brush size
 int QT_N[] = { 1};
 //int _mm[] = { 1,2 };// "attach", tag_union
 ;
-int _ps[] = { 10 };//"g_paint_area_scale"
+int _ps[] = { 15 };//"g_paint_area_scale"
 
 
 
@@ -172,7 +172,7 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 
 			for (sm = 0; sm < MAX_SALIENCY; sm++) {
 				int mf_loc = th*n_gr*MAX_SALIENCY + gr*MAX_SALIENCY+sm;
-				f_name_para_method_cfg[mf_loc] = "M"+g_saliency_method_str[sm]+"s_" + to_string(sthresh[th]) +
+				f_name_para_method_cfg[mf_loc] = "M"+g_saliency_method_str[sm]+"_s_" + to_string(sthresh[th]) +
 					"_g" + to_string(_grid[gr]) + ".cfg";
 				file_para_method_cfg[mf_loc].open(list_cfg_path + "\\" + f_name_para_method_cfg[mf_loc]);
 				cout << setw(5) << mf_loc << " : " << list_cfg_path + "\\" + f_name_para_method_cfg[mf_loc] << endl;

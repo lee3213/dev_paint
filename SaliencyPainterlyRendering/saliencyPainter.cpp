@@ -742,7 +742,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 			for (int i = RENDER_SALIENCY; i < RENDER_MAX; i++) {
 				_render[i]->add_gradient_map(Gradient_Sobel, sobel_8UC1);
 				_render[i]->add_gradient_map(Gradient_Saliency_C, gradient_Map_C);
-				//	if (g_Render_method != "Sobel") {
+				
 				_render[i]->add_gradient_map(Gradient_Saliency_G, gradient_Map_G);
 				_render[i]->add_gradient_map(Gradient_Union, gradient_Union);
 				_render[i]->add_gradient_map(Gradient_Twopass, gradient_Union);
@@ -760,8 +760,8 @@ int   RenderingImage(char * src_name, char * deploy_name)
 		}
 		else {
 			how_many_render = RENDER_MAX;
-			_render[RENDER_TWOPASS_ATTACH]->add_render(_render[0], _render[1]);//render_sobel, render_saliency
-			_render[RENDER_TWOPASS_MERGE]->add_render(_render[0], _render[1]);
+			_render[RENDER_TWOPASS_ATTACH]->add_render(_render[0], _render[2]);//render_sobel, render_union
+			_render[RENDER_TWOPASS_MERGE]->add_render(_render[0], _render[2]);
 		}
 		time_t p_s_time[RENDER_MAX], p_e_time[RENDER_MAX];
 		tm p_t_s[RENDER_MAX], p_t_e[RENDER_MAX];
@@ -794,16 +794,10 @@ int   RenderingImage(char * src_name, char * deploy_name)
 
 		cout <<" ++++++++++++++++++++++++++++++++++++++++" << endl;
 		//return 997788;
-#ifndef RUN_THREAD	
-		for (int i = 0; i < RENDER_MAX; i++) {
-			//for (int j = 0; j<_render[i]->mm_depth; j++){
-		//	cout << _render[i]->m_tag << " : " << _render[i]->mm_aStroke_set[j].size() << endl;
-		//}
-			_render[i]->success_or_fail = _render[i]->PainterlyRendering();
-			cout << "================= " << _render[i]->m_tag << " " << _render[i]->success_or_fail << " =========================================" << endl;
-			//	image_save(g_image_name + _render[i]->m_tag_, _render[i]->result_image, _render[i]->r_grid_map_1c_accu);
-		}
-#else
+
+#ifdef RUN_THREAD	
+		
+
 
 		std::thread *p_render[RENDER_MAX];
 
@@ -836,16 +830,40 @@ int   RenderingImage(char * src_name, char * deploy_name)
 			p_render[RENDER_SOBEL]->join();
 			p_render[RENDER_SALIENCY]->join();
 			p_render[RENDER_UNION]->join();
-			p_render[RENDER_TWOPASS_ATTACH]->join();
 			p_render[RENDER_TWOPASS_MERGE]->join();
-
+			p_render[RENDER_TWOPASS_ATTACH]->join();
+		
 			_render[RENDER_SALIENCY]->post_process();
 			_render[RENDER_UNION]->post_process();
 			_render[RENDER_TWOPASS_MERGE]->post_process();
 			_render[RENDER_TWOPASS_ATTACH]->post_process();
 		}
 		_render[RENDER_SOBEL]->post_process();
+#else
 
+		std::thread *p_render[RENDER_MAX];
+
+		p_render[0] = new thread(run_render, _render[RENDER_SOBEL]);
+		p_render[RENDER_SOBEL]->join();
+		_render[RENDER_SOBEL]->post_process();
+		if (g_saliency_method != string("Sobel")) {
+			p_render[RENDER_SALIENCY] = new thread(run_render, _render[RENDER_SALIENCY]);
+			p_render[RENDER_SALIENCY]->join();
+			p_render[RENDER_UNION] = new thread(run_render, _render[RENDER_UNION]);
+			p_render[RENDER_UNION]->join();
+			p_render[RENDER_TWOPASS_MERGE] = new thread(run_render, _render[RENDER_TWOPASS_MERGE]);
+			p_render[RENDER_TWOPASS_MERGE]->join();
+			p_render[RENDER_TWOPASS_ATTACH] = new thread(run_render, _render[RENDER_TWOPASS_ATTACH]);
+			p_render[RENDER_TWOPASS_ATTACH]->join();
+				
+			
+
+			_render[RENDER_SALIENCY]->post_process();
+			_render[RENDER_UNION]->post_process();
+			_render[RENDER_TWOPASS_MERGE]->post_process();
+			_render[RENDER_TWOPASS_ATTACH]->post_process();
+		}
+		
 #endif
 	time(&e_time);
 	localtime_s(&t_e, &e_time);

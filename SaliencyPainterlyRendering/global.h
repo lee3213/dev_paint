@@ -76,7 +76,7 @@ int g_INDEX_BRUSH_SIZE_HEIGHT;
 Mat Sgrid_grid_map_1c[MAX_DEPTH];
 Mat gradient_Map_C;
 Mat gradient_Map_G;
-std::string tag[] = { "0_sobel","1_saliency","2_union","3_two_merge","4_attach" };
+std::string tag[] = { "0_sobel","1_saliency","2_union","3_merge","4_attach" };
 std::string tag_[] = { "0_sobel_", "1_saliency_", "2_union_", "3_merge_","4_attach_" };
 std::string _tag[] = { "_0_sobel", "_1_saliency", "_2_union", "_3_merge_","_4_attach_" };
 

@@ -103,6 +103,13 @@ int   render_::PainterlyRendering()
 		time_t one_pass_time_s, one_pass_time_e;
 		time((&one_pass_time_s));
 		int paint_area_brush_count;
+		if (uu <= 1) {
+			if (uu >= 1) {
+				rst_accu_canvas[uu] = rst_accu_canvas[uu - 1].clone();
+				rst_accu_canvas_data[uu] = (unsigned char*)rst_accu_canvas[uu].data;
+			}
+			continue;
+		}
 
 		for (list<Img_node*>::iterator St_it = mm_aStroke_set[uu].begin(); St_it != mm_aStroke_set[uu].end(); St_it++)
 		{
