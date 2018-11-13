@@ -72,12 +72,13 @@ int  file_write(string f_name, string _file_str[], int _file_cnt) {
 	return _file_cnt;
 }//end of function
 string f_str[MAX_F_CNT];
-int bat_file_write(string f_name, string image_file[], int file_image_cnt, string  exe_path, int  file_meta_cnt, string  meta_cfg_file[]) {
+int bat_file_write(string f_name, string image_file[], int file_image_cnt, string  exe_path, 
+	int  file_meta_cnt, string  meta_cfg_file[],string render_src) {
 	int f_cnt = 0;
 
 	for(int i_f=0; i_f<file_image_cnt;i_f++)
 		for (int m_f = 0; m_f < file_meta_cnt; m_f++) {
-			f_str[f_cnt] = exe_path + " " + image_file[i_f] + " " + meta_cfg_file[m_f];
+			f_str[f_cnt] = exe_path + " " + render_src+"\\"+image_file[i_f] + " " + meta_cfg_file[m_f];
 			f_cnt++;
 			if (MAX_F_CNT <= f_cnt) {
 				break;
@@ -90,12 +91,12 @@ int bat_file_write(string f_name, string image_file[], int file_image_cnt, strin
 	return f_cnt;
 }
 int call_file_write(string f_name, string image_file[], int file_image_cnt,
-	string  call_path, int  file_meta_cnt, string  meta_cfg_file[]) {
+	string  call_path, int  file_meta_cnt, string  meta_cfg_file[],string render_src) {
 	int f_cnt = 0;
 
 	for (int i_f = 0; i_f<file_image_cnt; i_f++)
 		for (int m_f = 0; m_f < file_meta_cnt; m_f++) {
-			f_str[f_cnt] = call_path + " " + image_file[i_f] + " " + meta_cfg_file[m_f];
+			f_str[f_cnt] = call_path + " " + render_src+"\\"+image_file[i_f] + " " + meta_cfg_file[m_f];
 			f_cnt++;
 			if (MAX_F_CNT <= f_cnt) {
 				break;
@@ -113,6 +114,7 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
 	string batch_render_para_path,
 	string batch_render_para_method_path,
 	string batch_render_call_path,
+	string _render_src,
 	string exe_path)
 
  {
@@ -180,7 +182,9 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
 						ret = file_read(f_name_image, image_file, image_file_cnt);
 
 						f_name_para_bat = batch_render_para_path + "\\" + image_csv_file[image_idx] + "_" + meta_cfg_file[meta_file_idx] + ".bat";
-						int flag = bat_file_write(f_name_para_bat, image_file, image_file_cnt, exe_path, meta_json_cnt, meta_json_file);
+						int flag = bat_file_write(f_name_para_bat, image_file, image_file_cnt, exe_path,
+							meta_json_cnt, meta_json_file,
+							_render_src);
 					
 					}
 	
@@ -200,7 +204,9 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
 				f_name_method_bat = batch_render_method_path + "\\" + image_csv_file[image_idx] + "_" + method_cfg_file[method_file_idx] + ".bat";
 
 
-				int flag = bat_file_write(f_name_method_bat, image_file, image_file_cnt, exe_path, file_method_json_cnt, method_json_file);
+				int flag = bat_file_write(f_name_method_bat, image_file, image_file_cnt, exe_path,
+					file_method_json_cnt, method_json_file,
+					_render_src);
 			}
 	
 	}
@@ -219,7 +225,9 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
 			ret = file_read(f_name_image, image_file, image_file_cnt);
 
 			f_name_para_bat = batch_render_para_method_path + "\\" + image_csv_file[image_idx] + "_" + method_para_cfg_file[para_method_idx] + ".bat";
-			int flag = bat_file_write(f_name_para_bat, image_file, image_file_cnt, exe_path, para_method_json_cnt, para_method_json_file);
+			int flag = bat_file_write(f_name_para_bat, image_file, image_file_cnt, exe_path,
+				para_method_json_cnt, para_method_json_file,
+				_render_src);
 
 		}
 
