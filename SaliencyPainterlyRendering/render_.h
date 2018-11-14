@@ -72,6 +72,7 @@ public:
 	std::string m_tag;
 	std::string m__tag;
 	std::string m_tag_;
+	string m_t;
 
 	//int get_depth;
 	render_(int _render_method, Mat &_srcImg);

@@ -88,7 +88,7 @@ int   render_::PainterlyRendering()
 		rectangle_canvas(painting_area_canvas[i], Rect(St_srtPoint, St_endPoint), Scalar(0, 0, 255));//RED QT outline
 #endif
 	}
-
+	int first_layer = -1;
 	for(int i=0;i<mm_depth;i++)
 		r_cout << m_tag << " : "<<mm_depth<<" size: "<< mm_aStroke_set[i].size()<<endl;
 //	for (int i = 0; i < mm_depth; i++) {
@@ -99,11 +99,12 @@ int   render_::PainterlyRendering()
 
 	int size_mismatch = 0;
 	int saved_depth=-1;
+	
 	for (int uu = 0; uu < mm_depth; uu++) {
 		time_t one_pass_time_s, one_pass_time_e;
 		time((&one_pass_time_s));
 		int paint_area_brush_count;
-		if (uu <= 1) {
+		if (uu < g_first_layer) {
 			if (uu >= 1) {
 				rst_accu_canvas[uu] = rst_accu_canvas[uu - 1].clone();
 				rst_accu_canvas_data[uu] = (unsigned char*)rst_accu_canvas[uu].data;
@@ -163,19 +164,20 @@ int   render_::PainterlyRendering()
 			brush_area_w_size = brush_size[astroke_depth];// brush size(painting area) per each depth
 			int brush_area_h_size_half = brush_area_h_size / 2+brush_area_h_size%2;
 			int brush_area_w_size_half = brush_area_w_size / 2 + brush_area_w_size % 2;
-
-			if (astroke_depth == 0)
-				paint_area_brush_count = (st_w_size * st_h_size *g_paint_area_scale_0) /
-				(brush_area_h_size * brush_area_w_size);
-			else
-			 paint_area_brush_count = (st_w_size * st_h_size *g_paint_area_scale) /
-				(brush_area_h_size * brush_area_w_size);
-			//(brush_size[astroke_depth] * brush_size[astroke_depth]);
+			if (first_layer == -1) {
+				paint_area_brush_count = (st_w_size * st_h_size *g_paint_area_scale[astroke_depth]) /
+					(brush_area_h_size * brush_area_w_size);
+				first_layer = 0;
+			}
+			else {
+				paint_area_brush_count = (st_w_size * st_h_size *g_paint_area_scale[astroke_depth]) /
+					(brush_area_h_size * brush_area_w_size);
+			}//(brush_size[astroke_depth] * brush_size[astroke_depth]);
 
 			if (paint_area_brush_count == 0) {
 				r_cout << "paint_area_brush_count == 0 depth " << astroke_depth
 					<< " st_size : " << st_w_size << ", " << st_h_size << " g_paint_area_Scale " <<
-					g_paint_area_scale << (st_w_size * st_h_size *g_paint_area_scale) << " m_brush_size " << brush_size[astroke_depth] <<
+					g_paint_area_scale[astroke_depth] << (st_w_size * st_h_size *g_paint_area_scale[astroke_depth]) << " m_brush_size " << brush_size[astroke_depth] <<
 					" : " <<
 					(brush_area_h_size * brush_area_w_size) <<
 					endl;
@@ -318,22 +320,24 @@ int   render_::PainterlyRendering()
 		strftime(s_buff, 20, "%Y-%m-%d %H:%M:%S",&t_s );
 		char e_buff[20];
 		strftime(e_buff, 20, "%Y-%m-%d %H:%M:%S",&t_e );
-		r_cout << setw(15)<<m_tag << " :: d "<<setw(3)<<uu<<" ,size "<< setw(5) << mm_aStroke_set[uu].size()<<
-			"  "<< setw(4)<<paint_area_brush_count<<
-			" " << s_buff << " : " << e_buff << endl;
+		r_cout << setw(15)<<m_tag << " :depth "<<setw(3)<<uu<<" paint scale : "<< 
+			setw(3) << g_paint_area_scale[uu]<<" , Br_size "<< setw(5) << mm_aStroke_set[uu].size()<<
+			" br_cnt "<< setw(4)<<paint_area_brush_count<<
+			" s: " << s_buff << " e: " << e_buff << endl;
 		clog << m_tag << " ," << setw(3) << uu << " ,size, " << mm_aStroke_set[uu].size() <<
+			 " paint scale : " << setw(3) << g_paint_area_scale[uu] <<
 			"," << setw(4) << paint_area_brush_count <<
 			"," << s_buff << " , " << e_buff << endl;
-		debug_image("ing/ing_" + to_string(uu) + "_" + m_tag ,  ing_canvas[uu]);
+		debug_image("ing/_i_" + to_string(uu) + m_t +to_string(g_paint_area_scale[uu]),  ing_canvas[uu]);
 #ifdef _DEBUG_RENDER
-		debug_image("ing/painting_area" + to_string(i) + "_" + m_tag + to_string(called), painting_area_canvas[i]);
+		debug_image("ing/pa_" + to_string(uu) + "_" + m_tag + to_string(called), painting_area_canvas[uu]);
 
-		debug_image("ing/changed_" + m_tag + to_string(called), i, changed_map_canvas[i]);
+		debug_image("ing/ch_" + m_tag + to_string(called), uu, changed_map_canvas[uu]);
 
 #endif
 
-		debug_image("ing/accu_" + to_string(uu) + "_" + m_tag , rst_accu_canvas[uu]);
-		debug_image("ing/try_map_" + to_string(uu) + "_" + m_tag , r_try_map_1c[uu]);
+		debug_image("ing/_ac_" + to_string(uu) + m_t , rst_accu_canvas[uu]);
+		debug_image("ing/try_" + to_string(uu) + m_t , r_try_map_1c[uu]);
 
 	}//end of for depth uu
 	
@@ -349,25 +353,7 @@ int   render_::PainterlyRendering()
 		called++;
 		
 	}
-	/*
-#ifdef _DEBUG_RENDER	
-	for (int i = 0; i < mm_depth; i++) {
-		static int called = 0;
-		debug_image("ing/ing_" + to_string(i) + "_" + m_tag + to_string(called), ing_canvas[i]);
-#ifdef _DEBUG_RENDER
-		debug_image("ing/painting_area" + to_string(i) + "_" + m_tag + to_string(called), painting_area_canvas[i]);
 
-		debug_image("ing/changed_" + m_tag + to_string(called), i, changed_map_canvas[i]);
-
-#endif
-
-		debug_image("ing/accu_" + to_string(i) + "_" + m_tag + to_string(called), rst_accu_canvas[i]);
-		debug_image("ing/try_map_" + to_string(i) + "_" + m_tag + to_string(called), r_try_map_1c[i]);
-
-		
-	}
-#endif
-*/
 	result_image=rst_accu_canvas[mm_depth-1];
 
 	time((&e_time));

@@ -186,7 +186,7 @@ Mat & _src_ROI_canvas,
 				//	Alpha = bestBrush_data_resized[bIndex];// T(x, y);
 		//		Alpha = (int)s_hsv.val[2];
 				Alpha = bestBrush_data_gray_resized[gray_bIndex_1c];
-				if (Alpha < g_TH) {
+				if (Alpha < g_alpha_TH) {
 				
 					s_hsv.val[2] = s_hsv.val[2] + g_ET*(bestBrush_embossed_resized_data[gray_bIndex_1c] - 128);
 					 HSV2RGB(s_hsv, s_rgb);

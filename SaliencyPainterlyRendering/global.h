@@ -41,7 +41,7 @@ int g_min_gridsize;
 //int g_RetryTime;
 int g_brush_Ts;
 /////////////////////////////////////////////////////
-int g_debug_level;
+//int g_debug_level;
 
 string g_method_revision;
 
@@ -73,22 +73,15 @@ unsigned char *g_org_DensityMap_data;
 int g_INDEX_BRUSH_SIZE_WIDTH ;
 int g_INDEX_BRUSH_SIZE_HEIGHT;
 
-Mat Sgrid_grid_map_1c[MAX_DEPTH];
+//Mat Sgrid_grid_map_1c[MAX_DEPTH];
 Mat gradient_Map_C;
 Mat gradient_Map_G;
 std::string tag[] = { "0_sobel","1_saliency","2_union","3_merge","4_attach" };
 std::string tag_[] = { "0_sobel_", "1_saliency_", "2_union_", "3_merge_","4_attach_" };
 std::string _tag[] = { "_0_sobel", "_1_saliency", "_2_union", "_3_merge_","_4_attach_" };
+string _t[] = { "_0so","_1sa","_2un","_3me","_4at" };
 
 
-//int m_brush_size_x;
-//int m_brush_size_y;
-//random_device rand_x[5], rnd_y[5];
-//mt19937 g_engine_x[5];// (GetTickCount());
-//uniform_int_distribution<int> *g_distribution[5];
-//int g_debug_called_cnt;
-//int g_debug_min_level;
-//int g_grid_sum;//sum of g_Sgrid_painting_try[]
 #ifdef G_DEBUG_TOUCH
 cv::Mat g_touch;
 unsigned char * g_touch_data;
@@ -99,24 +92,14 @@ int g_src_image_height;
 int g_src_image_channels;
 int g_src_image_step1;
 
-//cv::Mat grid_map[5]; //
-//cv::Mat fetched_map[5]; // randominized fetched point
-//cv::Mat try_map[5]; // randominized try grid map
 string g_saliency_method;//without_saliency, saliency, pregraph, blackandwhite,resudual,fine_sobelined
 string g_paint_method;
-//string g_Render_method;//Union, Only
 
-int g_paint_area_scale;
+
+
 int g_QT_method_N;//N
-int g_paint_area_scale_0;
-//int g_grid_s;
-//int g_grid_threshold;
 
 
-
-//mt19937 g_engine_x[MAX_DEPTH];// (GetTickCount());
-//mt19937 g_engine_y[MAX_DEPTH];// (GetTickCount());
-//uniform_int_distribution<int> *g_distribution[MAX_DEPTH];
 
 streambuf* g_stream_buffer_file_cout;
 streambuf* g_stream_buffer_file_clog;
@@ -126,16 +109,17 @@ fstream g_file_cout;
 fstream g_file_clog;
 fstream g_file_cstat;
 fstream g_file_cerr;
-//ostream g_file_cout_backup;
-//streambuf *g_stream_buffer_file_cout_backup;
-int g_TH = 240;//used in alpha
+
+int g_alpha_TH = 240;//used in alpha
 int g_ET = 1;//positive ET=-1 negative
-//int g_merge_skip_count;
-float  g_BrushMax_scale = 2.0;
-//int _re_cnt = 3;
-//int _str_mm_cnt = 2;
-int g_qt_s_scale=2;
+
+int g_qt_s_scale=2;//
 int g_brush_choice = 1; //if (g_brush_choice == 0) {nth = rand() % 5;} else nth = 0;
 int g_trace_depth=7;
 string g_saliency_method_str[MAX_SALIENCY] = { "Sobel", "Itti","Pregraph","Residual","Blackandwhite","Fine_grained","Perazzi" };
+string g_sa_str[MAX_SALIENCY] = { "so","It","Pr","Re","Bw","Fg","Pe" };
 int g_max_f_cnt=0;
+int g_first_layer = 0;
+//int g_first_layer_scale = 3;// multiplied by g_paint_area_scale
+float  g_BrushMax_scale = 1.5;
+int g_paint_area_scale[MAX_DEPTH] ={ 20,10,8,6,4,4,4,4,4,4,4,4,4};

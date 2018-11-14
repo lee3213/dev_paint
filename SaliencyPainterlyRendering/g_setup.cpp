@@ -5,28 +5,42 @@
 #include <iostream>
 #include "extern.h"
 #include "set_result_path.h"
-int  set_global(string src_name,string deploy_name) {
-	//g_root_path = "/rst";
-	//g_method = "org";
-	//g_method_path = "/"+g_method;
-	//g_method_revision = "1";
+
+void
+cout_func(string src_name, string deploy_name){
+	cout << "deployname = " << deploy_name << endl;
+	cout << "src = " << src_name << endl;
+	cout << "image_name " << g_image_name << endl << endl;
+	cout << "g_root_path = " << g_root_path << endl;
+	cout << "g_root_path_win = " << g_root_path_win << endl;
+	cout << "g_para " << g_para << endl;
+	cout << "g_para_method = " << g_para_method << endl;
+	cout << "g_para_path = " << g_para_path << endl;
+	cout << "g_para_method_path= " << g_para_method_path << endl;
+	cout << "g_para_method_image_path= " << g_para_method_image_path << endl;
+	cout << endl;
+	cout << "g_saliency_method " << g_saliency_method << endl;
+
+	cout << "g_Depth_Limit = " << g_depth_limit << endl;
+	cout << "g_min_gridsize = " << g_min_gridsize << endl;
+	cout << "g_QT_avgSThreshold = " << g_QT_avgSThreshold << endl;
 	
-	//m_brush_size_x = 200;
-	//m_brush_size_y = 200;
+	cout << "g_BrushMinSize = " << g_BrushMinSize << endl;
+	cout << "g_brush_thumbnail_size = " << g_brush_thumbnail_size << endl;
+
+	cout << "g_QT_method_N = " << g_QT_method_N << endl;
+	for (int i = 0; i < MAX_DEPTH; i++) {
+		cout << setw(3) << i << " : " << g_paint_area_scale[i] << endl;
+	}
+}
+int  set_global(string src_name,string deploy_name) {
+	
 	g_INDEX_BRUSH_SIZE_WIDTH = 20;//changed by cwlee from 10 to same as thumbnail
 	g_INDEX_BRUSH_SIZE_HEIGHT = 20; //changed by cwlee from 10 to same as thumbnail
 	g_BrushNumber = 64;						//basic:64    expansion:48
 	g_brush_thumbnail_size = g_INDEX_BRUSH_SIZE_HEIGHT;
 
-	//g_BrushMinSize = 10;
-
-	//g_BrushMaxSize = 80;						//1024size에는 130, 3072size에는 400으로 설정했습니다..
-	//g_depth = 7;								// 1024 : 7
-	//g_min_gridsize = 10;
-	//	g_QT_avgSThreshold=23;
-
-	//g_Ts = 100;
-	//g_Ts = 230;
+	
 
 	int ret=json_deployment(deploy_name);
 	if (ret < 0) return -1;
@@ -53,12 +67,12 @@ int  set_global(string src_name,string deploy_name) {
 
 	g_para = string("s") + to_string(g_QT_avgSThreshold) + "d" + to_string(g_depth_limit)
 		+ "g" + to_string(g_min_gridsize) + "_b" + to_string(g_BrushMinSize) +
-		"_N" + to_string(g_QT_method_N) + "_ps" + to_string(g_paint_area_scale) + "_ts" + to_string(g_brush_Ts);
+		"_N" + to_string(g_QT_method_N);// + "_ps" + to_string(g_paint_area_scale[0]) ;
 		// + "_gth" + to_string(g_grid_threshold);
 
 	 cout << "g_para " << g_para << endl;
 
-	g_para_method = g_para + "_m" + g_saliency_method + "_" //+ g_Render_method +
+	g_para_method = g_para + "_m" + g_saliency_method //+ g_Render_method +
 	//	+"_p" + g_paint_method//+"_q"+to_string(g_merge_method)
 		;
 
@@ -84,6 +98,7 @@ int  set_global(string src_name,string deploy_name) {
 	//waitKey();
 	//std::exit(1);
 
+	cout_func(src_name,deploy_name);
 	string f_path_cerr = g_root_path_win + string("\\cerr\\") + g_para + "\\cerr_" + g_para_method + "_" + g_image_name + string(".txt");
 	cout << f_path_cerr << endl;
 
@@ -126,44 +141,8 @@ int  set_global(string src_name,string deploy_name) {
 		g_stream_buffer_file_cstat = g_file_cstat.rdbuf();
 
 	
-	//	file_redirection_clog(g_para_method_path+"/clog.txt");
-	// Redirect cout to file
-	
-	//g_method_path = g_root_path + string("/") + g_para + string("/")+g_method;// "/rst//org";
-	
+		cout_func(src_name, deploy_name);
 
-	cout << "deployname = " << deploy_name << endl;
-	cout << "src = " << src_name << endl;
-	cout << "image_name " << g_image_name << endl << endl;
-	cout << "g_root_path = " << g_root_path << endl;
-	cout << "g_root_path_win = " << g_root_path_win << endl;
-	cout << "g_para " << g_para << endl;
-	cout << "g_para_method = " << g_para_method << endl;
-	cout << "g_para_path = " << g_para_path << endl;
-	cout << "g_para_method_path= " << g_para_method_path << endl;
-	cout << "g_para_method_image_path= " << g_para_method_image_path << endl;
-	cout << endl;
-	cout << "g_saliency_method " << g_saliency_method << endl;
-
-	
-
-	cout << "g_Depth_Limit = " << g_depth_limit << endl;
-	cout << "g_min_gridsize = " << g_min_gridsize <<endl;
-	cout << "g_QT_avgSThreshold = " << g_QT_avgSThreshold << endl;
-	//cout << "g_grid_threshold = " << g_grid_threshold << endl;
-	cout << "g_Scale = " << g_paint_area_scale << endl;
-	cout << "g_Scale_0 = " << g_paint_area_scale_0 << endl;
-	cout << "g_BrushMinSize = " << g_BrushMinSize << endl;
-	cout << "g_brush_thumbnail_size = " << g_brush_thumbnail_size << endl;
-	cout << endl;
-	cout << "g_QT_method_N = " << g_QT_method_N << endl;
-	
-	//g_saliency_depth = g_depth;
-
-	//cout << "g_Ts= " << g_Ts << endl;
-	//	g_RetryTime = 40;
-
-	g_debug_level = 3;
 	g_unique_id = 0;//QT->no
 	g_debug_method = "";
 	g_debug_method.append("org");
@@ -178,13 +157,5 @@ int  set_global(string src_name,string deploy_name) {
 	else
 		g_brush_style = BRUSH_COPY;
 
-	//double m_brush_size_ratio = 1. / (float)g_depth;
-
-	
-
-
-//	g_debug_called_cnt = 1000;
-//	g_debug_min_level = 5;
-	//cout << f_path;
 	return 0;
 }

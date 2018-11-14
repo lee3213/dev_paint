@@ -12,17 +12,16 @@ using namespace std;
 using namespace cv;
 void image_save(string image_name, Mat result_image, Mat Quad_TreeMap) {
 	debug_image_abs(g_root_image_path, g_para_method + string("_") + image_name, result_image);
-	debug_image_abs(g_root_image_path, g_para_method + string("_") + image_name + string("_QT"), Quad_TreeMap);
+	debug_image_abs(g_root_image_path, g_para_method + string("_") + image_name+"_Q" , Quad_TreeMap);
 
 	debug_image_abs(g_para_path + string("/"), g_para_method + string("_") + image_name, result_image);
-	debug_image_abs(g_para_path + string("/"), g_para_method + string("_") + image_name + string("_QT"), Quad_TreeMap);
+	debug_image_abs(g_para_path + string("/"), g_para_method + string("_") + image_name + string("_Q"), Quad_TreeMap);
 
 	debug_image_abs(g_para_method_path + string("/"), g_para_method + string("_") + image_name, result_image);
-	debug_image_abs(g_para_method_path + string("/"), g_para_method + string("_") + image_name + string("_QT"), Quad_TreeMap);
+	debug_image_abs(g_para_method_path + string("/"), g_para_method + string("_") + image_name + string("_Q"), Quad_TreeMap);
 
-
-	debug_image_abs(g_para_method_image_path, g_para_method + string("_") + image_name, result_image);
-	debug_image_abs(g_para_method_image_path, g_para_method + string("_") + image_name + string("_QT"), Quad_TreeMap);
+		debug_image_abs(g_para_method_image_path, g_para_method + string("_") + image_name, result_image);
+	debug_image_abs(g_para_method_image_path, g_para_method + string("_") + image_name + string("_Q"), Quad_TreeMap);
 
 
 
@@ -187,10 +186,9 @@ int render_::draw_grid_depth(Mat  _grid_map_1c[], Mat _grid_map_1c_accu,
 	}//end of for i
 	for (int i = 0; i <= __saved_depth; i++) {
 		
-			debug_image("ing/_od_grid_" +tag+
-				"_r"+to_string(render_method)+"_", i, overlay_grid_map[i]);
-			debug_image("_grid_" + tag, i, _grid_map_1c[i]);
-			debug_image("ing/_grid_" + tag, i, _grid_map_1c[i]);
+			debug_image("ing/_og" +m_t, i, overlay_grid_map[i]);
+			debug_image("_g" + m_t, i, _grid_map_1c[i]);
+			debug_image("ing/_g" + m_t, i, _grid_map_1c[i]);
 
 			r_cout << tag<<" "<<setw(6) << i << " : " << setw(10)<<_QT_grid_count[i] << endl;
 				
@@ -198,7 +196,7 @@ int render_::draw_grid_depth(Mat  _grid_map_1c[], Mat _grid_map_1c_accu,
 	
 	}
 
-	debug_image("QT_" + tag + "_" + to_string(__saved_depth) + "_f", _grid_map_1c_accu);
+	debug_image("QT" + m_t + "_" + to_string(__saved_depth) + "_f", _grid_map_1c_accu);
 
 	//r_cout << "z depth " + tag << setw(5) << __saved_depth << " : QT_" << _QT_grid_count[__saved_depth] << endl;
 	
@@ -296,14 +294,18 @@ int render_::calc_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth
 		else 	k_depth = render_saliency->mm_depth; 
 		
 		 brush_step = (int)((_BrushMaxSize - _BrushMinSize) / (k_depth-1));
-		 _brush_size[0] = (int)(_BrushMaxSize*g_BrushMax_scale);
-		 for (int i = 1; i < k_depth; i++)
+		
+		 for (int i = 0; i < k_depth; i++)
 		 {
-			 _brush_size[i] = (int)(_BrushMaxSize - (i)* brush_step);
+			 if (i == g_first_layer) {
+				 _brush_size[g_first_layer] = (int)(_BrushMaxSize*g_BrushMax_scale);
+			 }
+			 else {
+				 _brush_size[i] = (int)(_BrushMaxSize - (i)* brush_step);
 
-			 if (_brush_size[i] < _BrushMinSize)
-				 _brush_size[i] = _BrushMinSize;
-		 
+				 if (_brush_size[i] < _BrushMinSize)
+					 _brush_size[i] = _BrushMinSize;
+			 }
 		//	r_cout << tag << "   Brush Size : " << i << ", " << setw(4) << _brush_size[i] << endl;
 			g_file_cstat << tag<<"   "<<g_para_method + "," << g_image_name << ", " << "brush_size" + to_string(i) + "," <<
 				_brush_size[i] << endl;
@@ -328,15 +330,19 @@ int render_::calc_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth
 			brush_step = (int)(_BrushMinSize) ;
 		else 
 			brush_step = (int)((_BrushMaxSize - _BrushMinSize) / (_depth-1));
-	 _brush_size[0] = (int)(_BrushMaxSize*g_BrushMax_scale);
-	 for (int i = 1; i < _depth; i++)
+	
+	 for (int i = 0; i < _depth; i++)
 		{
-			_brush_size[i] = (int)(_BrushMaxSize - (i)* brush_step);
+		 if (i == g_first_layer) {
+			 _brush_size[g_first_layer] = (int)(_BrushMaxSize*g_BrushMax_scale);
+		 }
+		 else {
+			 _brush_size[i] = (int)(_BrushMaxSize - (i)* brush_step);
 
-			if (_brush_size[i] < _BrushMinSize)
-				_brush_size[i] = _BrushMinSize;
-			
-		//	r_cout << tag << "   Brush Size : " << i << ", " << setw(4) << _brush_size[i] << endl;
+			 if (_brush_size[i] < _BrushMinSize)
+				 _brush_size[i] = _BrushMinSize;
+		 }
+		
 			g_file_cstat << g_para_method + "," << g_image_name << ", " << "brush_size" + to_string(i) + "," <<
 				_brush_size[i] << endl;
 		}
@@ -348,7 +354,7 @@ int render_::calc_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth
 	r_cout << "  _depth  " << _depth;
 	r_cout << "  brush_step " << brush_step << endl;
 	for (int i = 0; i < _depth; i++) {
-		r_cout << tag <<" " <<setw(5) << i << setw(3) << _brush_size[i] << endl;
+		r_cout << tag <<" : Br size : " <<setw(5) << i << setw(3) << _brush_size[i] << endl;
 	}
 	return _depth;
 }
@@ -370,11 +376,11 @@ void  render_::p_peek_canvas(unsigned char * p, int p_x, int p_y, int &p_0, int 
 void  render_::post_process() {
 	int ret;
 	if (success_or_fail == 0) {
-		image_save(g_image_name + m_tag_, result_image, r_grid_map_1c_accu);
+		image_save(m_t+g_image_name, result_image, r_grid_map_1c_accu);
 
 		
-			ret = draw_grid_2(result_image.clone(), mm_aStroke_set, "prst_" + m_tag, mm_depth, //-1, 
-				255, m_tag);
+			ret = draw_grid_2(result_image.clone(), mm_aStroke_set, "prst_" + m_t, mm_depth, //-1, 
+				255, m_t);
 
 		func_();
 	}
@@ -393,6 +399,7 @@ render_::render_(int _render_method, cv::Mat &_srcImg) {
 	m_tag = tag[_render_method];
 	m_tag_ = tag_[_render_method];
 	m__tag = _tag[_render_method];
+	m_t = _t[render_method];
 	BrushMinSize = g_BrushMinSize;
 	m_srcImg_ = _srcImg.clone();
 	if (m_srcImg_.channels() == 1)
@@ -544,7 +551,7 @@ int render_::prepare() {
 
 //	sort(m_aStroke_set->begin(), m_aStroke_set->end());
 	//m_aStroke_set->sort();
-	mm_depth = draw_grid_depth(r_grid_map_1c, r_grid_map_1c_accu, mm_aStroke_set, m_tag,
+	mm_depth = draw_grid_depth(r_grid_map_1c, r_grid_map_1c_accu, mm_aStroke_set, m_t,
 		grid_map_sum, QT_grid_count//, true, -1, 0
 	);
 	k_depth = -1;

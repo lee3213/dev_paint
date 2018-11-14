@@ -28,7 +28,7 @@ int _at[] = { 5 }; //attach brush size
 int QT_N[] = { 1};
 //int _mm[] = { 1,2 };// "attach", tag_union
 ;
-int _ps[] = { 15 };//"g_paint_area_scale"
+//int _ps[] = { 15 };//"g_paint_area_scale"
 
 
 
@@ -38,7 +38,7 @@ int br, th, de, gr, sm, qt, re, mm, gth, ps;// , bts;
 void get_json_name(string & file_name) {
 	 file_name = "M" + g_saliency_method_str[sm]+"_s" + to_string(sthresh[th]) + "_d" + to_string(depth[de]) +
 		"_g" + to_string(_grid[gr]) + "_b" + to_string(_br[br]) + "_N" + to_string(QT_N[qt])
-		+ "_ps" + to_string(_ps[ps])
+		//+ "_ps" + to_string(_ps[ps])
 		//	 + "_ts" + to_string(_bts[bts])
 		 + "_copy.json";
 	
@@ -61,7 +61,7 @@ int write_json_content(string from_jsonfolderPath) {
 	root["g_BrushAttachSize"] = _at[0];//5
 									   //		root["g_brush_Ts"] = _bts[bts];//brush tranparency threshold brush
 	root["end"] = "end";
-	root["g_paint_area_scale"] = _ps[ps];//
+	//root["g_paint_area_scale"] = _ps[ps];//
 										 //root["g_merge_method"] = _str_mm[mm];
 										 //	root["g_grid_threshold"] = _gth[gth];
 	root["QT_avgSThreshold"] = sthresh[th];//15, 25  used in divide for  AvgS
@@ -99,15 +99,13 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 	int n_qt = sizeof(QT_N) / sizeof(int);
 	//int n_re = _re_cnt;
 //	int n_mm = 1;//_str_mm_cnt;
-	int n_ps = sizeof(_ps) / sizeof(int);
+	//int n_ps = sizeof(_ps) / sizeof(int);
 
-	howmany = MAX_SALIENCY* n_sth * n_de * n_gr*n_qt*n_ps*n_bth;
+	howmany = MAX_SALIENCY* n_sth * n_de * n_gr*n_qt*n_bth;
 	int Max_PARA = n_sth*n_gr;
 	if (Max_PARA > MAX_PARA) {
 		cout << "Max PAra " << Max_PARA << "Exceeded " << MAX_PARA << endl;
 		return -1;
-
-
 	}
 	std::ofstream file_all_cfg;
 	string f_name_all_cfg;
@@ -199,7 +197,7 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 			for (de = 0; de < n_de; de++) //depth
 				for (br = 0; br < n_bth; br++)//brush min size
 					for (qt = 0; qt < n_qt; qt++) //N QTn{
-						for (ps = 0; ps < n_ps; ps++) {//ps //scale
+						//for (ps = 0; ps < n_ps; ps++) {//ps //scale
 							for (sm = 0; sm < MAX_SALIENCY; sm++) { //saliency method
 								get_json_name(json_file_name);
 								int mf_loc = th*n_gr*MAX_SALIENCY + gr*MAX_SALIENCY + sm;
@@ -221,7 +219,7 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 								}
 
 							}
-						}
+						
 
 		}
 	for (th = 0; th < n_sth; th++) //avg S thresh
@@ -248,7 +246,7 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 				for (de = 0; de < n_de; de++) //depth
 						for (br = 0; br < n_bth; br++)//brush min size
 						for (qt = 0; qt < n_qt; qt++) //N QTn{
-							for (ps = 0; ps < n_ps; ps++) {//ps //scale
+						//	for (ps = 0; ps < n_ps; ps++) {//ps //scale
 								
 								get_json_name(json_file_name);
 							
@@ -276,7 +274,7 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 					
 
 							
-							}// rest of parameter
+						//	}// rest of parameter
 			}//for dth and gid min
 			file_method_cfg.close();
 		}//for sm
@@ -288,6 +286,7 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 	std::cout << __FUNCTION__<<"    method " <<f_count<<endl;
 	return fail_flag;
 }
+
 void add_batch_a(string batch_path, string b_render_path,string  list_name2, string para[], int para_cnt) {
 
 	std::ofstream file_id;

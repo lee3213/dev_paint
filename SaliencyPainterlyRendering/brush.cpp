@@ -35,8 +35,10 @@ int BrushInitialization(vector <Brush*> &_brush_set,int _brush_depth,int brush_s
 	
 	nth = 0;
 	Mat brush_gray;
+#ifdef BRUSH_BR2
 	Mat *brush_gray_x[4];
-
+	unsigned char * brush_gray_x_data[4];
+#endif
 	string fname;
 	Brush *__brush;
 	int b_step1, b_channels;
@@ -63,7 +65,7 @@ int BrushInitialization(vector <Brush*> &_brush_set,int _brush_depth,int brush_s
 		bsize_h = temp_brush.size().height;
 		s_step1 = b_step1 = (int)temp_brush.step1();
 		s_channels = b_channels = temp_brush.channels();
-		unsigned char * brush_gray_x_data[4];
+	
 #ifdef BRUSH_BR2
 		if (run_once) {
 			int _brush_Ts[] = { 100,150,200,230 };

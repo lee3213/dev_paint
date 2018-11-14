@@ -827,17 +827,18 @@ int   RenderingImage(char * src_name, char * deploy_name)
 			cout << "p_twopass  ATTACH t_id: " << p_render[RENDER_TWOPASS_ATTACH]->get_id() << endl;
 			std::cout << "Number of threads Twopass = "
 				<< std::thread::hardware_concurrency() << std::endl;
-			p_render[RENDER_SOBEL]->join();
+			
 			p_render[RENDER_SALIENCY]->join();
 			p_render[RENDER_UNION]->join();
 			p_render[RENDER_TWOPASS_MERGE]->join();
 			p_render[RENDER_TWOPASS_ATTACH]->join();
-		
+			
 			_render[RENDER_SALIENCY]->post_process();
 			_render[RENDER_UNION]->post_process();
 			_render[RENDER_TWOPASS_MERGE]->post_process();
 			_render[RENDER_TWOPASS_ATTACH]->post_process();
 		}
+		p_render[RENDER_SOBEL]->join();
 		_render[RENDER_SOBEL]->post_process();
 #else
 
