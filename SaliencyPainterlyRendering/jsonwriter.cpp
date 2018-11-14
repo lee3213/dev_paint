@@ -16,19 +16,12 @@ using namespace std;
 //	root["indent"]["length"] = getCurrentIndentLength();
 //	root["indent"]["use_space"] = getCurrentIndentUseSpace();
 int sthresh[] = {110,120,130 };
-int _grid[] = { 10,20 };
+int _grid[] = { 5,10 };
 int depth[] = { 10 };
-int _br[] = { 10 }; //g_BrushMinSize
-int _at[] = { 5 }; //attach brush size
+int _br[] = { 5,10 }; //g_BrushMinSize
+int _at[] = { 3 }; //attach brush size
 
-//string _re[MAX_DEPTH] = { "Sobel","Saliency","Twopass" };
-//string _str_mm[MAX_DEPTH] = { "Attach","Merge" };
-
-//int saliency_method_cnt = sizeof(g_saliency_method_str) / sizeof(string);
-int QT_N[] = { 1};
-//int _mm[] = { 1,2 };// "attach", tag_union
-;
-//int _ps[] = { 15 };//"g_paint_area_scale"
+int QT_N[] = {1};
 
 
 
@@ -247,7 +240,7 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 						for (br = 0; br < n_bth; br++)//brush min size
 						for (qt = 0; qt < n_qt; qt++) //N QTn{
 						//	for (ps = 0; ps < n_ps; ps++) {//ps //scale
-								
+						{
 								get_json_name(json_file_name);
 							
 								if (file_all_cfg.is_open()) {
@@ -274,7 +267,7 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 					
 
 							
-						//	}// rest of parameter
+							}// rest of parameter
 			}//for dth and gid min
 			file_method_cfg.close();
 		}//for sm

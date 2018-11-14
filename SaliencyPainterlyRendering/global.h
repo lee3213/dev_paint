@@ -113,6 +113,7 @@ fstream g_file_cerr;
 int g_alpha_TH = 240;//used in alpha
 int g_ET = 1;//positive ET=-1 negative
 
+
 int g_qt_s_scale=2;//
 int g_brush_choice = 1; //if (g_brush_choice == 0) {nth = rand() % 5;} else nth = 0;
 int g_trace_depth=7;
