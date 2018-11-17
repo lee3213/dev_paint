@@ -25,3 +25,6 @@
 
 #define MAX_SALIENCY 7
 #define MAX_F_CNT 3000
+
+#define TIME_STAMP_START 1
+#define TIME_STAMP_END  2

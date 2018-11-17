@@ -46,7 +46,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
-    <UseOfMfc>Dynamic</UseOfMfc>
+    <UseOfMfc>Static</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -173,6 +173,7 @@
     <ClInclude Include="global.h" />
     <ClInclude Include="g_setup.h" />
     <ClInclude Include="define.h" />
+    <ClInclude Include="time_stamp.h" />
     <ClInclude Include="image_util.h" />
     <ClInclude Include="json\json-forwards.h" />
     <ClInclude Include="json\json.h">
@@ -247,6 +248,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="superpixel.cpp" />
+    <ClCompile Include="time_stamp.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>

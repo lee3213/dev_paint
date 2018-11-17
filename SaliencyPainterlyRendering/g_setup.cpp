@@ -80,20 +80,21 @@ int  set_global(string src_name,string deploy_name) {
 	g_para_method_path = g_root_path + string("/") + g_para + "/" + g_para_method;
 	g_para_method_image_path = g_para_method_path + "/" + g_image_name;
 	g_root_image_path = g_root_path + "/" + g_image_name;
-
+	g_root_saliency_path = g_root_path + "/saliency";
 	cout << "g_para_method [" << g_para_method << "]"<<endl;										 //	g_win_path = g_root_path_win + string("\\") + g_method + string("\\") + g_image_name;
 	cout << "g_para_path [" << g_para_path <<"]"<< endl;
 	cout << "g_image_path [" << g_root_image_path << "]" << endl;
 
 	check_and_create(g_root_path_win , false);
 	check_and_create(g_root_path_win +string("\\cout"), false);
-	check_and_create(g_root_path_win +string("\\clog"), false);
+	check_and_create(g_root_path_win +string("\\csv_log"), false);
 	check_and_create(g_root_path_win + string("\\cerr"), false);
 	check_and_create(g_root_path_win + string("\\cstat"), false);
 	check_and_create(g_root_path_win + string("\\")+g_image_name, false);
 	check_and_create(g_root_path_win + string("\\cout\\") + g_para, false);
-	check_and_create(g_root_path_win + string("\\clog\\") + g_para, false);
+	check_and_create(g_root_path_win + string("\\csv_log\\") + g_para, false);
 	check_and_create(g_root_path_win + string("\\cerr\\") + g_para, false);
+	check_and_create(g_root_saliency_path,false);
 	//g_method_path_win=g_root_path_win + string("\\") + g_method;// "\\rst\\org";
 	//waitKey();
 	//std::exit(1);
@@ -121,16 +122,16 @@ int  set_global(string src_name,string deploy_name) {
 
 	//file_redirection_cout(g_para_method_path+"/cout.txt");
 	//fstream file;
-	string f_path_log = g_root_path_win + string("\\clog\\")+g_para+ "\\clog_"+  g_para_method + "_"+g_image_name+ string(".txt");
+	string f_path_log = g_root_path_win + string("\\csv_log\\")+g_para+ "\\clog_"+  g_para_method + "_"+g_image_name+ string(".txt");
 	cout << f_path_log << endl;
 	
 	g_file_clog.open(f_path_log.c_str(), ios::out);
 	// Get the streambuffer of the file
 
-	g_stream_buffer_file_clog = g_file_clog.rdbuf();
+	//g_stream_buffer_file_clog = g_file_clog.rdbuf();
 
 	// Redirect cout to file
-	clog.rdbuf(g_stream_buffer_file_clog);
+	//csv_log.rdbuf(g_stream_buffer_file_clog);
 	
 
 	string f_path_stat = g_root_path_win + string("\\cstat\\cstat_")+g_image_name+".csv";

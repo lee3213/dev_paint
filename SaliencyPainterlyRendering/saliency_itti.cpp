@@ -7,14 +7,15 @@
 SaliencyMap::SaliencyMap(int height, int width)
 {
   // previous frame information
-  prev_frame = NULL;
+  //prev_frame = NULL;
   
   // set Gabor Kernel (9x9)
   GaborKernel0.create(9, 9, CV_32FC1);
   GaborKernel45.create(9, 9, CV_32FC1);
   GaborKernel90.create(9, 9, CV_32FC1);
   GaborKernel135.create(9, 9, CV_32FC1);
-  for(int i=0; i<9; i++) for(int j=0; j<9; j++){
+  for(int i=0; i<9; i++) 
+	  for(int j=0; j<9; j++){
     GaborKernel0.at<float>( i, j)= (float)GaborKernel_0[i][j]; // 0 degree orientation
     GaborKernel45.at<float>(i, j)= (float)GaborKernel_45[i][j]; // 45 degree orientation
     GaborKernel90.at<float>(i, j)= (float)GaborKernel_90[i][j]; // 90 degree orientation
@@ -31,12 +32,13 @@ SaliencyMap::SaliencyMap(int height, int width)
   static const int   OFXSALIENCYMAP_DEF_DEFAULT_STEP_LOCAL = 8;
   smParams.SetWeights(WEIGHT_INTENSITY, WEIGHT_COLOR, WEIGHT_ORIENTATION, WEIGHT_MOTION);
 }
+
 SaliencyMap::~SaliencyMap(void)
 {
-	GaborKernel0.release();
-	GaborKernel135.release();
-	GaborKernel45.release();
-	GaborKernel90.release();
+	//GaborKernel0.release();
+//	GaborKernel135.release();
+	//GaborKernel45.release();
+	//GaborKernel90.release();
 	
 	/*
   cvReleaseMat(&GaborKernel0);
@@ -46,23 +48,30 @@ SaliencyMap::~SaliencyMap(void)
   */
   }
 
-cv::Mat SaliencyMap::SMGetSM(Mat &src,string tag_1)
+cv::Mat SaliencyMap::SMGetSM(Mat i_src,string tag_1)
 {
 
-  int inputWidth = src.cols; // width of the image
-  int inputHeight = src.rows; // height of the image
+  int inputWidth = i_src.cols; // width of the image
+  int inputHeight = i_src.rows; // height of the image
   cv::Size sSize = cvSize(inputWidth, inputHeight);
   tag = tag_1;
   //=========================
   // Intensity and RGB Extraction
   //=========================
   Mat R, G, B, I;
-  SMExtractRGBI(src, R, G, B, I);
+  // move from SMExtractRGBI(
+  /*R.create(inputHeight, inputWidth, CV_32FC1);
+  G.create(inputHeight, inputWidth, CV_32FC1);
+  B.create(inputHeight, inputWidth, CV_32FC1);
+  I.create(inputHeight, inputWidth, CV_32FC1);
+  */
+  SMExtractRGBI(i_src, R, G, B, I);
+#ifdef DEBUG_ITTI
   debug_image( "saliency/R_"+tag,R);
   debug_image( "saliency/G_"+tag,G);
   debug_image( "saliency/B_"+tag,B);
   debug_image( "saliency/I_"+tag,I);
-
+#endif
 
   
   //=========================
@@ -72,31 +81,38 @@ cv::Mat SaliencyMap::SMGetSM(Mat &src,string tag_1)
   // intensity feature maps
   Mat IFM[6];
   IFMGetFM(I, IFM);
+#ifdef DEBUG_ITTI	
   for (int i = 0; i < 6; i++) {
-	 
+ 
 	  debug_image("saliency/IFM_"+tag,i,IFM[i]);
 	 }
+#endif
   // color feature maps
   cv::Mat CFM_RG[6];
   cv::Mat CFM_BY[6];
 
   CFMGetFM(R, G, B, CFM_RG, CFM_BY);
+#ifdef DEBUG_ITTI
   for (int i = 0; i < 6; i++) {	 
 	  debug_image( "saliency/CFM_RG_"+tag,i,CFM_RG[i]);
   }
   for (int i = 0; i < 6; i++) {
 	  debug_image("saliency/CFM_BY_"+tag,i,CFM_BY[i]);
   }
+#endif
   // orientation feature maps
   cv::Mat OFM[24];
   OFMGetFM(I, OFM);
+#ifdef DEBUG_ITTI
   for (int i = 0; i < 24; i++) { 
 	  debug_image("saliency/OFM_"+tag,i,OFM[i]);
   }
+#endif
   // motion feature maps
   cv::Mat MFM_X[6];
   cv::Mat MFM_Y[6];
   MFMGetFM(I, MFM_X, MFM_Y);
+#ifdef DEBUG_ITTI
   for (int i = 0; i < 6; i++) {
 	  debug_image("saliency/MFM_X_"+tag,i,MFM_X[i]);
   }
@@ -104,10 +120,11 @@ cv::Mat SaliencyMap::SMGetSM(Mat &src,string tag_1)
   for (int i = 0; i < 6; i++) {
 	  debug_image("saliency/MFM_Y_"+tag,i,MFM_Y[i]);
   }
-  R.release();
-  G.release();
-  B.release();
-  I.release();
+#endif
+  //R.release();
+  //G.release();
+ // B.release();
+  //I.release();
   /*
   cvReleaseMat(&R);
   cvReleaseMat(&G);
@@ -122,12 +139,12 @@ cv::Mat SaliencyMap::SMGetSM(Mat &src,string tag_1)
   cv::Mat CCM = CCMGetCM(CFM_RG, CFM_BY, sSize);
   cv::Mat OCM = OCMGetCM(OFM, sSize);
   cv::Mat MCM = MCMGetCM(MFM_X, MFM_Y, sSize);
-  
+#ifdef DEBUG_ITTI 
   debug_image("saliency/0_ICM_"+tag,ICM);
   debug_image("saliency/0_CCM_"+tag,CCM);
   debug_image("saliency/0_OCM_"+tag,OCM);
   debug_image("saliency/0_MCM_"+tag,MCM);
-
+#endif
   for(int i=0; i<6; i++){
     /*cvReleaseMat(&IFM[i]);
     cvReleaseMat(&CFM_RG[i]);
@@ -141,6 +158,7 @@ cv::Mat SaliencyMap::SMGetSM(Mat &src,string tag_1)
 	  MFM_X[i].release();
 	  MFM_Y[i].release();
   }
+
   for(int i=0; i<24; i++) OFM[i].release();
 
   //=========================
@@ -165,9 +183,13 @@ cv::Mat SaliencyMap::SMGetSM(Mat &src,string tag_1)
   float _w_intensity, _w_color, _w_orient, _w_motion;
   smParams.GetWeights(_w_intensity, _w_color, _w_orient, _w_motion);
   cv::addWeighted(ICM_norm, _w_intensity, OCM_norm, _w_orient, 0.0, SM_Mat);
+#ifdef DEBUG_ITTI
   debug_image("saliency/SM_Mat_"+tag,1,SM_Mat);
+#endif
   cv::addWeighted(CCM_norm, _w_color, SM_Mat, 1.00, 0.0, SM_Mat);
+#ifdef DEBUG_ITTI
   debug_image("saliency/SM_Mat_"+tag,2,SM_Mat);
+#endif
   cv::addWeighted(MCM_norm, _w_motion, SM_Mat, 1.00, 0.0, SM_Mat);
 /*  cvReleaseMat(&ICM_norm);
   cvReleaseMat(&CCM_norm);
@@ -175,17 +197,23 @@ cv::Mat SaliencyMap::SMGetSM(Mat &src,string tag_1)
   cvReleaseMat(&MCM_norm);
   */
   // Output Result Map
+#ifdef DEBUG_ITTI
   debug_image("saliency/SM_Mat_"+tag,3,SM_Mat);
-
+#endif
   cv::Mat normalizedSM = SMRangeNormalize(SM_Mat);
+#ifdef DEBUG_ITTI
   debug_image("saliency/normalizedSM_"+tag,normalizedSM);
-
+#endif
   cv::Mat smoothedSM;smoothedSM.create(SM_Mat.rows, SM_Mat.cols, CV_32FC1); // Saliency Image Output
   cv::GaussianBlur(normalizedSM, smoothedSM, Size(7, 7),0); // smoothing (if necessary)
   cv::Mat SM;SM.create(inputHeight, inputWidth, CV_32FC1); // Saliency Image Output
+#ifdef DEBUG_ITTI
   debug_image("saliency/smoothedSM_"+tag,smoothedSM);
+#endif
   cv::resize(smoothedSM, SM, Size(inputWidth,inputHeight),CV_INTER_NN);
+#ifdef DEBUG_ITTI
   debug_image("saliency/0_SMx256_"+tag,SM);
+#endif
   /*cvReleaseMat(&SM_Mat);
   cvReleaseMat(&normalizedSM);
   cvReleaseMat(&smoothedSM);
@@ -193,58 +221,65 @@ cv::Mat SaliencyMap::SMGetSM(Mat &src,string tag_1)
   //SM *= 256.;
   return SM;
 }
-
+//void SMExtractRGBI(Mat  inputImage, Mat  &R, Mat  &G, Mat  &B, Mat  &I);
 void SaliencyMap::SMExtractRGBI(Mat  inputImage, Mat &R, Mat &G, Mat &B, Mat &I)
 {
   int height = inputImage.rows;
   int width = inputImage.cols;
 
   // convert scale of array elements
-  Mat  src;
+  Mat  src_x;
   Mat i;
+#ifdef DEBUG_ITTI
   debug_image("saliency/0_input_" + tag, inputImage);
-  src.create(height, width, CV_32FC3);
+#endif
+ // src_x.create(height, width, CV_32FC3);
   if (inputImage.channels() == 1) {
 	 cvtColor(inputImage,i, CV_GRAY2RGB);
-	  debug_image("saliency/0_input_8UC3_" + tag,i);
+#ifdef DEBUG_ITTI
+	 debug_image("saliency/0_input_8UC3_" + tag,i);
 	  mat_print(i, "saliency/0_input_8UC3_" + tag);
+#endif
 	  inputImage = i.clone();
   }
 
-  inputImage.convertTo(src,CV_32FC3);
-
-  debug_image("saliency/1_saliency_src_32FC3"+tag, src);
-   src *= 1 / 256.;
+  inputImage.convertTo(src_x,CV_32FC3);
+#ifdef DEBUG_ITTI
+  debug_image("saliency/1_saliency_src_32FC3"+tag, src_x);
+#endif
+   src_x *= 1 / 256.;
   
    // initalize matrix for I,R,G,B
-  R.create(height, width, CV_32FC1);
-  G.create(height, width, CV_32FC1);
-  B.create(height, width, CV_32FC1);
-  I.create(height, width, CV_32FC1);
+  
 
   //Mat R_8UC3, G_8UC3,B_8UC3,I_8UC3;
   // split
   vector<Mat> channels;
-  split(src, channels);
+  split(src_x, channels);
    channels[2].convertTo(R,CV_32FC1);
   channels[1].convertTo(G,CV_32FC1);
   channels[0].convertTo(B,CV_32FC1);
+#ifdef DEBUG_ITTI
   for (int i = 0; i < 3; i++)
 	  debug_image("saliency/channel_"+tag, i,channels[i]);
+#endif
   // Split(src, B, G, R, NULL);
 
   // extract intensity image
   Mat I_8UC3,
 	  I_256;
-  cvtColor(src, I_8UC3, CV_BGR2GRAY);
+  cvtColor(src_x, I_8UC3, CV_BGR2GRAY);
   I_8UC3.convertTo(I_256,CV_32FC1);
+#ifdef DEBUG_ITTI
   debug_image("saliency/I_8UC3_"+tag, I_8UC3);
   debug_image("saliency/I_32FC1_"+tag, I_256);
-
+#endif
   I = I_256*1. / 256.;
+#ifdef DEBUG_ITTI
   debug_image("saliency/I_32FC1_div_256_"+tag, I);
+#endif
   // release
-  src.release();
+  //src.release();
   //cvReleaseMat(&src);
 
 }
@@ -280,7 +315,9 @@ void SaliencyMap::FMCreateGaussianPyr(Mat& src, Mat dst[9],char *p)
 	for (int i = 1; i<9; i++) {
 		dst[i].create(dst[i - 1].rows / 2, dst[i - 1].cols / 2, CV_32FC1);
 		pyrDown(dst[i - 1],dst[i]);
+#ifdef DEBUG_ITTI
 		debug_image("itty/pyr_"+tag+"_",i-1,dst[i - 1]);
+#endif
 	}
 }
 
@@ -385,7 +422,7 @@ void SaliencyMap::OFMGetFM(cv::Mat & I, cv::Mat dst[24])
   FMCenterSurroundDiff(tempGaborOutput45, temp45);
   FMCenterSurroundDiff(tempGaborOutput90, temp90);
   FMCenterSurroundDiff(tempGaborOutput135, temp135);
-  
+#ifdef DEBUG_ITTI
   for (int j = 2; j < 9; j++) {
 	  debug_image("saliency/GaborOutput0_"+tag, j, tempGaborOutput0[j]);
 	  debug_image("saliency/GaborOutput45_" + tag, j, tempGaborOutput45[j]);
@@ -404,7 +441,7 @@ void SaliencyMap::OFMGetFM(cv::Mat & I, cv::Mat dst[24])
   
   }
  
-
+#endif
   // saving the 6 center-surround difference feature map of each angle configuration to the destination pointer
   for(int i=0; i<6; i++){
     dst[i] = temp0[i];
@@ -414,7 +451,7 @@ void SaliencyMap::OFMGetFM(cv::Mat & I, cv::Mat dst[24])
   }
 }
 
-void SaliencyMap::MFMGetFM(cv::Mat& I, cv::Mat dst_x[], cv::Mat dst_y[])
+void SaliencyMap::MFMGetFM(cv::Mat& I, cv::Mat dst_x[6], cv::Mat dst_y[6])
 {
   int height = I.rows;
   int width = I.cols;
@@ -451,7 +488,7 @@ void SaliencyMap::MFMGetFM(cv::Mat& I, cv::Mat dst_x[], cv::Mat dst_y[])
 
 
 
-void SaliencyMap::normalizeFeatureMaps(cv::Mat FM[], cv::Mat NFM[], int width, int height, int num_maps)
+void SaliencyMap::normalizeFeatureMaps(cv::Mat FM[6], cv::Mat NFM[6], int width, int height, int num_maps)
 {
   for(int i=0; i<num_maps; i++){
 	//  cout << "normalizeFeatureMaps : " << i << endl;
@@ -459,8 +496,10 @@ void SaliencyMap::normalizeFeatureMaps(cv::Mat FM[], cv::Mat NFM[], int width, i
     cv::Mat  normalizedImage = SMNormalization(FM[i]);
     NFM[i].create(height, width, CV_32FC1);
 	cv::resize(normalizedImage, NFM[i],Size(width,height), CV_INTER_LINEAR);
+#ifdef DEBUG_ITTI
 	debug_image("saliency/normalizedMap_" + tag, i, NFM[i]);
 	//cv::ReleaseMat(&normalizedImage);
+#endif
   }
 }
 
@@ -523,7 +562,7 @@ cv::Mat SaliencyMap::SMRangeNormalize(cv::Mat& src)
 }
 
 
-cv::Mat  SaliencyMap::ICMGetCM(cv::Mat IFM[], cv::Size size)
+cv::Mat  SaliencyMap::ICMGetCM(cv::Mat IFM[6], cv::Size size)
 {
   int num_FMs = 6;
 
@@ -543,7 +582,7 @@ cv::Mat  SaliencyMap::ICMGetCM(cv::Mat IFM[], cv::Size size)
   return ICM;
 }
 
-cv::Mat  SaliencyMap::CCMGetCM(cv::Mat CFM_RG[], cv::Mat CFM_BY[], cv::Size size)
+cv::Mat  SaliencyMap::CCMGetCM(cv::Mat CFM_RG[6], cv::Mat CFM_BY[6], cv::Size size)
 {
   int num_FMs = 6;
   cv::Mat CCM_RG = ICMGetCM(CFM_RG, size);
@@ -558,7 +597,7 @@ cv::Mat  SaliencyMap::CCMGetCM(cv::Mat CFM_RG[], cv::Mat CFM_BY[], cv::Size size
   return CCM;
 }
 
-cv::Mat  SaliencyMap::OCMGetCM(cv::Mat OFM[], cv::Size size)
+cv::Mat  SaliencyMap::OCMGetCM(cv::Mat OFM[24], cv::Size size)
 {
   int num_FMs_perAngle = 6;
   int num_angles = 4;
@@ -602,7 +641,7 @@ cv::Mat  SaliencyMap::OCMGetCM(cv::Mat OFM[], cv::Size size)
   return OCM;
 }
 
-cv::Mat  SaliencyMap::MCMGetCM(cv::Mat MFM_X[], cv::Mat MFM_Y[], cv::Size size)
+cv::Mat  SaliencyMap::MCMGetCM(cv::Mat MFM_X[6], cv::Mat MFM_Y[6], cv::Size size)
 {
   return CCMGetCM(MFM_X, MFM_Y, size);
 }

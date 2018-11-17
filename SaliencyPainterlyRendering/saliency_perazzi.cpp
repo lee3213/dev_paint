@@ -44,9 +44,9 @@ SaliencySettings::SaliencySettings() {
 	k_ = 3; // The paper states K=6 (but then I think we used standard deviation and not variance, was probably a typo)
 	
 	// Upsampling parameters
-	min_saliency_ = 0.1;
-	alpha_ = 1.0 / 30.0;
-	beta_ = 1.0 / 30.0;
+	min_saliency_ = (float)0.1;
+	alpha_ = (float)1.0 / (float)30.0;
+	beta_ = (float)1.0 / (float)30.0;
 	
 	// Various algorithm settings
 	upsample_ = true;
@@ -147,14 +147,14 @@ Mat_< float > Saliency::saliency( const Mat_< Vec3b >& im ) const {
 	
 	// Increase the saliency value until we are below the minimal threshold
 	double m_sal = settings_.min_saliency_ * r.size().area();
-	for( float sm = sum( r )[0]; sm < m_sal; sm = sum( r )[0] )
+	for( float sm = sum( r )[0]; sm < (float)m_sal; sm = sum( r )[0] )
 		r =  min( r*m_sal/sm, 1.0f );
 	
 	return r;
 }
 // Normalize a vector of floats to the range [0..1]
 void normVec( std::vector< float > &r ){
-	const int N = r.size();
+	const int N = (int)r.size();
 	float mn = r[0], mx = r[0];
 	for( int i=1; i<N; i++ ) {
 		if (mn > r[i])
@@ -166,7 +166,7 @@ void normVec( std::vector< float > &r ){
 		r[i] = (r[i] - mn) / (mx - mn);
 }
 std::vector< float > Saliency::uniqueness( const std::vector< SuperpixelStatistic >& stat ) const {
-	const int N = stat.size();
+	const int N = (int)stat.size();
 	std::vector< float > r( N );
 	const float sp = 0.5 / (settings_.sigma_p_ * settings_.sigma_p_);
 	for( int i=0; i<N; i++ ) {

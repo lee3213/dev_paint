@@ -1,4 +1,5 @@
 #pragma once
+#include "stdafx.h"
 #include "debug_image.h"
 #include "brush.h"
 #include <random>
@@ -52,6 +53,8 @@ string g_root_path_win;
 				   // g_method_path_win;// "\\rst\\org";
 string g_para;
 string g_para_path;;
+string g_root_saliency_path;
+
 string g_method;
 //string g_method_path;// "/rst//org";
 string g_para_method;
@@ -124,3 +127,4 @@ int g_first_layer = 0;
 //int g_first_layer_scale = 3;// multiplied by g_paint_area_scale
 float  g_BrushMax_scale = 1.5;
 int g_paint_area_scale[MAX_DEPTH] ={ 20,10,8,6,4,4,4,4,4,4,4,4,4};
+

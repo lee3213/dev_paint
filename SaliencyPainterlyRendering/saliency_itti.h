@@ -78,11 +78,11 @@ public:
   };
   ~SMParams() {
   };
-  int SetFrameSize(cv::Size _frame_size);
-  int SetOutputScale(float scale);
-  cv::Size GetFrameSize();
-  float GetRetinalDecayParam();
-  float GetOutputScale();
+ // int SetFrameSize(cv::Size _frame_size);
+ // int SetOutputScale(float scale);
+//  cv::Size GetFrameSize();
+//  float GetRetinalDecayParam();
+ // float GetOutputScale();
 
 protected:
   cv::Size frame_size;
@@ -97,7 +97,7 @@ public:
 //  ~ParallelSaliencyMap(void);
    ~SaliencyMap(void);
 // Core: saliency map generation
-  cv::Mat SMGetSM(Mat & src,string _tag);
+  cv::Mat SMGetSM(Mat  src,string _tag);
   // Interfaces
   //cv::Mat* SMGetSMFromVideoFrame(CvCapture * input_video, IplImage * &inputFrame_cur, int frameNo);
  // cv::Mat* SMGetSMFromVideoFrameWebcam(videoInput &vi, int dev_id, IplImage * &inputFrame_cur);
@@ -105,15 +105,15 @@ public:
   SMParams smParams;
   string tag;
 private:
-  Mat  R,  G,  B,  I;
-  Mat  prev_frame;
+  //Mat  R,  G,  B,  I;
+//  Mat  prev_frame;
 
   Mat  GaborKernel0;
   Mat  GaborKernel45;
   Mat  GaborKernel90;
   Mat  GaborKernel135;
   
-private:
+public:
   // splsaliencyng color channels
   void SMExtractRGBI(Mat  inputImage, Mat  &R, Mat  &G, Mat  &B, Mat  &I);
   // extracting feature maps

@@ -5,7 +5,7 @@
 #include "opencv2\core.hpp"
 
 using namespace cv;
-Mat saliency_itti_main(Mat &srcImg,string tag_s){
+Mat saliency_itti_main(Mat srcImg,string tag_s){
 	//imwrite("/rst/saliency_src.ppm", srcImg);
     SaliencyMap * SM  = new SaliencyMap  (srcImg.rows,srcImg.cols);
       // create retinal filter mask

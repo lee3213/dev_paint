@@ -161,7 +161,7 @@ int JudgementImage(unsigned char * src_ROI_canvas_Data_p, unsigned char * change
 	be.release();
 	sr.release();
 #endif
-	//clog << ", "<<", "<<src2rst << "," << src2before <<","<<src2rst-src2before<< endl;
+	//csv_log << ", "<<", "<<src2rst << "," << src2before <<","<<src2rst-src2before<< endl;
 	
 	if (src2rst <= src2before)
 	return CHANGED_BETTER ;

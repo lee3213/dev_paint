@@ -22,11 +22,7 @@ int   render_::PainterlyRendering()
 	int image_height = g_src_image_height;
 	int image_channels = g_src_image_channels;
 	int image_step1 = (int)g_src_image_step1;
-	tm t_s, t_e;
 	
-	time_t s_time, e_time;
-	time(&s_time);
-	localtime_s(&t_s, &s_time);
 
 	Point St_srtPoint, St_endPoint, fetch_color_Point;
 	Point centered_SrtPoint, centered_EndPoint;
@@ -39,7 +35,7 @@ int   render_::PainterlyRendering()
 	random_device rand_x[MAX_DEPTH];
 	random_device rand_y[MAX_DEPTH];
 
-
+	
 
 	//Mat beforeImg_canvas;
 
@@ -101,8 +97,7 @@ int   render_::PainterlyRendering()
 	int saved_depth=-1;
 	
 	for (int uu = 0; uu < mm_depth; uu++) {
-		time_t one_pass_time_s, one_pass_time_e;
-		time((&one_pass_time_s));
+		
 		int paint_area_brush_count;
 		if (uu < g_first_layer) {
 			if (uu >= 1) {
@@ -162,17 +157,12 @@ int   render_::PainterlyRendering()
 #endif
 			brush_area_h_size = brush_size[astroke_depth];// brush size(painting area) per each depth
 			brush_area_w_size = brush_size[astroke_depth];// brush size(painting area) per each depth
-			int brush_area_h_size_half = brush_area_h_size / 2+brush_area_h_size%2;
+			int brush_area_h_size_half = brush_area_h_size / 2 + brush_area_h_size%2;
 			int brush_area_w_size_half = brush_area_w_size / 2 + brush_area_w_size % 2;
-			if (first_layer == -1) {
+			
 				paint_area_brush_count = (st_w_size * st_h_size *g_paint_area_scale[astroke_depth]) /
 					(brush_area_h_size * brush_area_w_size);
-				first_layer = 0;
-			}
-			else {
-				paint_area_brush_count = (st_w_size * st_h_size *g_paint_area_scale[astroke_depth]) /
-					(brush_area_h_size * brush_area_w_size);
-			}//(brush_size[astroke_depth] * brush_size[astroke_depth]);
+		
 
 			if (paint_area_brush_count == 0) {
 				r_cout << "paint_area_brush_count == 0 depth " << astroke_depth
@@ -181,31 +171,33 @@ int   render_::PainterlyRendering()
 					" : " <<
 					(brush_area_h_size * brush_area_w_size) <<
 					endl;
-				paint_area_brush_count = 4;
+				paint_area_brush_count = 2;
 				size_mismatch++;
 
 			}
-		
+			
 				uniform_int_distribution<int> dist_x(0, (int)(st_w_size));
 				uniform_int_distribution<int> dist_y(0, (int)(st_h_size));
+				random_x = new int[paint_area_brush_count];
+				random_y = new int[paint_area_brush_count];
 
-				//uniform_int_distribution<int> dist_x_0(0, (int)(st_w_size)-brush_area_w_size_half);
-				//uniform_int_distribution<int> dist_y_0(0, (int)(st_h_size)-brush_area_w_size_half);
-				
-		
+				for (int painting_count = 0; painting_count < paint_area_brush_count; painting_count++) {
+					random_x[painting_count] = dist_x(rand_x[astroke_depth]);
+					random_y[painting_count] = dist_y(rand_y[astroke_depth]);
+				}
+
 			for (int painting_count = 0; painting_count < paint_area_brush_count; painting_count++)
 			{
 
-				int random_x;
-				int random_y;
+			//	int random_x;
+			//	int random_y;
 				bool modified = true;
 				int retry_cnt = 1;
 				
-					random_x = dist_x(rand_x[astroke_depth]);
-					random_y = dist_y(rand_y[astroke_depth]);
 				
-					fetch_color_Point.x = St_srtPoint.x + random_x;
-					fetch_color_Point.y = St_srtPoint.y + random_y;
+				
+					fetch_color_Point.x = St_srtPoint.x + random_x[painting_count];
+					fetch_color_Point.y = St_srtPoint.y + random_y[painting_count];
 
 				
 
@@ -309,10 +301,11 @@ int   render_::PainterlyRendering()
 				//testImg_resized.release();
 			}
 			//end of retry
-
+			delete[] random_x;
+			delete[] random_y;
 		}//end of it astroke
 	//	time_t one_pass_time_e;
-		time((&one_pass_time_e));
+		/*time((&one_pass_time_e));
 		char s_buff[20];
 		tm t_s, t_e;
 		localtime_s(&t_s, &one_pass_time_s);
@@ -320,14 +313,15 @@ int   render_::PainterlyRendering()
 		strftime(s_buff, 20, "%Y-%m-%d %H:%M:%S",&t_s );
 		char e_buff[20];
 		strftime(e_buff, 20, "%Y-%m-%d %H:%M:%S",&t_e );
-		r_cout << setw(15)<<m_tag << " :depth "<<setw(3)<<uu<<" paint scale : "<< 
-			setw(3) << g_paint_area_scale[uu]<<" , Br_size "<< setw(5) << mm_aStroke_set[uu].size()<<
-			" br_cnt "<< setw(4)<<paint_area_brush_count<<
-			" s: " << s_buff << " e: " << e_buff << endl;
-		clog << m_tag << " ," << setw(3) << uu << " ,size, " << mm_aStroke_set[uu].size() <<
+		*/
+		r_cout << setw(15) << m_tag << " :depth " << setw(3) << uu << " paint scale : " <<
+			setw(3) << g_paint_area_scale[uu] << " , Br_size " << setw(5) << mm_aStroke_set[uu].size() <<
+			" br_cnt " << setw(4) << paint_area_brush_count <<
+			endl;
+		g_file_clog << m_tag << " ," << setw(3) << uu << " ,size, " << mm_aStroke_set[uu].size() <<
 			 " paint scale : " << setw(3) << g_paint_area_scale[uu] <<
-			"," << setw(4) << paint_area_brush_count <<
-			"," << s_buff << " , " << e_buff << endl;
+			"," << setw(4) << paint_area_brush_count 
+			<< endl;
 		debug_image("ing/_i_" + to_string(uu) + m_t +to_string(g_paint_area_scale[uu]),  ing_canvas[uu]);
 #ifdef _DEBUG_RENDER
 		debug_image("ing/pa_" + to_string(uu) + "_" + m_tag + to_string(called), painting_area_canvas[uu]);
@@ -355,15 +349,17 @@ int   render_::PainterlyRendering()
 	}
 
 	result_image=rst_accu_canvas[mm_depth-1];
-
+	/*
 	time((&e_time));
 	char s_buff[20];
 	localtime_s(&t_e, &e_time);
 	strftime(s_buff, 20, "%Y-%m-%d %H:%M:%S", &t_s);
 	char e_buff[20];
 	strftime(e_buff, 20, "%Y-%m-%d %H:%M:%S", &t_e);
+
 	r_cout << setw(15) << m_tag<<"-->"<<s_buff << " : "<<e_buff << endl;
-	clog << "R End, "<<m_tag << "," << s_buff << "," << e_buff << endl;
+	csv_log << "R End, "<<m_tag << "," << s_buff << "," << e_buff << endl;
+		*/
 		return 0;
 
 }

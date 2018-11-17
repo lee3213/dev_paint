@@ -1,5 +1,6 @@
 #pragma once
 //#include "debug_image.h"
+#include "stdafx.h"
 #include "define.h"
 #include "brush.h"
 
@@ -12,6 +13,7 @@
 #include <streambuf>
 using namespace std;
 using namespace cv;
+
 //extern render_ *_render[];
 //extern CWinApp theApp;
 
@@ -68,7 +70,7 @@ extern string g_para_path;
 extern string g_para_method_image_path;
 
 extern string g_root_image_path;
-
+extern string g_root_saliency_path;
 //extern int g_paint_area_scale_0;
 
 extern int g_QT_method_N;//N

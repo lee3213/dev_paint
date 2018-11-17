@@ -73,10 +73,11 @@ public:
 	std::string m__tag;
 	std::string m_tag_;
 	string m_t;
-
+	int *random_x;
+	int *random_y;
 	//int get_depth;
 	render_(int _render_method, Mat &_srcImg);
-	~render_();
+	~render_() ;
 	void render_::func_();
 	int  PainterlyRendering();
 	int stroke_dump(list<Img_node*> *_aStroke_set[], string tag, int  depth);

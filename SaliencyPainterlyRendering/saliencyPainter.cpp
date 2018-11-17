@@ -17,7 +17,7 @@
 
 #include "opencv2/saliency.hpp"
 #include "saliency_blackandwhite.h"
-
+#include "time_stamp.h"
 using namespace std;
 using namespace cv;
 
@@ -33,9 +33,10 @@ render_ *_render[RENDER_MAX];
 
 #include "render_.h"
 #include "time.h"
-#include "cvQuiver.h"
+//#include "cvQuiver.h"
 
 
+#include "dir.h"
 cv::Mat get_canny_map(Mat & srcImg) {
 	cv::Mat gray_Map;
 	cv::Mat org_Gaussian_Map;
@@ -473,7 +474,6 @@ void gradientHSV(Mat &bgr3u, Mat &mag1u)
 
 
 
-
 void run_render(render_ * _render) {
 	for (int j = 0; j < _render->mm_depth; j++)
 		if (_render->mm_aStroke_set[j].size() == 0) {
@@ -487,6 +487,8 @@ void run_render(render_ * _render) {
 
 int   RenderingImage(char * src_name, char * deploy_name)
 {
+
+	time_stamp t1;
 	time_t s_time, e_time;
 	tm t_s, t_e;
 	time(&s_time);
@@ -506,23 +508,10 @@ int   RenderingImage(char * src_name, char * deploy_name)
 	Mat sobel_8UC3;
 	Mat gradient_Union;
 
-	/*	Mat saliency_finegrained_C;
-		Mat saliency_pregraph_C;
-		Mat saliency_blackandwhite_C;
-		Mat saliency_residual_C;
-		Mat saliency_itti_C;
 
-		Mat saliency_finegrained_G;
-		Mat saliency_pregraph_G;
-		Mat saliency_blackandwhite_G;
-		Mat saliency_residual_G;
-		Mat saliency_itti_G;
+	Mat saliency_8UC1;
 
-		int get_depth_saliency;
-		int get_depth_twopass;
-		int get_depth_sobel;
-		int get_depth_union;
-	*/
+	Mat saliency_32F;
 	int saved_depth = -1;
 
 
@@ -538,30 +527,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 		cout << "Src " << src_name << " size 0" << endl;
 		return -100;
 	}
-	/* ROI test
-	Mat clone = x_srcImg.clone();
-	Point Point_LT, Point_RB;
-	Point_LT.x = 0;
-	Point_LT.y = 0;
-	Point_RB.x = 100;
-	Point_RB.y = 100;
-	Rect roi = Rect(Point_LT, Point_RB);
-	Size s(Point_RB);
-	Mat mask(s, CV_8UC1);
-	mask.setTo(255);
-	Mat ROI = clone(roi);
-	Mat sobel_ROI= get_sobel_map(ROI);
-	debug_image("ROI.jpg", ROI);
-	debug_image("ROI_sobel.jpg", sobel_ROI);
-	debug_image("src_ROI.jpg", clone);
-	Mat a;
-	cvtColor(sobel_ROI, a, CV_GRAY2BGR);
-	//a.copyTo(ROI,mask);
-	a.copyTo(ROI);
-	debug_image("copyTo_ROI.jpg", clone);
-	return -12345;
-	*/
-	//Point St_srtPoint, St_endPoint, fetch_color_Point, centered_SrtPoint, centered_EndPoint;
+	
 	g_src_image_width = x_srcImg.size().width;
 	g_src_image_height = x_srcImg.size().height;
 	g_src_image_channels = x_srcImg.channels();
@@ -578,22 +544,11 @@ int   RenderingImage(char * src_name, char * deploy_name)
 		_render[i] = new  render_(i, x_srcImg);
 	}
 
-	//Brush initialization
-
-
-	//g_saliency_method;//without, itti, pregraph, blackandwhite,resudual,fine_sobelined
-
+	
 
 	cout << "Saliency Method " << g_saliency_method << endl;
 	//	cout << "g_Render_method " << g_Render_method << endl;
-	time_t s_s_time, s_e_time;
-	tm s_t_s, s_t_e;
-	time(&s_s_time);
-	localtime_s(&s_t_s, &s_s_time);
-
-	char s_s_buff[20];
-	strftime(s_s_buff, 20, "%Y-%m-%d %H:%M:%S", &s_t_s);
-	char s_e_buff[20];
+	
 
 	sobel_8UC1 = get_sobel_map(x_srcImg);
 	if (sobel_8UC1.cols == 0 ||
@@ -604,15 +559,13 @@ int   RenderingImage(char * src_name, char * deploy_name)
 	}
 
 	debug_image("0_sobel_gradient", sobel_8UC1);
+
 #ifdef CANNY
 	Mat canny_map = get_canny_map(x_srcImg);
 #endif
 
 	cv::cvtColor(sobel_8UC1, sobel_8UC3, CV_GRAY2RGB);
 
-	Mat saliency_8UC1;
-
-	Mat saliency_32F;
 
 #ifdef BING
 	Mat sa;
@@ -650,85 +603,130 @@ int   RenderingImage(char * src_name, char * deploy_name)
 	*/
 
 #endif		
+		
+		Mat gradient_Map_C_8UC3;
+		Mat gradient_Map_G_8UC3;
+		string saliency_G;
+		string saliency_C;
+		string f_saliency_img;
+		f_saliency_img = g_root_saliency_path + "/" + g_image_name +"_"+ g_saliency_method;
+		saliency_G = f_saliency_img + "_G.jpg";
+		saliency_C = f_saliency_img + "_C.jpg";
 		if (g_saliency_method == string("Sobel")) {
 		}
-		else if (g_saliency_method == string("Residual")) {
+		else
+		{
+			bool exists;
+			int flag = 0;
+			
+			exists = fileExists(saliency_C);
+			if (exists == true) {
+				flag += 1;
+				
+				gradient_Map_C_8UC3 = cv::imread(saliency_C, CV_LOAD_IMAGE_COLOR);
+				gradient_Map_C_8UC3.convertTo(gradient_Map_C, CV_8UC1);
+				exists = fileExists(saliency_G);
+				if (exists == true) {
+					flag += 1;
+					gradient_Map_G_8UC3 = cv::imread(saliency_G, CV_LOAD_IMAGE_COLOR);
+					gradient_Map_G_8UC3.convertTo(gradient_Map_G, CV_8UC1);
+				}
+			}
+		
+			if (flag ==0 ) {
+					if (g_saliency_method == string("Residual")) {
 
-			//Mat saliency_residual_8UC1;
-			Ptr<StaticSaliencySpectralResidual> saliencyAlgorithm = StaticSaliencySpectralResidual::create();
-			saliencyAlgorithm->computeSaliency(x_srcImg, saliency_8UC1);
-			//	mat_print(saliency_8UC1, "Residual");
-			gradient_Map_C = saliency_8UC1.clone();
-			//	if (g_Render_method != "Saliency") {
-			saliencyAlgorithm->computeSaliency(sobel_8UC3, saliency_8UC1);
-			gradient_Map_G = saliency_8UC1.clone();
-			//	}
+						//Mat saliency_residual_8UC1;
+						Ptr<StaticSaliencySpectralResidual> saliencyAlgorithm = StaticSaliencySpectralResidual::create();
+						saliencyAlgorithm->computeSaliency(x_srcImg, saliency_8UC1);
+						//	mat_print(saliency_8UC1, "Residual");
+						gradient_Map_C = saliency_8UC1.clone();
+						//	if (g_Render_method != "Saliency") {
+						saliencyAlgorithm->computeSaliency(sobel_8UC3, saliency_8UC1);
+						gradient_Map_G = saliency_8UC1.clone();
+						//	}
 
-		}
-		else if (g_saliency_method == string("Fine_grained")) {
-			//	Mat saliency_finegrained_8UC1;
-			Ptr<StaticSaliencyFineGrained> saliencyAlgorithmG = StaticSaliencyFineGrained::create();
-			saliencyAlgorithmG->computeSaliency(x_srcImg, saliency_8UC1);
-			gradient_Map_C = saliency_8UC1.clone();
-			//	if (g_Render_method != "Saliency") {
-			saliencyAlgorithmG->computeSaliency(sobel_8UC3, saliency_8UC1);
-			gradient_Map_G = saliency_8UC1.clone();
-			//	}
+					}
+					else if (g_saliency_method == string("Fine_grained")) {
+						//	Mat saliency_finegrained_8UC1;
+						Ptr<StaticSaliencyFineGrained> saliencyAlgorithmG = StaticSaliencyFineGrained::create();
+						saliencyAlgorithmG->computeSaliency(x_srcImg, saliency_8UC1);
+						gradient_Map_C = saliency_8UC1.clone();
+						//	if (g_Render_method != "Saliency") {
+						saliencyAlgorithmG->computeSaliency(sobel_8UC3, saliency_8UC1);
+						gradient_Map_G = saliency_8UC1.clone();
+						//	}
 
-		}
-		else if (g_saliency_method == string("Blackandwhite")) {
+					}
+					else if (g_saliency_method == string("Blackandwhite")) {
 
-			//Mat saliency_blackandwhite_8UC1;
-			saliency_8UC1 = saliency_blackandwhite_main(x_srcImg);
-			gradient_Map_C = saliency_8UC1.clone();
-			//	if (g_Render_method != "Saliency") {
-			saliency_8UC1 = saliency_blackandwhite_main(sobel_8UC3);
-			gradient_Map_G = saliency_8UC1.clone();
-			//	}
-		}
-		else if (g_saliency_method == string("Pregraph")) {
+						//Mat saliency_blackandwhite_8UC1;
+						saliency_8UC1 = saliency_blackandwhite_main(x_srcImg);
+						gradient_Map_C = saliency_8UC1.clone();
+						//	if (g_Render_method != "Saliency") {
+						saliency_8UC1 = saliency_blackandwhite_main(sobel_8UC3);
+						gradient_Map_G = saliency_8UC1.clone();
+						//	}
+					}
+					else if (g_saliency_method == string("Pregraph")) {
 
-			saliency_32F = preGraph_main(x_srcImg);
-			saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-			gradient_Map_C = saliency_8UC1.clone();
-			//	if (g_Render_method != "Saliency") {
-			saliency_32F = preGraph_main(sobel_8UC3);
-			saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-			gradient_Map_G = saliency_8UC1.clone();
-			//	}
+						saliency_32F = preGraph_main(x_srcImg);
+						saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
+						gradient_Map_C = saliency_8UC1.clone();
+						//	if (g_Render_method != "Saliency") {
+						saliency_32F = preGraph_main(sobel_8UC3);
+						saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
+						gradient_Map_G = saliency_8UC1.clone();
+						//	}
 
-		}
-		else if (g_saliency_method == string("Itti")
-			) {
-			//Mat saliency_itti_32F;
+					}
+					else if (g_saliency_method == string("Itti")) {
+						//Mat saliency_itti_32F;
 
-			saliency_32F = saliency_itti_main(x_srcImg, "C");
-			saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-			gradient_Map_C = saliency_8UC1.clone();
-			//	if (g_Render_method != "Saliency") {
-			saliency_32F = saliency_itti_main(sobel_8UC3, "G");
-			saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-			gradient_Map_G = saliency_8UC1.clone();
-			//	}
-		}
-		else if (g_saliency_method == string("Perazzi")) {
+						saliency_32F = saliency_itti_main(x_srcImg.clone(), "C");
+						saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
+						gradient_Map_C = saliency_8UC1.clone();
+						//	if (g_Render_method != "Saliency") {
+						saliency_32F = saliency_itti_main(sobel_8UC3.clone(), "G");
+						saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
+						gradient_Map_G = saliency_8UC1.clone();
+						//	}
+					}
+					else if (g_saliency_method == string("Perazzi")) {
 
-			saliency_32F = saliency_Perazzi_main(x_srcImg);
-			saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-			gradient_Map_C = saliency_8UC1.clone();
-			//	if (g_Render_method != "Saliency") {
-			saliency_32F = saliency_Perazzi_main(sobel_8UC3);
-			saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-			gradient_Map_G = saliency_8UC1.clone();
-			//	}
+						saliency_32F = saliency_Perazzi_main(x_srcImg);
+						saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
+						gradient_Map_C = saliency_8UC1.clone();
+						//	if (g_Render_method != "Saliency") {
+						saliency_32F = saliency_Perazzi_main(sobel_8UC3);
+						saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
+						gradient_Map_G = saliency_8UC1.clone();
+						//	}
 
-		}
+					}
 
-		else {
-			cout << "No Saliency method assigned" << endl;
-			return -5555;
-		}
-		_render[RENDER_SOBEL]->add_gradient_map(Gradient_Sobel, sobel_8UC1);
+					else {
+						cout << "No Saliency method assigned" << endl;
+						return -5555;
+					}
+					vector<int> compression_params;
+					compression_params.push_back(CV_IMWRITE_PXM_BINARY);
+					compression_params.push_back(0);
+
+					gradient_Map_C.convertTo(gradient_Map_C_8UC3, CV_8UC3);
+					gradient_Map_G.convertTo(gradient_Map_G_8UC3, CV_8UC3);
+					//cv::imwrite(saliency_C, gradient_Map_C_8UC3, compression_params);
+					//cv::imwrite(saliency_G, gradient_Map_G_8UC3, compression_params);
+					cv::imwrite(saliency_C, gradient_Map_C_8UC3);
+					cv::imwrite(saliency_G, gradient_Map_G_8UC3);
+			}
+			else {//flag != 0 
+				if (flag != 2)
+					return -1;
+				
+			}
+		}// if sobel
+			_render[RENDER_SOBEL]->add_gradient_map(Gradient_Sobel, sobel_8UC1);
 		if (g_saliency_method != string("Sobel")) {
 
 			debug_image("0_Saliency_C_" + g_saliency_method, gradient_Map_C);
@@ -749,11 +747,8 @@ int   RenderingImage(char * src_name, char * deploy_name)
 				//	}
 			}
 		}// if != Sobel
-		time(&s_e_time);
-		localtime_s(&s_t_e, &s_e_time);
-		strftime(s_e_buff, 20, "%Y-%m-%d %H:%M:%S", &s_t_e);
-		cout << "saliency finished " << s_s_buff << " : " << s_e_buff << endl;
-		clog << "saliency finished " << s_s_buff << " , " << s_e_buff << endl;
+	
+		t1.time_stamping(cout,"saliency_finished",TIME_STAMP_END);
 		int how_many_render;
 		if (g_saliency_method == string("Sobel")) {
 			how_many_render = 1;
@@ -789,7 +784,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 			strftime(p_s_buff, 20, "%Y-%m-%d %H:%M:%S", &p_t_s[i]);
 			strftime(p_e_buff, 20, "%Y-%m-%d %H:%M:%S", &p_t_e[i]);
 			cout << " Prepare Finished " << _render[i]->m_tag << " " << p_s_buff << " : " << p_e_buff << endl;
-			clog << " Prepare Finished, " << _render[i]->m_tag << " " << p_s_buff << ", " << p_e_buff << endl;
+			g_file_clog << " Prepare Finished, " << _render[i]->m_tag << " " << p_s_buff << ", " << p_e_buff << endl;
 		}
 
 		cout <<" ++++++++++++++++++++++++++++++++++++++++" << endl;
@@ -870,7 +865,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 	localtime_s(&t_e, &e_time);
 	strftime(e_buff, 20, "%Y-%m-%d %H:%M:%S", &t_e);
 	cout <<  "R end, " << s_buff << " : " << e_buff << endl;
-	clog << "E end, " << s_buff << ", " << e_buff << endl;
+	g_file_clog << "E end, " << s_buff << ", " << e_buff << endl;
 	return 0;
 }
 
