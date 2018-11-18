@@ -416,7 +416,7 @@ render_::~render_() {
 	}*/
 	}
 	
-	brush_delete(brush_set);
+//	brush_delete(brush_set);
 	for(int i=0;i<MAX_DEPTH;i++)
 		brush_delete(brush_resized_set[i]);
 
@@ -581,13 +581,8 @@ int render_::prepare() {
 	calc_brush_size(BrushMaxSize, BrushMinSize, mm_depth,
 	brush_size, m_tag);
 
-	ret = BrushInitialization(brush_set, mm_depth, brush_size);
-	if (ret != 0) {
-		r_cout << "Brush Initialization Error_" + m_tag << endl;
-		cerr << "Brush Initialization Error_" + m_tag << endl;
-		return -1001;
-	}
-	brush_resize();
+	
+	brush_resize( g_brush_set);
 
 	////for (int i = 0; i < mm_depth; i++) {
 	//	r_cout << "Brush "<<i << ", " << brush_size[i] << endl;
@@ -693,7 +688,7 @@ int render_::DivideImage(cv::Mat &SaliencyMap, Stroke_Node* me_node, Stroke_set 
 	int child_QT_depth = me_node->depth + 1;
 
 
-	if (child_QT_depth <= g_depth_limit)
+	if (child_QT_depth >= g_depth_limit)
 		return child_QT_depth;
 
 

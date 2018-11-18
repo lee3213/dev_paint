@@ -47,8 +47,9 @@ int   render_::PainterlyRendering()
 	src_canvas.setTo(255);
 	Rect src_Rect_full(Point(canvas_size_bezel_size, canvas_size_bezel_size),
 		Size(g_src_image_width, g_src_image_height));
-//	Mat src_ROI_canvas_full = src_canvas(src_Rect_full);
-//	m_srcImg_.copyTo(src_ROI_canvas_full);
+	 
+	Mat src_ROI_canvas_full = src_canvas(src_Rect_full);
+	 m_srcImg_.copyTo(src_ROI_canvas_full);
 //	debug_image("src_canvas", src_canvas);
 //	debug_image("src_canvas_ROI", src_ROI_canvas_full);
 
@@ -174,14 +175,14 @@ int   render_::PainterlyRendering()
 				random_x = new int[paint_area_brush_count];
 				random_y = new int[paint_area_brush_count];
 
-				for (int painting_count = 0; painting_count < paint_area_brush_count; painting_count++) {
-					random_x[painting_count] = dist_x(rand_x[astroke_depth]);
-					random_y[painting_count] = dist_y(rand_y[astroke_depth]);
+				for (int painting_try = 0; painting_try < paint_area_brush_count; painting_try++) {
+					random_x[painting_try] = dist_x(rand_x[astroke_depth]);
+					random_y[painting_try] = dist_y(rand_y[astroke_depth]);
 				}
 
 				r_s_grid_painting_try[astroke_depth] += paint_area_brush_count ;//
 			
-			for (int painting_count = 0; painting_count < paint_area_brush_count; painting_count++)
+			for (int painting_try = 0; painting_try < paint_area_brush_count; painting_try++)
 			{
 
 			//	int random_x;
@@ -189,8 +190,8 @@ int   render_::PainterlyRendering()
 				bool modified = true;
 				int retry_cnt = 1;
 	
-					fetch_color_Point.x = St_srtPoint.x + random_x[painting_count];
-					fetch_color_Point.y = St_srtPoint.y + random_y[painting_count];
+					fetch_color_Point.x = St_srtPoint.x + random_x[painting_try];
+					fetch_color_Point.y = St_srtPoint.y + random_y[painting_try];
 
 				int fetch_Index = (fetch_color_Point.x + fetch_color_Point.y*image_width)*image_channels;
 				int fetch_Index_1c = (fetch_color_Point.x + fetch_color_Point.y*image_width);
@@ -224,7 +225,8 @@ int   render_::PainterlyRendering()
 				rectangle(painting_area_canvas[astroke_depth], canvas_centered_ROI_rect, Scalar(0, 0, 0));//BLACK
 #endif
 				src_ROI_canvas = src_canvas(canvas_centered_ROI_rect);
-			
+				debug_image("p" + to_string(astroke_depth) + "/src_ROI_canvas_" + m_tag_ + to_string(painting_try), src_ROI_canvas);
+
 				Mat before_canvas_ROI = rst_accu_canvas[astroke_depth](canvas_centered_ROI_rect);
 				Mat changed_canvas_ROI = rst_accu_canvas[astroke_depth](canvas_centered_ROI_rect).clone();
 
@@ -245,8 +247,10 @@ int   render_::PainterlyRendering()
 					brush_area_w_size, brush_area_h_size,
 					//m_tag,
 					//stroke_no, 
-					astroke_depth, painting_count, 
-					color_BGR_B, color_BGR_G, color_BGR_R				
+					astroke_depth, painting_try, 
+					color_BGR_B, color_BGR_G, color_BGR_R,
+					astroke_depth,
+					painting_try
 				);
 
 				//	current_fetched_map_data,fetched_color_data,r,g,b);

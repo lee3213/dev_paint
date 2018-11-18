@@ -84,7 +84,7 @@ public:
 
 
 	int depth_sobel, depth_saliency;//, depth_attach;
-	vector <Brush*> brush_set;
+
 	vector <Brush*> brush_resized_set[MAX_DEPTH];
 	int QT_depth;
 
@@ -151,7 +151,8 @@ public:
 	int render_::P_Rendering(Mat & _src_ROI, Mat & _before_ROI, cv::Mat & _changed_ROI,
 		cv::Mat & ing_ROI, Point _fetch_color_Point, Point centered_SrtPoint,
 		Point canvas_centered_SrtPoint, Point canvas_centered_EndPoint, int brush_area_w_size,
-		int brush_area_h_size, int astroke_depth, int painting_count, int color_BGR_B, int color_BGR_G, int color_BGR_R);
+		int brush_area_h_size, int astroke_depth, int painting_try, int color_BGR_B, int color_BGR_G, int color_BGR_R,
+		int _depth,int _try_);
 
 /*
 	int   render_::P_Rendering(//cv::Mat srcImg,
@@ -170,7 +171,7 @@ public:
 		//String tag,
 		//int astroke_number,
 		//int ing,
-		int astroke_depth, int painting_count,
+		int astroke_depth, int painting_try,
 		int color_BGR_B, int color_BGR_G, int color_BGR_R//BGR order
 														  //unsigned char * _ing_canvas_data
 
@@ -185,7 +186,8 @@ public:
 		Mat & gradient_src,
 		Mat stageMap, int depth, string tag);
 
-	void brush_resize();
+	void brush_resize(
+		vector <Brush*> g_brush_set);
 	/*
 	Mat brush_at_brush_clone(vector <Brush*> & _brush_set, int no) {
 

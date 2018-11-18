@@ -130,4 +130,7 @@ extern string g_sa_str[MAX_SALIENCY];
 extern int g_first_layer;
 //
 extern int g_paint_area_scale[MAX_DEPTH];
+
+
+extern vector <Brush*> g_brush_set;
 //extern int g_brush_scale[MAX_DEPTH];

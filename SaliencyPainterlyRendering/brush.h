@@ -23,4 +23,5 @@ public:
 
 #define BRUSH_ALPHA 1
 #define BRUSH_COPY 2
-int BrushInitialization(vector <Brush*> &brush,int _called_once,int brush_size[]);
+int BrushInitialization(vector <Brush*> &brush);
+//, int _called_once, int brush_size[]);

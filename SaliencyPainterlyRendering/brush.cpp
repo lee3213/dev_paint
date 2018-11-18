@@ -10,7 +10,7 @@
 using namespace std;
 
 
-int BrushInitialization(vector <Brush*> &_brush_set,int _brush_depth,int brush_size[])
+int BrushInitialization(vector <Brush*> &_brush_set)
 {
 	cv::Mat temp_brush;
 	cv::Mat temp_index_brush;
@@ -90,12 +90,7 @@ int BrushInitialization(vector <Brush*> &_brush_set,int _brush_depth,int brush_s
 #endif
 		 cv::cvtColor(temp_brush, brush_gray, COLOR_RGB2GRAY);
 		 unsigned char * bestBrush_data_gray_resized = brush_gray.data;
-		//mat_print(temp_brush, "temp_brush");
 	
-	//	crop_s.x = b_rect.x;
-		//crop_s.y = b_rect.y;
-		//crop_e.x = crop_s.x + b_rect.width;
-	//	crop_e.y = crop_s.y + b_rect.height;
 #ifdef DO_CENTERED_BRUSH
 		cv::Mat centered;
 		centered.create(bsize_x, bsize_y, CV_8UC1);

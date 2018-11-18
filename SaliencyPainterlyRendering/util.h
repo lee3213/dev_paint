@@ -33,7 +33,7 @@ inline void rectangle_canvas(cv::Mat mat, cv::Rect  rect, Scalar s);
 {
 	static int called_cnt = 0;
 	called_cnt++;
-	if ((called_cnt % g_painting_count[depth])) return false;
+	if ((called_cnt % g_painting_try[depth])) return false;
 	if (depth < 4) return true;
 	else return false;
 };

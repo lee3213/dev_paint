@@ -522,7 +522,12 @@ int   RenderingImage(char * src_name, char * deploy_name)
 	int ret = set_global(string(src_name), string(deploy_name));
 	if (ret < 0)
 		return -7777;
-
+	ret = BrushInitialization(g_brush_set);
+	if (ret != 0) {
+		cout << "Brush Initialization Error_"  << endl;
+		cerr << "Brush Initialization Error_"  << endl;
+		return -1001;
+	}
 	x_srcImg = cv::imread(src_name, CV_LOAD_IMAGE_COLOR);
 
 	if (x_srcImg.cols == 0

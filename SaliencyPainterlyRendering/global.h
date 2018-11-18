@@ -98,7 +98,7 @@ int g_src_image_step1;
 string g_saliency_method;//without_saliency, saliency, pregraph, blackandwhite,resudual,fine_sobelined
 string g_paint_method;
 
-
+vector <Brush*> g_brush_set;
 
 int g_QT_method_N;//N
 

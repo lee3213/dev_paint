@@ -31,18 +31,20 @@ int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, vector
 	for (vector <Brush*>::iterator it = _brush_set.begin(); it != _brush_set.end(); it++, nth++)
 	{
 		unsigned char* indexData = (unsigned char*)(*it)->brush_thumbnail.data;
-
+		int pixel_cnt = 0;
 		double cDis = 0;
 		for (int y = 0; y < height; y++)
 		{
 			for (int x = 0; x < width; x++)
 			{
 				size_t index = y * testImg.step1() + x;
-				if (indexData[index] != 255)
+				if (indexData[index] <= 240) {
 					cDis += abs(testData[index] - indexData[index]);
+					pixel_cnt++;
+				}
 			}
 		}
-		cDis /= (width * height);
+		cDis /= pixel_cnt;
 		vector<DisData>::iterator it2 = lower_bound(colorDis.begin(), colorDis.end(), (double)cDis, compareDistance);
 
 		newDistance.distance = cDis;
@@ -50,10 +52,11 @@ int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, vector
 		colorDis.insert(it2, newDistance);
 		//cout << " distance " << setw(10)<<cDis<< "b no "<<(*it).brush_no << " nth " << nth << endl;
 	}
-	if (g_brush_choice == 0) {
-		nth = rand() % 5;
-	}
-	else nth = 0;
+	//if (g_brush_choice == 0) {
+//		nth = rand() % 5;
+	//}
+	//else 
+		nth = 0;
 	brush_no = colorDis.at(nth).nth;
 	return brush_no;
 }
@@ -103,16 +106,7 @@ int JudgementImage(unsigned char * src_ROI_canvas_Data_p, unsigned char * change
 	{
 		for (int bx = 0; bx < brush_area_w_size; bx++)
 		{
-		//	s_Idx_x = bx;
-		//	s_Idx_y = by;
-		/*
-			if (s_Idx_x < 0) continue; //skip outside of image
-			if (s_Idx_y < 0) continue;
-			if (s_Idx_y > (s_height-1)) continue;
-			if (s_Idx_x > (s_width-1)) continue;
 		
-			
-		*/
 			int canvas_index = (by*canvas_ROI_step1) + (bx)* canvas_c;
 			int b_index = (by*b_step1) + bx*b_c;
 		//	int c_index= (s_Idx_y)*c_step1 + (s_Idx_x)* c_c;
