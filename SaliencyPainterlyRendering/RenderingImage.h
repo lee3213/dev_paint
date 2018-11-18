@@ -1,6 +1,7 @@
 #pragma once
-#include "opencv2\opencv.hpp"
-#include "opencv2\core.hpp"
+#include <random>
+#include "opencv2\\opencv.hpp"
+#include "opencv2\\core.hpp"
 #include "bsShowImage.h"
 #include "brush.h"
 #include "util.h"
@@ -11,7 +12,7 @@
 #include "extern.h"
 #include "debug_define.h"
 #include "util.h"
-#include <random>
+
 #include "render_.h"
 using namespace std;
 using namespace cv;

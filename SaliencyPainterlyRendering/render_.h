@@ -1,28 +1,58 @@
 #pragma once
 #include "stdafx.h"
-#include "define.h"
-#include "brush.h"
-#include "QuadTree.h"
+#include <list>
 #include "opencv2\\opencv.hpp"
 #include "opencv2\\core.hpp"
-#include "define.h"
-#include "extern.h"
 
+#include "define.h"
+#include "brush.h"
+
+#include "extern.h"
+#include "QuadTree.h"
 using namespace std;
 using namespace cv;
 //int draw_grid_2(Mat _Quad_TreeMap,
 	//list<Img_node*> *aStroke_set, string tag, int  depth, int draw_depth, int c, string _tag);
+class Stroke_set {
+public:
+	Stroke_Node a;
+	list<Stroke_Node *> stroke_list;
+	//int stroke_cnt;
+	int depth;
+	//int size() {
+	//		return (int)(stroke_list.size());
+	//}
+	Stroke_set() {
 
+	};
+	~Stroke_set() {
+
+	};
+	void set_depth(int _depth) {
+		depth = _depth;
+	};
+	int push_back(Stroke_Node * _p) {
+
+		stroke_list.push_back(_p);
+
+
+		return 0;//Good
+	};
+	
+
+};
 class render_ {
 public:
+	Stroke_set *a_mm_aStroke_set;
+	Stroke_set mm_aStroke_set[MAX_DEPTH];
 	fstream r_cout;
-//	streambuf* r_stream_cout;
+	//	streambuf* r_stream_cout;
 	fstream r_clog;
-//	streambuf* r_stream_clog;
+	//	streambuf* r_stream_clog;
 	fstream r_cstat;
-//	streambuf* r_stream_cstat;
-	//Mat *paint_map;
-	//unsigned char * paint_map_data;
+	//	streambuf* r_stream_cstat;
+		//Mat *paint_map;
+		//unsigned char * paint_map_data;
 	int success_or_fail;
 	int render_method;
 	//Mat render_::PainterlyRendering();
@@ -31,13 +61,13 @@ public:
 	unsigned char * m_srcData;
 	//cv::Mat Quad_TreeMap;
 	cv::Mat result_image;
-	
+
 	Mat src_canvas;
 	cv::Mat rst_accu_canvas[MAX_DEPTH];
 	cv::Mat ing_canvas[MAX_DEPTH];
 	unsigned char * rst_accu_canvas_data[MAX_DEPTH];
 	unsigned char * ing_canvas_data[MAX_DEPTH];
-	
+
 	int canvas_size_width;
 	int canvas_size_height;
 	int canvas_size_bezel_size;
@@ -45,16 +75,14 @@ public:
 	int  BrushMinSize;
 	int brush_step;
 	int grid_map_sum = 0, grid_count_sum = 0;
-	Mat r_grid_map_1c[MAX_DEPTH+1];
+	Mat r_grid_map_1c[MAX_DEPTH + 1];
 	Mat r_grid_map_1c_accu;
-	Mat r_try_map_1c[MAX_DEPTH+1];
+	Mat r_try_map_1c[MAX_DEPTH + 1];
 	unsigned char * r_try_map_1c_data[MAX_DEPTH];
 	int mm_depth;
 
-	list<Img_node*> mm_aStroke_set[MAX_DEPTH];
-	//list<Img_node*> *m_aStroke_set_merge;
 
-	//list<QuadTree::Img_node*>aStroke_set_Sgrad;
+
 	int depth_sobel, depth_saliency;//, depth_attach;
 	vector <Brush*> brush_set;
 	vector <Brush*> brush_resized_set[MAX_DEPTH];
@@ -77,20 +105,23 @@ public:
 	int *random_y;
 	//int get_depth;
 	render_(int _render_method, Mat &_srcImg);
-	~render_() ;
+	~render_();
 	void render_::func_();
 	int  PainterlyRendering();
-	int stroke_dump(list<Img_node*> *_aStroke_set[], string tag, int  depth);
-	int stroke_dump(list<Img_node*> *_aStroke_set, string tag, int  depth);
+
+
+
+	int stroke_dump(Stroke_set _aStroke_set[], string tag, int  depth);
+	//int stroke_dump(Stroke_set _aStroke_set, string tag, int  depth);
 	int draw_grid_depth(Mat  _grid_map_1c[], Mat _grid_map_1c_accu,
-		list<Img_node*> aStroke_set[], string tag, int & grid_map_sum,
+		Stroke_set  aStroke_set[], string tag, int & grid_map_sum,
 		int _QT_grid_count[]//, bool do_grid_cnt//, int draw_depth, int c
 	);
 	void proof_box(Point &s, int i_width, int i_height, char * p);
 	void proof_box(Point &s, int i_width, int i_height);
-	list<Img_node*> *get_stroke_set_ptr(int i) {
-		return &mm_aStroke_set[i];
-	}
+	//	list<Img_node*> *get_Stroke_set_ptr(int i) {
+		//	return &mm_aStroke_set[i];
+	//	}
 	void add_gradient_map(int i, Mat a_map);
 	int render_::prepare();
 	void post_process();
@@ -112,17 +143,24 @@ public:
 	};
 	//void  render_::p_peek_canvas(unsigned char * p, int p_x, int p_y, int &p_0, int &p_1, int &p_2);
 	int draw_grid_2(Mat _Quad_TreeMap,
-		list<Img_node*> aStroke_set[], string ftag, int  depth,// int draw_depth, 
+		Stroke_set aStroke_set[], string ftag, int  depth,// int draw_depth, 
 		int c, string _tag);
 	int render_::calc_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth,
 		int _brush_size[], string tag);
+
+	int render_::P_Rendering(Mat & _src_ROI, Mat & _before_ROI, cv::Mat & _changed_ROI,
+		cv::Mat & ing_ROI, Point _fetch_color_Point, Point centered_SrtPoint,
+		Point canvas_centered_SrtPoint, Point canvas_centered_EndPoint, int brush_area_w_size,
+		int brush_area_h_size, int astroke_depth, int painting_count, int color_BGR_B, int color_BGR_G, int color_BGR_R);
+
+/*
 	int   render_::P_Rendering(//cv::Mat srcImg,
 							   //	unsigned char * srcData,
 							   //	unsigned char * changed_canvas_data,//rstImage
 		Mat & _src_ROI,
 		Mat & _before_ROI,//rstImage.clone()
 		cv::Mat & _changed_ROI,
-		cv:: Mat & ing_ROI,
+		cv::Mat & ing_ROI,
 		//vector <Brush*> &_brush_set,
 		Point _fetch_color_Point,
 		Point centered_SrtPoint,
@@ -135,8 +173,17 @@ public:
 		int astroke_depth, int painting_count,
 		int color_BGR_B, int color_BGR_G, int color_BGR_R//BGR order
 														  //unsigned char * _ing_canvas_data
-		
-		);
+
+	);
+	*/
+	double TakeAvgS(cv::Mat &srcImg, Point srtPoint, Point endPoint, int depth, string quad);
+	Point render_::get_midPoint(cv::Mat &srcImg, Point s, Point e, double *D, int d, int child_QT_depth);
+	int  TakeQuadTree(cv::Mat &SaliencyMap, Stroke_set aStroke[], string tag);
+
+	int DivideImage(cv::Mat &SaliencyMap, Stroke_Node* me_node, Stroke_set aStroke_set[],
+		string  quad,
+		Mat & gradient_src,
+		Mat stageMap, int depth, string tag);
 
 	void brush_resize();
 	/*
@@ -218,6 +265,18 @@ public:
 		p_0 = p[index];
 	}
 
-int render_::lbph();
-	};
+	int lbph();
+
+
+	double double_array_min_at(double a[], int n);
+	double double_array_min(double a[], int n);
+	double double_array_max(double a[], int n);
+	double double_array_max_at(double a[], int n);
+	double double_2xarray_min_at(double *a, int w, int h, int n);
+	double double_2xarray_min(double *a, int w, int h, int n);
+	double double_2xarray_max(double *a, int w, int h, int n);
+	double double_2xarray_max_at(double *a, int w, int h, int n);
+	int get_selected(double *_D, int n, int divider, int &selected_x, int &selected_y);
+
+};
 

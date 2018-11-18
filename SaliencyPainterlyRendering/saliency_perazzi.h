@@ -54,12 +54,14 @@ struct SaliencySettings{
 	bool upsample_, uniqueness_, distribution_, filter_uniqueness_, filter_distribution_;
 	// Should we use the image color or superpixel color as a feature for upsampling
 	bool use_spix_color_;
+	
 };
 
 class Saliency {
 protected:
 	SaliencySettings settings_;
 	Superpixel superpixel_;
+	string tag_perazzi = "perazzi";
 protected:
 	std::vector< float > uniqueness( const std::vector< SuperpixelStatistic > & stat ) const;
 	std::vector< float > uniquenessFilter( const std::vector< SuperpixelStatistic > & stat ) const;

@@ -68,21 +68,21 @@ Mat_< float > Saliency::saliency( const Mat_< Vec3b >& im ) const {
 	im.convertTo( rgbim, CV_32F, 1.0/255. );
 	cvtColor( rgbim, labim, CV_BGR2Lab );
 	rgbim.convertTo(uc3, CV_8UC3, 256);
-	printf("settings_.n_iterations_ %d", settings_.n_iterations_);
-	printf("settings_.k_%f", settings_.k_);
+	printf("perazzi_settings_.n_iterations_ %d", settings_.n_iterations_);
+	printf("perazzi_settings_.k_%f", settings_.k_);
 	
 	ty = type2str(rgbim.type());
-	printf("rgbim: %s %dx%d \n", ty.c_str(), rgbim.cols, rgbim.rows);
+	printf("perazzi_rgbim: %s %dx%d \n", ty.c_str(), rgbim.cols, rgbim.rows);
 
 	ty = type2str(labim.type());
-	printf("labim: %s %dx%d \n", ty.c_str(), labim.cols, labim.rows);
+	printf("perazzi_labim: %s %dx%d \n", ty.c_str(), labim.cols, labim.rows);
 
 
-	debug_image("saliency/rgbim.jpg", rgbim);
+	debug_image("saliency/perazzi_rgbim.jpg", rgbim);
 
-	debug_image("saliency/rgbimuc3.jpg",uc3);
+	debug_image("saliency/perazzi_rgbimuc3.jpg",uc3);
 
-	debug_image("saliency/labim.jpg", labim);
+	debug_image("saliency/perazzi_labim.jpg", labim);
 
 	//imshow("rgbim", rgbim);
 	//imshow("labim", labim);
@@ -95,11 +95,11 @@ Mat_< float > Saliency::saliency( const Mat_< Vec3b >& im ) const {
 	//imshow("a", lab_im[1]);
 	//imshow("b", lab_im[2]);
 
-	debug_image("saliency/L.jpg", lab_im[0]);
+	debug_image("saliency/perazzi_L.jpg", lab_im[0]);
 
-	debug_image("saliency/a.jpg", lab_im[1]);
+	debug_image("saliency/perazzi_a.jpg", lab_im[1]);
 
-	debug_image("saliency/b.jpg", lab_im[2]);
+	debug_image("saliency/perazzi_b.jpg", lab_im[2]);
 	// Do the abstraction
 	Mat_<int> segmentation = superpixel_.segment( labim );
 	std::vector< SuperpixelStatistic > stat = superpixel_.stat( labim, im, segmentation );
@@ -108,7 +108,7 @@ Mat_< float > Saliency::saliency( const Mat_< Vec3b >& im ) const {
 	
 	segmentation.convertTo(uc3, CV_8UC3, 256);
 
-	debug_image("saliency/segmentation.jpg", uc3);
+	debug_image("saliency/perazzi_segmentation.jpg", uc3);
 	//imshow("segmentation",segmentation);
 	// Compute the uniqueness
 	std::vector<float> unique( stat.size(), 1 );
@@ -191,7 +191,7 @@ std::vector< float > Saliency::uniqueness( const std::vector< SuperpixelStatisti
 	return r;
 }
 std::vector< float > Saliency::distribution( const std::vector< SuperpixelStatistic >& stat ) const {
-	const int N = stat.size();
+	const int N = (int)stat.size();
 	std::vector< float > r( N );
 	const float sc =  0.5 / (settings_.sigma_c_*settings_.sigma_c_);
 	for( int i=0; i<N; i++ ) {
@@ -221,11 +221,11 @@ std::vector< float > Saliency::distribution( const std::vector< SuperpixelStatis
 	return r;
 }
 std::vector< float > Saliency::uniquenessFilter( const std::vector< SuperpixelStatistic >& stat ) const {
-	const int N = stat.size();
+	const int N = (int)stat.size();
 	
 	// Setup the data and features
 	std::vector< Vec2f > features( stat.size() );
-	Mat_<float> data( stat.size(), 5 );
+	Mat_<float> data( (int)stat.size(), 5 );
 	for( int i=0; i<N; i++ ) {
 		features[i] = stat[i].mean_position_ / settings_.sigma_p_;
 		Vec3f c = stat[i].mean_color_;
@@ -243,7 +243,7 @@ std::vector< float > Saliency::uniquenessFilter( const std::vector< SuperpixelSt
 	std::vector< float > r( N );
 	for( int i=0; i<N; i++ ) {
 		Vec3f c = stat[i].mean_color_;
-		float u = 0, norm = 1e-10;
+		float u = 0, norm = (float)1e-10;
 		Vec2f p = stat[i].mean_position_;
 		
 		r[i] = data(i,0)*c.dot(c) + data(i,4) - 2*( c[0]*data(i,1) + c[1]*data(i,2) + c[2]*data(i,3) );
@@ -252,11 +252,11 @@ std::vector< float > Saliency::uniquenessFilter( const std::vector< SuperpixelSt
 	return r;
 }
 std::vector< float > Saliency::distributionFilter( const std::vector< SuperpixelStatistic >& stat ) const {
-	const int N = stat.size();
+	const int N = (int)stat.size();
 	
 	// Setup the data and features
-	std::vector< Vec3f > features( stat.size() );
-	Mat_<float> data( stat.size(), 4 );
+	std::vector< Vec3f > features( (int)stat.size() );
+	Mat_<float> data( (int)stat.size(), 4 );
 	for( int i=0; i<N; i++ ) {
 		features[i] = stat[i].mean_color_ / settings_.sigma_c_;
 		Vec2f p = stat[i].mean_position_;
@@ -326,7 +326,7 @@ cv::Mat_< float > Saliency::assignFilter( const cv::Mat_< Vec3b >& im, const cv:
 	Mat_<float> r( im.size() );
 	for( int j=0; j<im.rows; j++ )
 		for( int i=0; i<im.cols; i++ )
-			r(j,i) = data(j,i)[0] / (data(j,i)[1] + 1e-10);
+			r(j,i) =(float)( data(j,i)[0] / (data(j,i)[1] + 1e-10));
 	return r;
 }
 

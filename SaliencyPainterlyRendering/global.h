@@ -77,8 +77,8 @@ int g_INDEX_BRUSH_SIZE_WIDTH ;
 int g_INDEX_BRUSH_SIZE_HEIGHT;
 
 //Mat Sgrid_grid_map_1c[MAX_DEPTH];
-Mat gradient_Map_C;
-Mat gradient_Map_G;
+Mat gradient_Map_C_8UC1;
+Mat gradient_Map_G_8UC1;
 std::string tag[] = { "0_sobel","1_saliency","2_union","3_merge","4_attach" };
 std::string tag_[] = { "0_sobel_", "1_saliency_", "2_union_", "3_merge_","4_attach_" };
 std::string _tag[] = { "_0_sobel", "_1_saliency", "_2_union", "_3_merge_","_4_attach_" };
@@ -122,9 +122,9 @@ int g_brush_choice = 1; //if (g_brush_choice == 0) {nth = rand() % 5;} else nth 
 int g_trace_depth=7;
 string g_saliency_method_str[MAX_SALIENCY] = { "Sobel", "Itti","Pregraph","Residual","Blackandwhite","Fine_grained","Perazzi" };
 string g_sa_str[MAX_SALIENCY] = { "so","It","Pr","Re","Bw","Fg","Pe" };
-int g_max_f_cnt=0;
+//int g_unique_id;
 int g_first_layer = 0;
-//int g_first_layer_scale = 3;// multiplied by g_paint_area_scale
 float  g_BrushMax_scale = 1.5;
 int g_paint_area_scale[MAX_DEPTH] ={ 20,10,8,6,4,4,4,4,4,4,4,4,4};
+int g_brush_scale    [MAX_DEPTH] = { 10, 4,4,4,4,4,4,4,4,4,4,4,4 };
 

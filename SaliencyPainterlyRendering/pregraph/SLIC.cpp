@@ -333,7 +333,7 @@ void SLIC::PerturbSeeds(
 	const int dx8[8] = {-1, -1,  0,  1, 1, 1, 0, -1};
 	const int dy8[8] = { 0, -1, -1, -1, 0, 1, 1,  1};
 	
-	int numseeds = kseedsl.size();
+	int numseeds =(int) kseedsl.size();
 
 	for( int n = 0; n < numseeds; n++ )
 	{

@@ -75,20 +75,20 @@ string f_str[MAX_F_CNT];
 int bat_file_write(string f_name, string image_file[], int file_image_cnt, string  exe_path, 
 	int  file_meta_cnt, string  meta_cfg_file[],string render_src) {
 	int f_cnt = 0;
-
+	int f_cnt_writed = 0;
 	for(int i_f=0; i_f<file_image_cnt;i_f++)
 		for (int m_f = 0; m_f < file_meta_cnt; m_f++) {
 			f_str[f_cnt] = exe_path + " " + render_src+"\\"+image_file[i_f] + " " + meta_cfg_file[m_f];
 			f_cnt++;
+			f_cnt_writed++;
 			if (MAX_F_CNT <= f_cnt) {
-				break;
+				
+				file_write(f_name, f_str, f_cnt);
+				f_cnt = 0;
 			}
 		}
-	if (g_max_f_cnt < f_cnt) {
-		g_max_f_cnt = f_cnt;
-	}
-	file_write(f_name,f_str,f_cnt);
-	return f_cnt;
+	
+	return f_cnt_writed;
 }
 int call_file_write(string f_name, string image_file[], int file_image_cnt,
 	string  call_path, int  file_meta_cnt, string  meta_cfg_file[],string render_src) {
@@ -102,9 +102,7 @@ int call_file_write(string f_name, string image_file[], int file_image_cnt,
 				break;
 			}
 		}
-	if (g_max_f_cnt < f_cnt) {
-		g_max_f_cnt = f_cnt;
-	}
+
 	file_write(f_name, f_str, f_cnt);
 	return f_cnt;
 }

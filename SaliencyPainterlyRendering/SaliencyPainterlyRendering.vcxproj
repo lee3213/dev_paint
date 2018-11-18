@@ -232,6 +232,7 @@
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="RenderingImage.cpp" />
     <ClCompile Include="render_.cpp" />
+    <ClCompile Include="render_etc.cpp" />
     <ClCompile Include="rgb2hsv.cpp" />
     <ClCompile Include="saliencyPainter.cpp" />
     <ClCompile Include="SaliencyPainterlyRendering.cpp" />

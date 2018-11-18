@@ -1,12 +1,12 @@
 #pragma once
 #include "stdafx.h"
 
-#include "opencv2\opencv.hpp"
-#include "opencv2\core.hpp"
+#include "opencv2\\opencv.hpp"
+#include "opencv2\\core.hpp"
 
 #include "RenderingImage.h"
-#define BEFORE_BETTER 0
-#define CHANGED_BETTER 1
+
+
 typedef struct ColorDistanceData
 {
 	double distance;

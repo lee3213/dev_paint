@@ -7,5 +7,4 @@
 #include"image_util.h"
 #include "debug_image.h"
 #include "Judgement.h"
-
 #include "render_.h"

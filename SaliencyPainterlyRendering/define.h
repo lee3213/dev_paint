@@ -24,7 +24,11 @@
 #define Gradient_Twopass 4
 
 #define MAX_SALIENCY 7
-#define MAX_F_CNT 3000
-
+#define MAX_F_CNT 300
+#define MAX_STROKE 1000
+#define STROKE_FULL (-1)
 #define TIME_STAMP_START 1
 #define TIME_STAMP_END  2
+
+#define BEFORE_BETTER 0
+#define CHANGED_BETTER 1

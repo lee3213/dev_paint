@@ -507,11 +507,7 @@ int   RenderingImage(char * src_name, char * deploy_name)
 	Mat sobel_8UC1;
 	Mat sobel_8UC3;
 	Mat gradient_Union_8UC1;
-	Mat gradient_Map_C_8UC3;
-	Mat gradient_Map_G_8UC3;
-	string fname_saliency_G;
-	string fname_saliency_C;
-	string f_saliency_img;
+
 
 	Mat saliency_8UC1;
 	Mat saliency_32F;
@@ -608,13 +604,19 @@ int   RenderingImage(char * src_name, char * deploy_name)
 
 #endif		
 		
-		
+		Mat gradient_Map_C_8UC3;
+		Mat gradient_Map_G_8UC3;
+		string fname_saliency_G;
+		string fname_saliency_C;
+		string f_saliency_img;
 		f_saliency_img = g_root_saliency_path + "/" + g_image_name +"_"+ g_saliency_method;
 		fname_saliency_G = f_saliency_img + "_G_8UC3.jpg";
 		fname_saliency_C = f_saliency_img + "_C_8UC3.jpg";
 
-		if (g_saliency_method != string("Sobel")) {
-	
+		if (g_saliency_method == string("Sobel")) {
+		}
+		else
+		{
 			bool exists;
 			int flag = 0;
 			
@@ -623,12 +625,12 @@ int   RenderingImage(char * src_name, char * deploy_name)
 				flag += 1;
 				
 				gradient_Map_C_8UC3 = cv::imread(fname_saliency_C, CV_LOAD_IMAGE_COLOR);
-				cvtColor(gradient_Map_C_8UC3,gradient_Map_C_8UC1,CV_BGR2GRAY);
+				cvtColor(gradient_Map_C_8UC3,gradient_Map_C_8UC1, BGR2GRAY);
 				exists = fileExists(fname_saliency_G);
 				if (exists == true) {
 					flag += 1;
 					gradient_Map_G_8UC3 = cv::imread(fname_saliency_G, CV_LOAD_IMAGE_COLOR);
-					cvtColor(gradient_Map_G_8UC3, gradient_Map_G_8UC1, CV_BGR2GRAY);
+					cvtColor(gradient_Map_G_8UC3, gradient_Map_G_8UC1, BGR2GRAY);
 					//gradient_Map_G_8UC3.convertTo(gradient_Map_G_8UC1, CV_8UC1);
 				}
 			}
@@ -713,10 +715,8 @@ int   RenderingImage(char * src_name, char * deploy_name)
 					compression_params.push_back(CV_IMWRITE_PXM_BINARY);
 					compression_params.push_back(0);
 
-					cvtColor(gradient_Map_C_8UC1, gradient_Map_C_8UC3, CV_GRAY2BGR);
-					cvtColor(gradient_Map_G_8UC1, gradient_Map_G_8UC3, CV_GRAY2BGR);
-				//	gradient_Map_C_8UC1.convertTo(gradient_Map_C_8UC3, CV_8UC3);
-				//	gradient_Map_G_8UC1.convertTo(gradient_Map_G_8UC3, CV_8UC3);
+					gradient_Map_C_8UC1.convertTo(gradient_Map_C_8UC3, CV_8UC3);
+					gradient_Map_G_8UC1.convertTo(gradient_Map_G_8UC3, CV_8UC3);
 					//cv::imwrite(saliency_C, gradient_Map_C_8UC3, compression_params);
 					//cv::imwrite(saliency_G, gradient_Map_G_8UC3, compression_params);
 					cv::imwrite(fname_saliency_C, gradient_Map_C_8UC3);
@@ -733,11 +733,11 @@ int   RenderingImage(char * src_name, char * deploy_name)
 
 			debug_image("0_Saliency_C_" + g_saliency_method, gradient_Map_C_8UC1);
 			//if (g_Render_method != "Sobel") {
-			debug_image("0_Saliency_G_"+g_saliency_method
+			debug_image("0_Saliency_G_sobel"+g_saliency_method
 				, gradient_Map_G_8UC1);
 
 			int size_union =saliency_union(gradient_Map_C_8UC1, gradient_Map_G_8UC1,gradient_Union_8UC1);
-			debug_image("0_Saliency_union_" + g_saliency_method , gradient_Union_8UC1);
+			debug_image("0_Saliency_union_gra(sobel)_gra(" + g_saliency_method + ")", gradient_Union_8UC1);
 
 			//}
 

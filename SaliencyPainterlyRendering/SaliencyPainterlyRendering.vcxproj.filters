@@ -263,6 +263,9 @@
     <ClCompile Include="time_stamp.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="render_etc.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SaliencyPainterlyRendering.rc">
