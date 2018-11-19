@@ -43,7 +43,7 @@ int   render_::PainterlyRendering()
 	
 	src_canvas.create(canvas_size_height, canvas_size_width, CV_8UC3);
 	src_canvas.setTo(255);
-	Rect src_Rect_full(Point(canvas_size_bezel_size, canvas_size_bezel_size),
+	Rect src_Rect_full(Point(canvas_bezel_size, canvas_bezel_size),
 		Size(g_src_image_width, g_src_image_height));
 	 
 	Mat src_ROI_canvas_full = src_canvas(src_Rect_full);
@@ -189,15 +189,16 @@ int   render_::PainterlyRendering()
 			//	int random_y;
 				bool modified = true;
 				int retry_cnt = 1;
-	
+				int adjust_h_size;
+				int adjust_w_size;
 					fetch_color_Point.x = St_srtPoint.x + random_x[painting_try];
 					fetch_color_Point.y = St_srtPoint.y + random_y[painting_try];
 
 				int fetch_Index = (fetch_color_Point.x + fetch_color_Point.y*image_width)*image_channels;
 				int fetch_Index_1c = (fetch_color_Point.x + fetch_color_Point.y*image_width);
 
-				int canvas_Index = ((fetch_color_Point.x + canvas_size_bezel_size)
-					+ (fetch_color_Point.y + canvas_size_bezel_size)*(image_width + canvas_size_bezel_size))*image_channels;
+				int canvas_Index = ((fetch_color_Point.x + canvas_bezel_size)
+					+ (fetch_color_Point.y + canvas_bezel_size)*(image_width + canvas_bezel_size))*image_channels;
 
 			
 				int color_BGR_B, color_BGR_G, color_BGR_R;
@@ -205,9 +206,18 @@ int   render_::PainterlyRendering()
 
 				p_poke(r_try_map_1c_data[astroke_depth], fetch_Index_1c, 0);
 
+				if (brush_area_w_size_half > canvas_bezel_size)
+					adjust_w_size = canvas_bezel_size;
+				else
+					adjust_w_size = brush_area_w_size_half;
 
-				centered_SrtPoint.x = fetch_color_Point.x - brush_area_w_size_half;
-				centered_SrtPoint.y = fetch_color_Point.y - brush_area_h_size_half;
+				if (brush_area_h_size_half > canvas_bezel_size)
+					adjust_h_size = canvas_bezel_size;
+				else
+					adjust_h_size = brush_area_w_size_half;
+
+				centered_SrtPoint.x = fetch_color_Point.x - adjust_w_size;
+				centered_SrtPoint.y = fetch_color_Point.y - adjust_h_size;
 
 				centered_EndPoint.x = fetch_color_Point.x +(brush_area_w_size-brush_area_w_size_half);// to overcome odd brush size
 				centered_EndPoint.y = fetch_color_Point.y +(brush_area_h_size-brush_area_h_size_half);// to overcome odd brush size
@@ -215,10 +225,10 @@ int   render_::PainterlyRendering()
 	
 			//	Point Point_X, Point_Y;
 			
-				canvas_centered_SrtPoint.x = centered_SrtPoint.x + canvas_size_bezel_size ;
-				canvas_centered_SrtPoint.y = centered_SrtPoint.y + canvas_size_bezel_size ;
-				canvas_centered_EndPoint.x = centered_EndPoint.x + canvas_size_bezel_size ;
-				canvas_centered_EndPoint.y = centered_EndPoint.y + canvas_size_bezel_size ;
+				canvas_centered_SrtPoint.x = centered_SrtPoint.x + canvas_bezel_size;
+				canvas_centered_SrtPoint.y = centered_SrtPoint.y + canvas_bezel_size ;
+				canvas_centered_EndPoint.x = centered_EndPoint.x + canvas_bezel_size;
+				canvas_centered_EndPoint.y = centered_EndPoint.y + canvas_bezel_size ;
 				Rect canvas_centered_ROI_rect = Rect(canvas_centered_SrtPoint, canvas_centered_EndPoint);
 
 #ifdef _DEBUG_RENDER

@@ -70,7 +70,7 @@ public:
 
 	int canvas_size_width;
 	int canvas_size_height;
-	int canvas_size_bezel_size;
+	int canvas_bezel_size;
 	int  BrushMaxSize;						//1024size에는 130, 3072size에는 400으로 설정했습니다..
 	int  BrushMinSize;
 	int brush_step;
@@ -128,7 +128,7 @@ public:
 	void  render_::rectangle_canvas(cv::Mat mat, cv::Rect  rect, Scalar s);
 	//void p_poke_canvas(unsigned char * p, int index, int y, int r, int g, int b);
 	void  render_::p_poke_canvas(unsigned char * p, int p_x, int p_y, int p_0, int p_1, int p_2) {
-		int index = ((p_x + canvas_size_bezel_size) + (p_y + canvas_size_bezel_size) * canvas_size_width) * 3;
+		int index = ((p_x + canvas_bezel_size) + (p_y + canvas_bezel_size) * canvas_size_width) * 3;
 		p[index] = p_0;
 		p[index + 1] = p_1;
 		p[index + 2] = p_2;

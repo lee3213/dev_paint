@@ -328,13 +328,13 @@ int render_::calc_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth
 
 void  render_::rectangle_canvas(cv::Mat mat, cv::Rect  rect, Scalar s) {
 
-	rect.x = rect.x + canvas_size_bezel_size;
-	rect.y = rect.y + canvas_size_bezel_size;
+	rect.x = rect.x + canvas_bezel_size;
+	rect.y = rect.y + canvas_bezel_size;
 	cv::rectangle(mat, rect, s);
 }
 
 void  render_::p_peek_canvas(unsigned char * p, int p_x, int p_y, int &p_0, int &p_1, int &p_2) {
-	int index = ((p_x + canvas_size_bezel_size) + (p_y + canvas_size_bezel_size) * canvas_size_width) * 3;
+	int index = ((p_x + canvas_bezel_size) + (p_y + canvas_bezel_size) * canvas_size_width) * 3;
 
 	p_0 = p[index];
 	p_1 = p[index + 1];
@@ -423,11 +423,11 @@ int render_::prepare() {
 	else
 		BrushMaxSize = g_src_image_height / g_image_divider;
 
-	canvas_size_bezel_size = BrushMaxSize; 
+	canvas_bezel_size = BrushMaxSize*g_brush_scale[0]; 
 
 	//Rendering
-	canvas_size_width = g_src_image_width + canvas_size_bezel_size * 2;
-	canvas_size_height = g_src_image_height + canvas_size_bezel_size * 2;
+	canvas_size_width = g_src_image_width + canvas_bezel_size * 2;
+	canvas_size_height = g_src_image_height + canvas_bezel_size * 2;
 	//paint_map = new Mat(canvas_size_height, canvas_size_width, CV_8UC3);
 	//	paint_map_data = paint_map->data;
 	//	paint_map->setTo(255);
