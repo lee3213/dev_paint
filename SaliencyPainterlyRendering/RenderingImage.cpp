@@ -10,7 +10,32 @@
 #include "render_.h"
 
 #include "time.h"
+Size x_src_image_size;
+Rect x_src_Rect_full;
 
+void render_::func_p_map(Mat & a_map_8UC1,string tag) {
+	double minval, maxval;
+	Point minloc, maxloc;
+	int i_minval, i_maxval;
+	cv::minMaxLoc(a_map_8UC1, &minval, &maxval, &minloc, &maxloc);
+	i_minval = (int)minval;
+	i_maxval = (int)maxval;
+
+	int diff = i_maxval - i_minval;
+	int step = (int)256 / diff;
+	Mat p_map;
+	a_map_8UC1.convertTo(p_map, -1, step);
+	debug_image("ing/" + tag, p_map);
+	r_cout <<tag<< " minLoc " << minloc.x << ", " << minloc.y << " : " << (int)i_minval ;
+	r_cout << " maxLoc " << maxloc.x << ", " << maxloc.y << " : " << (int)i_maxval ;
+	r_cout << " diff = " << diff << ", " << "step = " << step ;
+
+
+	Mat paint_ROI = a_map_8UC1(x_src_Rect_full);
+	int zero_pixel_cnt = (x_src_image_size.height*x_src_image_size.width) - cv::countNonZero(paint_ROI);
+	r_cout << "zero pixel = " << zero_pixel_cnt << " / " << (x_src_image_size.height*x_src_image_size.width) <<
+		" = " << setw(10) << setprecision(2) << ((float)zero_pixel_cnt / (float)(x_src_image_size.height*x_src_image_size.width))*100.0 << endl;
+}
 
 int   render_::PainterlyRendering()
 
@@ -43,10 +68,15 @@ int   render_::PainterlyRendering()
 	
 	src_canvas.create(canvas_size_height, canvas_size_width, CV_8UC3);
 	src_canvas.setTo(255);
-	Rect src_Rect_full(Point(canvas_bezel_size, canvas_bezel_size),
-		Size(g_src_image_width, g_src_image_height));
+	x_src_image_size.width = (g_src_image_width);
+	x_src_image_size.height= g_src_image_height;
+	 x_src_Rect_full.width= x_src_image_size.width; 
+	 x_src_Rect_full.height = x_src_image_size.height;
+	 x_src_Rect_full.x = canvas_bezel_size;
+	 x_src_Rect_full.y = canvas_bezel_size;
+		
 	 
-	Mat src_ROI_canvas_full = src_canvas(src_Rect_full);
+	Mat src_ROI_canvas_full = src_canvas(x_src_Rect_full);
 	 m_srcImg_.copyTo(src_ROI_canvas_full);
 //	debug_image("src_canvas", src_canvas);
 //	debug_image("src_canvas_ROI", src_ROI_canvas_full);
@@ -66,7 +96,16 @@ int   render_::PainterlyRendering()
 		ing_canvas[i].create(canvas_size_height, canvas_size_width, CV_8UC3);
 		ing_canvas_data[i] = (unsigned char*)ing_canvas[i].data;
 		ing_canvas[i].setTo(255);
+		
+		
 
+		paint_map_8UC1[i].create(canvas_size_height, canvas_size_width, CV_8UC1);
+		paint_map_8UC1_data[i] = paint_map_8UC1[i].data;
+		paint_map_8UC1[i].setTo(0);
+
+		paint_map_accu_8UC1[i].create(canvas_size_height, canvas_size_width, CV_8UC1);
+		paint_map_accu_8UC1_data[i] = paint_map_accu_8UC1[i].data;
+		paint_map_accu_8UC1[i].setTo(0);
 #ifdef _DEBUG_RENDER
 		painting_area_canvas[i].create(canvas_size_height, canvas_size_width, CV_8UC3);
 		painting_area_canvas[i].setTo(255);
@@ -79,9 +118,14 @@ int   render_::PainterlyRendering()
 		rectangle_canvas(painting_area_canvas[i], Rect(St_srtPoint, St_endPoint), Scalar(0, 0, 255));//RED QT outline
 #endif
 	}
+	paint_map_8UC1[MAX_DEPTH].create(canvas_size_height, canvas_size_width, CV_8UC1);
+	paint_map_8UC1[MAX_DEPTH].setTo(0);
+	depth_map_8UC1.create(canvas_size_height, canvas_size_width, CV_8UC1);
+	depth_map_8UC1_data = depth_map_8UC1.data;
+	depth_map_8UC1.setTo(255);
 	//int first_layer = -1;
-	for(int i=0;i<mm_depth;i++)
-		r_cout << m_tag << " : "<<mm_depth<<" size: "<< mm_aStroke_set[i].stroke_list.size()<<endl;
+	//for(int i=0;i<mm_depth;i++)
+	//	r_cout << m_tag << " : "<<mm_depth<<" size: "<< mm_aStroke_set[i].stroke_list.size()<<endl;
 //	for (int i = 0; i < mm_depth; i++) {
 //		r_cout << "0 "<<i << ", " << brush_size[i] << endl;
 //	}
@@ -95,6 +139,7 @@ int   render_::PainterlyRendering()
 	int st_w_size, st_h_size;
 	Size stroke_size;
 	int times;
+
 	for (int uu_depth = 0; uu_depth < mm_depth; uu_depth++) {
 		
 		int paint_area_brush_count;
@@ -135,6 +180,7 @@ int   render_::PainterlyRendering()
 
 				continue;
 			}
+
 			if (brush_size[astroke_depth] < 0) {
 				cerr << "m_brush[" << astroke_depth << "]" << brush_size[astroke_depth] << endl;
 				r_cout << "m_brush[" << astroke_depth << "]" << brush_size[astroke_depth] << endl;
@@ -169,15 +215,19 @@ int   render_::PainterlyRendering()
 					" , bsc :" <<g_brush_scale[astroke_depth]<<
 					endl;
 				paint_area_brush_count = 2;
-				size_mismatch++;
+				//size_mismatch++;
 
 			}
-			
+			Rect depth_ROI_rect(Point(St_srtPoint.x+canvas_bezel_size, St_srtPoint.y + canvas_bezel_size),
+				Size(st_w_size, st_h_size));
+			Mat depth_map_8UC1_ROI = depth_map_8UC1(depth_ROI_rect);
+			depth_map_8UC1_ROI = astroke_depth;
 				uniform_int_distribution<int> dist_x(0, (int)(st_w_size));
 				uniform_int_distribution<int> dist_y(0, (int)(st_h_size));
 				random_x = new int[paint_area_brush_count];
 				random_y = new int[paint_area_brush_count];
 
+				
 				for (int painting_try = 0; painting_try < paint_area_brush_count; painting_try++) {
 					random_x[painting_try] = dist_x(rand_x[astroke_depth]);
 					random_y[painting_try] = dist_y(rand_y[astroke_depth]);
@@ -303,15 +353,19 @@ int   render_::PainterlyRendering()
 		r_cout << setw(10) << m_tag << " :depth " << setw(3) << uu_depth << " : "
 			<<setw(5)<< mm_aStroke_set[uu_depth].stroke_list.size()
 			<<setw(5)<<times<<"times, paint scale : " <<
-			setw(3) << g_paint_try_scale[uu_depth] << " , Br_size " << setw(5) << mm_aStroke_set[uu_depth].stroke_list.size() <<
+			setw(3) << g_paint_try_scale[uu_depth] << " , Br_size " << 
+			setw(5) << mm_aStroke_set[uu_depth].stroke_list.size() <<
 			", "<<setw(5)<<g_brush_scale[uu_depth]<<
 			" br_cnt " << setw(4) << paint_area_brush_count <<
 			endl;
+		r_cout << "try cnt "<< r_s_grid_painting_try[uu_depth]<< " changed count = " << r_s_changed_count[uu_depth];
+		r_cout << " ratio = " << setw(7)<<std::setprecision(2)<<((float)r_s_changed_count[uu_depth] / (float)r_s_grid_painting_try[uu_depth])*100.0 << endl;
 		g_file_clog << m_tag << " ," << setw(3) << uu_depth << " ,size, " << mm_aStroke_set[uu_depth].stroke_list.size() <<
 			 " paint scale : " << setw(3) << g_paint_try_scale[uu_depth] <<
 			"," << setw(4) << paint_area_brush_count 
 			<< endl;
 		debug_image("ing/_i_" + to_string(uu_depth) + m_t +to_string(g_paint_try_scale[uu_depth]),  ing_canvas[uu_depth]);
+
 #ifdef _DEBUG_RENDER
 		debug_image("ing/pa_" + to_string(uu) + "_" + m_tag + to_string(called), painting_area_canvas[uu_depth]);
 
@@ -321,15 +375,21 @@ int   render_::PainterlyRendering()
 
 		debug_image("ing/_ac_" + to_string(uu_depth) + m_t , rst_accu_canvas[uu_depth]);
 		debug_image("ing/try_" + to_string(uu_depth) + m_t , r_try_map_1c[uu_depth]);
-
+		paint_map_accu_8UC1[uu_depth] += paint_map_8UC1[uu_depth];
+		paint_map_accu_8UC1[uu_depth+1] = paint_map_accu_8UC1[uu_depth];
+		string tag = "p_map_" + m_tag+to_string(uu_depth);
+		func_p_map(paint_map_8UC1[uu_depth],tag);
+		tag = "p_map_a_" + m_tag + to_string(uu_depth);
+		func_p_map(paint_map_accu_8UC1[uu_depth],tag);
+		
 	}//end of for depth uu
 	
 
 //	int ret = draw_grid_2(rst_accu_canvas[mm_depth-1].clone(), mm_aStroke_set, string("rst_") + m_tag, mm_depth, -1, 255, m_tag);
 	//ret = draw_grid_2(r_try_map_1c[mm_depth-1], mm_aStroke_set, string("try_") + m_tag, mm_depth, -1, 255, m_tag);
 //	r_cout << "Merge SKIP count : " << g_merge_skip_count << endl;
-	r_cout << " depth : " << mm_depth << endl;
-	r_cout << "size mismatch " << size_mismatch << endl;
+	//r_cout << " depth : " << mm_depth << endl;
+	//r_cout << "size mismatch " << size_mismatch << endl;
 	
 	result_image=rst_accu_canvas[mm_depth-1];
 	/*
@@ -343,6 +403,19 @@ int   render_::PainterlyRendering()
 	r_cout << setw(15) << m_tag<<"-->"<<s_buff << " : "<<e_buff << endl;
 	csv_log << "R End, "<<m_tag << "," << s_buff << "," << e_buff << endl;
 		*/
+	double minval, maxval;
+	int i_minloc, i_maxloc;
+	int i_minval, i_maxval;
+	cv::minMaxLoc(depth_map_8UC1, &minval, &maxval);// , &i_minloc, &i_maxloc);
+	i_minval = (int)minval;
+	i_maxval = (int)maxval;
+
+	int diff = i_maxval - i_minval;
+	int step = (int)256 / diff;
+	Mat p_map;
+	depth_map_8UC1.convertTo(p_map, -1, step);
+
+	debug_image("depth_map", p_map);
 		return 0;
 
 }

@@ -36,6 +36,50 @@ cout_func(string src_name, string deploy_name){
 			<<setw(10)<<g_brush_scale[i]<< endl;
 	}
 }
+
+
+void set_result_path(std::string para_path, string method_path, int depth) {
+	string dirs[] = { "ing","sobel","saliency" ,"br","grid","br2","grad_ori" };
+	string sub_dirs;
+	string dir;
+
+	dir = g_root_path_win + string("\\") + para_path;
+	cout << "dir " << g_root_path_win << " : " << dir << endl;
+	check_and_create(dir, false);
+
+	dir = g_root_path_win + string("\\") + para_path + "\\" + method_path;
+	cout << "dir " << g_root_path_win << " : " << dir << endl;
+	check_and_create(dir, false);
+
+	dir = g_root_path_win + string("\\") + para_path + "\\" + method_path + "\\" + g_image_name;
+	cout << "dir " << g_root_path_win << " : " << dir << endl;
+	check_and_create(dir, true);
+
+	for (int i = 0; i < sizeof(dirs) / sizeof(string); i++) {
+		sub_dirs = dir;
+		sub_dirs.append("\\");
+		sub_dirs.append(dirs[i]);
+		cout << i << " : " << sub_dirs << endl;
+		check_and_create(sub_dirs, true);
+	}
+
+	for (int i = 0; i < MAX_DEPTH; i++) {
+		sub_dirs = dir;
+
+		sub_dirs.append("\\p");
+		sub_dirs.append(to_string(i));
+		cout << i << " : " << sub_dirs << endl;
+		check_and_create(sub_dirs, true);
+	}
+	for (int i = 0; i < MAX_DEPTH; i++) {
+		sub_dirs = dir;
+
+		sub_dirs.append("\\br\\p");
+		sub_dirs.append(to_string(i));
+		cout << i << " : " << sub_dirs << endl;
+		check_and_create(sub_dirs, true);
+	}
+}
 int  set_global(string src_name,string deploy_name) {
 	
 	g_INDEX_BRUSH_SIZE_WIDTH = 20;//changed by cwlee from 10 to same as thumbnail

@@ -15,11 +15,11 @@ using namespace cv;
 #include "render_.h"
 
 void run_render(render_ * _render) {
-	for (int j = 0; j < _render->mm_depth; j++)
-		if (_render->mm_aStroke_set[j].stroke_list.size() == 0) {
-			cout << _render->m_tag << " stroke_size==0" << endl;
-			return;
-		}
+	//for (int j = 0; j < _render->mm_depth; j++)
+		//if (_render->mm_aStroke_set[j].stroke_list.size() == 0) {
+			//cout << _render->m_tag << " stroke_size==0" << endl;
+		//	return ;
+	//	}
 
 	_render->success_or_fail = _render->PainterlyRendering();
 //	image_save(g_image_name + _render->m_tag_, _render->result_image, _render->grid_map_1c[MAX_DEPTH]);
@@ -37,7 +37,8 @@ int do_rendering(){
 		cout << "p_sobel  t_id : " << p_render[RENDER_SOBEL]->get_id() << endl;
 		std::cout << "Number of threads = " 
 			<< std::thread::hardware_concurrency() << std::endl;
-		
+		p_render[RENDER_SOBEL]->join();
+		_render[RENDER_SOBEL]->post_process();
 		if (g_saliency_method != SALIENCY_STR_SOBEL) {
 			p_render[RENDER_SALIENCY] = new thread(run_render, _render[RENDER_SALIENCY]);
 			p_render[RENDER_UNION] = new thread(run_render, _render[RENDER_UNION]);
@@ -63,8 +64,7 @@ int do_rendering(){
 			_render[RENDER_TWOPASS_MERGE]->post_process();
 			_render[RENDER_TWOPASS_ATTACH]->post_process();
 		}
-		p_render[RENDER_SOBEL]->join();
-		_render[RENDER_SOBEL]->post_process();
+		
 #else
 
 		std::thread *p_render[RENDER_MAX];

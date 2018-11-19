@@ -231,9 +231,10 @@
     <ClCompile Include="RenderingImage.cpp" />
     <ClCompile Include="render_.cpp" />
     <ClCompile Include="render_etc.cpp" />
+    <ClCompile Include="render_partition.cpp" />
     <ClCompile Include="rgb2hsv.cpp" />
     <ClCompile Include="run_render.cpp" />
-    <ClCompile Include="PainterlyRendering.cpp" />
+    <ClCompile Include="PainterlyRendering_main.cpp" />
     <ClCompile Include="saliency_blackandwhite.cpp" />
     <ClCompile Include="saliency_itti.cpp" />
     <ClCompile Include="saliency_itti_main.cpp" />

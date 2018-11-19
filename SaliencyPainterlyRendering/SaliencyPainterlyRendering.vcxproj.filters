@@ -257,7 +257,10 @@
     <ClCompile Include="run_render.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="PainterlyRendering.cpp">
+    <ClCompile Include="render_partition.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="PainterlyRendering_main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

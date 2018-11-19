@@ -16,7 +16,7 @@ void TakeColorDistance(cv::Mat &testImg, list<DisData> &colorDis);
 
 bool compareDistance_rev(DisData a, double b);
 
-int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, vector <Brush*> &_brush_set,string tag)
+int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, vector <Brush*> &_brush_set,string tag,int depth)
 {
 	vector<DisData> colorDis;
 	colorDis.resize(g_BrushNumber);
@@ -26,7 +26,12 @@ int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, vector
 	//	int height = testImg.size().height;
 	string f_path;
 	int brush_no;
-	static int called = 0;
+	static int called_cnt ;
+	static int saved_depth = -1;
+	if (saved_depth != depth) {
+		saved_depth = depth;
+		called_cnt = 0;
+	}
 	//colorDis.reserve(g_BrushNumber);
 	int nth = 0;
 	for (vector <Brush*>::iterator it = _brush_set.begin(); it != _brush_set.end(); it++)
@@ -59,14 +64,14 @@ int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, vector
 	//	nth = rand() % 5;
 //	}
 	//else
-	if (called < 40) {
+	if (called_cnt < 40) {
 		for (int i = 0; i < 5; i++)
 		{
 			string f_name = tag + "_" + to_string(i);
 			debug_image(f_name, _brush_set.at(i)->brush_thumbnail);
 		}
 	}
-	called++;
+	called_cnt++;
 		nth = 0;
 	brush_no = colorDis.at(nth).nth;
 	return brush_no;
@@ -77,7 +82,7 @@ int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, vector
 
 int JudgementImage(unsigned char * src_ROI_canvas_Data_p, unsigned char * changed_ROI_clone_Data_p, unsigned char * before_ROI_canvas_Data_p, 
 	int brush_area_w_size, int brush_area_h_size,
-	//Point centered_SrtPoint, Point _fetch_color_point,
+	Point centered_SrtPoint,//, Point _fetch_color_point,
 	int astroke_depth,
 	int b_w, int b_h, int b_c, int b_step1,
 	int canvas_w, int canvas_h, int canvas_c,int canvas_ROI_step1,
@@ -86,6 +91,8 @@ int JudgementImage(unsigned char * src_ROI_canvas_Data_p, unsigned char * change
 //	unsigned char * beforeData_p = beforeImg.data;
 	//unsigned char * changedData_p = changedImg.data;
 	int src2rst = 0, src2before = 0;
+	
+
 //	string f_path;
 #ifdef DEBUG_
 	static int called_cnt = 0;
@@ -168,8 +175,8 @@ int JudgementImage(unsigned char * src_ROI_canvas_Data_p, unsigned char * change
 #endif
 	//csv_log << ", "<<", "<<src2rst << "," << src2before <<","<<src2rst-src2before<< endl;
 	
-	if (src2rst <= src2before)
-	return CHANGED_BETTER ;
+	if (src2rst >= src2before)
+		return CHANGED_BETTER ;
 	else
 		return BEFORE_BETTER;
 }
@@ -179,7 +186,7 @@ int JudgementImage(unsigned char * src_ROI_canvas_Data_p, unsigned char * change
 int  JudgementBrush(cv::Mat &testImg, int depth, int width, int height,vector <Brush*> _brush_set,string tag)
 	
 {
-	int brush_no=TakeColorDistance_thumbnail(testImg,width,height,_brush_set,tag);
+	int brush_no=TakeColorDistance_thumbnail(testImg,width,height,_brush_set,tag,depth);
 	return brush_no;
 }
 

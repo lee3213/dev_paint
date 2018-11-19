@@ -51,8 +51,12 @@ public:
 	//	streambuf* r_stream_clog;
 	fstream r_cstat;
 	//	streambuf* r_stream_cstat;
-		//Mat *paint_map;
-		//unsigned char * paint_map_data;
+	Mat depth_map_8UC1;
+	unsigned char * depth_map_8UC1_data;
+		Mat paint_map_8UC1[MAX_DEPTH+1];
+		unsigned char * paint_map_8UC1_data[MAX_DEPTH+1];
+		Mat paint_map_accu_8UC1[MAX_DEPTH + 1];
+		unsigned char * paint_map_accu_8UC1_data[MAX_DEPTH + 1];
 	int success_or_fail;
 	int render_method;
 	//Mat render_::PainterlyRendering();
@@ -109,7 +113,7 @@ public:
 	void render_::func_();
 	int  PainterlyRendering();
 
-
+	void func_p_map(Mat & a_map_8UC1, string tag);
 
 	int stroke_dump(Stroke_set _aStroke_set[], string tag, int  depth);
 	//int stroke_dump(Stroke_set _aStroke_set, string tag, int  depth);
@@ -171,6 +175,9 @@ public:
 	
 	inline void p_poke(unsigned char * p, int index, int p_0) {
 		p[index] = p_0;
+	}
+	inline void p_poke_add_n(unsigned char * p, int index, int p_0) {
+		p[index] += p_0;
 	}
 	inline void p_poke(unsigned char * p, int index, int p_0, int p_1, int p_2) {
 		p[index] = p_0;
