@@ -159,11 +159,14 @@ int   render_::PainterlyRendering()
 		
 
 			if (paint_area_brush_count == 0) {
-				r_cout << "paint_area_brush_count == 0 depth " << astroke_depth
-					<< " st_size : " << st_w_size << ", " << st_h_size << " g_paint_area_Scale " <<
-					g_paint_try_scale[astroke_depth] << (st_w_size * st_h_size *g_paint_try_scale[astroke_depth]) << " m_brush_size " << brush_size[astroke_depth] <<
-					" : " <<
-					(brush_area_h_size * brush_area_w_size) <<
+				r_cout << "bc == 0 d: " << astroke_depth
+					<< " st_size : " << st_w_size << ", " << st_h_size <<"= "<<st_w_size*st_h_size<<
+					"brush area size= " <<
+					(brush_area_h_size * brush_area_w_size) << " try_Scale " <<
+					g_paint_try_scale[astroke_depth] << " : "<<times<<
+					" " 
+					<< " m_brush_size " << brush_size[astroke_depth] <<
+					" , bsc :" <<g_brush_scale[astroke_depth]<<
 					endl;
 				paint_area_brush_count = 2;
 				size_mismatch++;
@@ -297,9 +300,11 @@ int   render_::PainterlyRendering()
 		char e_buff[20];
 		strftime(e_buff, 20, "%Y-%m-%d %H:%M:%S",&t_e );
 		*/
-		r_cout << setw(10) << m_tag << " :depth " << setw(3) << uu_depth << " : "<<setw(5)<<times<<" paint scale : " <<
+		r_cout << setw(10) << m_tag << " :depth " << setw(3) << uu_depth << " : "
+			<<setw(5)<< mm_aStroke_set[uu_depth].stroke_list.size()
+			<<setw(5)<<times<<"times, paint scale : " <<
 			setw(3) << g_paint_try_scale[uu_depth] << " , Br_size " << setw(5) << mm_aStroke_set[uu_depth].stroke_list.size() <<
-			", "<<setw(5)<<g_brush_scale<<
+			", "<<setw(5)<<g_brush_scale[uu_depth]<<
 			" br_cnt " << setw(4) << paint_area_brush_count <<
 			endl;
 		g_file_clog << m_tag << " ," << setw(3) << uu_depth << " ,size, " << mm_aStroke_set[uu_depth].stroke_list.size() <<
