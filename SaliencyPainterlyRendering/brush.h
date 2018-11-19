@@ -2,8 +2,8 @@
 
 #include "stdafx.h"
 
-#include "opencv2\\opencv.hpp"
-#include "opencv2\\core.hpp"
+#include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
 using namespace std;
 using namespace cv;
 
@@ -21,7 +21,5 @@ public:
 };
 
 
-#define BRUSH_ALPHA 1
-#define BRUSH_COPY 2
 int BrushInitialization(vector <Brush*> &brush);
 //, int _called_once, int brush_size[]);

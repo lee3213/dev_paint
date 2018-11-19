@@ -1,12 +1,13 @@
 #include "stdafx.h"
 
-#include "opencv2\opencv.hpp"
-#include "opencv2\core.hpp"
+#include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
 #include "define.h"
-#include "render_.h"
-#include "extern.h"
-#include "debug_image.h"
 
+//#include "extern.h"
+#include "debug_image.h"
+using namespace std;
+using namespace cv;
 void render_::brush_resize(	vector <Brush*> _brush_set)
 {
 	Brush *brush_resized;

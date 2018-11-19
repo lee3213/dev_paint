@@ -337,15 +337,15 @@ void SLIC::PerturbSeeds(
 
 	for( int n = 0; n < numseeds; n++ )
 	{
-		int ox = kseedsx[n];//original x
-		int oy = kseedsy[n];//original y
-		int oind = oy*m_width + ox;
+		int ox = (int)kseedsx[n];//original x
+		int oy = (int)kseedsy[n];//original y
+		int oind = (int)oy*m_width + ox;
 
-		int storeind = oind;
+		int storeind = (int)oind;
 		for( int i = 0; i < 8; i++ )
 		{
-			int nx = ox+dx8[i];//new x
-			int ny = oy+dy8[i];//new y
+			int nx = (int)(ox+dx8[i]);//new x
+			int ny = (int)(oy+dy8[i]);//new y
 
 			if( nx >= 0 && nx < m_width && ny >= 0 && ny < m_height)
 			{
@@ -389,8 +389,8 @@ void SLIC::GetLABXYSeeds_ForGivenStepSize(
 
 	//int xstrips = m_width/STEP;
 	//int ystrips = m_height/STEP;
-	int xstrips = (0.5+double(m_width)/double(STEP));
-	int ystrips = (0.5+double(m_height)/double(STEP));
+	int xstrips = (int)(0.5+double(m_width)/double(STEP));
+	int ystrips = (int)(0.5+double(m_height)/double(STEP));
 
     int xerr = m_width  - STEP*xstrips;if(xerr < 0){xstrips--;xerr = m_width - STEP*xstrips;}
     int yerr = m_height - STEP*ystrips;if(yerr < 0){ystrips--;yerr = m_height- STEP*ystrips;}
@@ -411,14 +411,14 @@ void SLIC::GetLABXYSeeds_ForGivenStepSize(
 
 	for( int y = 0; y < ystrips; y++ )
 	{
-		int ye = y*yerrperstrip;
+		int ye = (int)(y*yerrperstrip);
 		for( int x = 0; x < xstrips; x++ )
 		{
-			int xe = x*xerrperstrip;
-            int seedx = (x*STEP+xoff+xe);
+			int xe = (int)(x*xerrperstrip);
+            int seedx = (int)(x*STEP+xoff+xe);
             if(hexgrid){ seedx = x*STEP+(xoff<<(y&0x1))+xe; seedx = min(m_width-1,seedx); }//for hex grid sampling
-            int seedy = (y*STEP+yoff+ye);
-            int i = seedy*m_width + seedx;
+            int seedy = (int)(y*STEP+yoff+ye);
+            int i = (int)(seedy*m_width + seedx);
 			
 			kseedsl[n] = m_lvec[i];
 			kseedsa[n] = m_avec[i];
@@ -454,9 +454,9 @@ void SLIC::GetKValues_LABXYZ(
 	int numseeds(0);
 	int n(0);
 
-	int xstrips = (0.5+double(m_width)/double(STEP));
-	int ystrips = (0.5+double(m_height)/double(STEP));
-	int zstrips = (0.5+double(m_depth)/double(STEP));
+	int xstrips = (int)(0.5+double(m_width)/double(STEP));
+	int ystrips = (int)(0.5+double(m_height)/double(STEP));
+	int zstrips = (int)(0.5+double(m_depth)/double(STEP));
 
     int xerr = m_width  - STEP*xstrips;if(xerr < 0){xstrips--;xerr = m_width - STEP*xstrips;}
     int yerr = m_height - STEP*ystrips;if(yerr < 0){ystrips--;yerr = m_height- STEP*ystrips;}
@@ -481,15 +481,15 @@ void SLIC::GetKValues_LABXYZ(
 
 	for( int z = 0; z < zstrips; z++ )
 	{
-		int ze = z*zerrperstrip;
+		int ze = (int)(z*zerrperstrip);
 		int d = (z*STEP+zoff+ze);
 		for( int y = 0; y < ystrips; y++ )
 		{
-			int ye = y*yerrperstrip;
+			int ye = (int)(y*yerrperstrip);
 			for( int x = 0; x < xstrips; x++ )
 			{
-				int xe = x*xerrperstrip;
-				int i = (y*STEP+yoff+ye)*m_width + (x*STEP+xoff+xe);
+				int xe = (int)(x*xerrperstrip);
+				int i = (int)((y*STEP+yoff+ye)*m_width + (x*STEP+xoff+xe));
 				
 				kseedsl[n] = m_lvecvec[d][i];
 				kseedsa[n] = m_avecvec[d][i];
@@ -548,10 +548,10 @@ void SLIC::PerformSuperpixelSLIC(
 		distvec.assign(sz, DBL_MAX);
 		for( int n = 0; n < numk; n++ )
 		{
-                        y1 = max(0.0,			kseedsy[n]-offset);
-                        y2 = min((double)m_height,	kseedsy[n]+offset);
-                        x1 = max(0.0,			kseedsx[n]-offset);
-                        x2 = min((double)m_width,	kseedsx[n]+offset);
+                        y1 = (int)max(0.0,			kseedsy[n]-offset);
+                        y2 = (int)min((double)m_height,	kseedsy[n]+offset);
+                        x1 = (int)max(0.0,			kseedsx[n]-offset);
+                        x2 = (int)min((double)m_width,	kseedsx[n]+offset);
 
 
 			for( int y = y1; y < y2; y++ )
@@ -686,12 +686,12 @@ void SLIC::PerformSupervoxelSLIC(
 		distvec.assign(m_depth, initdouble);
 		for( int n = 0; n < numk; n++ )
 		{
-                        y1 = max(0.0,			kseedsy[n]-offset);
-                        y2 = min((double)m_height,	kseedsy[n]+offset);
-                        x1 = max(0.0,			kseedsx[n]-offset);
-                        x2 = min((double)m_width,	kseedsx[n]+offset);
-                        z1 = max(0.0,			kseedsz[n]-offset);
-                        z2 = min((double)m_depth,	kseedsz[n]+offset);
+                        y1 = (int)max(0.0,			kseedsy[n]-offset);
+                        y2 = (int)min((double)m_height,	kseedsy[n]+offset);
+                        x1 = (int)max(0.0,			kseedsx[n]-offset);
+                        x2 = (int)min((double)m_width,	kseedsx[n]+offset);
+                        z1 = (int)max(0.0,			kseedsz[n]-offset);
+                        z2 = (int)min((double)m_depth,	kseedsz[n]+offset);
 
 
 			for( int z = z1; z < z2; z++ )

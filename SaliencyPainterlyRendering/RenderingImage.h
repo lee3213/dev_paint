@@ -5,7 +5,7 @@
 #include "bsShowImage.h"
 #include "brush.h"
 #include "util.h"
-#include "RenderingImage.h"
+
 #include "QuadTree.h"
 #include "Judgement.h"
 #include "brush.h"
@@ -17,9 +17,6 @@
 using namespace std;
 using namespace cv;
 
-
-
-int RenderingImage(char * srcImgname, char * saliImgname);
 //void RenderingImage(cv::Mat &srcImg, cv::Mat &saliImg);
 
 

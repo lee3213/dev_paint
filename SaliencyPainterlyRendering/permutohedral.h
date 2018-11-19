@@ -70,7 +70,7 @@ protected:
 		// Swap out the old memory
 		short * old_keys = keys_;
 		int * old_table = table_;
-		int old_capacity = capacity_;
+		int old_capacity = (int)capacity_;
 		capacity_ *= 2;
 		// Allocate the new memory
 		keys_ = new short[ (old_capacity+10)*key_size_ ];
@@ -109,7 +109,7 @@ public:
 		delete [] table_;
 	}
 	int size() const {
-		return filled_;
+		return (int)filled_;
 	}
 	void reset() {
 		filled_ = 0;
@@ -127,7 +127,7 @@ public:
 					// Insert a new key and return the new id
 					for( size_t i=0; i<key_size_; i++ )
 						keys_[ filled_*key_size_+i ] = k[i];
-					return table_[h] = filled_++;
+					return (int)(table_[h] = (int)filled_++);
 				}
 				else
 					return -1;
@@ -433,7 +433,7 @@ public:
 		float inv_std_dev = float(sqrt(2.0 / 3.0)*(d_+1));
 		// Compute the diagonal part of E (p.5 in [Adams etal 2010])
 		for( int i=0; i<d_; i++ )
-			scale_factor[i] = 1.0 / sqrt( (i+2)*(i+1) ) * inv_std_dev;
+			scale_factor[i] = (float)( 1.0 / sqrt( (i+2)*(i+1) ) * inv_std_dev);
 		
 		// Compute the simplex each feature lies in
 		for( int k=0; k<N_; k++ ){
@@ -451,10 +451,10 @@ public:
 			
 			// Find the closest 0-colored simplex through rounding
 			float down_factor = 1.0f / (d_+1);
-			float up_factor = (d_+1);
+			float up_factor = (float)(d_+1);
 			int sum = 0;
 			for( int i=0; i<=d_; i++ ){
-				int rd = round( down_factor * elevated[i]);
+				int rd = (int)round( down_factor * elevated[i]);
 				rem0[i] = rd*up_factor;
 				sum += rd;
 			}

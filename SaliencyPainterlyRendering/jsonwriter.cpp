@@ -1,13 +1,16 @@
 #include "stdafx.h"
-#include "json/json.h"
 #include <iostream>
 #include <fstream>
-using namespace std;
-#include "extern.h"
 #include <comdef.h> 
 #include <windows.h>
-#include "dir.h"
+#include "define.h"
+#include "json/json.h"
+
+using namespace std;
 #include "extern.h"
+
+#include "dir.h"
+
 // ...
 // At application shutdown to make the new configuration document:
 // Since Json::Value has implicit constructor for all value types, it is not
@@ -18,11 +21,11 @@ using namespace std;
 int sthresh[] = {110,120,130 };
 int _grid[] = { 5,10 };
 int depth[] = { 10 };
-int _br[] = { 5,10 }; //g_BrushMinSize
-int _at[] = { 3 }; //attach brush size
+int _br[] = { 7,10 }; //g_BrushMinSize
+int _at[] = { 5 }; //attach brush size
 
 int QT_N[] = {1};
-
+string paint_method_str = BRUSH_STENCIL_STR;
 
 
 //int _bts[] = {250 };//brush transparecy threshold
@@ -33,7 +36,7 @@ void get_json_name(string & file_name) {
 		"_g" + to_string(_grid[gr]) + "_b" + to_string(_br[br]) + "_N" + to_string(QT_N[qt])
 		//+ "_ps" + to_string(_ps[ps])
 		//	 + "_ts" + to_string(_bts[bts])
-		 + "_copy.json";
+		 + "_"+paint_method_str+".json";
 	
 }
 #define MAX_PARA 100
@@ -49,12 +52,12 @@ int write_json_content(string from_jsonfolderPath) {
 	
 	root["root_path"] = "/rst";
 	root["root_path_win"] = "\\rst";
-	root["g_paint_method"] = "copy";//copy alpha
+	root["g_paint_mode_str"] = paint_method_str;//Stencil alpha
 	root["g_BrushMinSize"] = _br[0]; //15
 	root["g_BrushAttachSize"] = _at[0];//5
 									   //		root["g_brush_Ts"] = _bts[bts];//brush tranparency threshold brush
 	root["end"] = "end";
-	//root["g_paint_area_scale"] = _ps[ps];//
+	//root["g_paint_try_scale"] = _ps[ps];//
 										 //root["g_merge_method"] = _str_mm[mm];
 										 //	root["g_grid_threshold"] = _gth[gth];
 	root["QT_avgSThreshold"] = sthresh[th];//15, 25  used in divide for  AvgS
@@ -97,7 +100,7 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 	howmany = MAX_SALIENCY* n_sth * n_de * n_gr*n_qt*n_bth;
 	int Max_PARA = n_sth*n_gr;
 	if (Max_PARA > MAX_PARA) {
-		cout << "Max PAra " << Max_PARA << "Exceeded " << MAX_PARA << endl;
+		cout << "Max Para " << Max_PARA << "Exceeded " << MAX_PARA << endl;
 		return -1;
 	}
 	std::ofstream file_all_cfg;

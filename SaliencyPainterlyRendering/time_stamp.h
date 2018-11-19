@@ -4,8 +4,10 @@
 #include <ios>
 #include <iostream>
 #include <streambuf>
+#include "time.h"
 #include "define.h"
-#include "render_.h"
+
+using namespace std;
 
 class time_stamp {
 private:
@@ -18,6 +20,6 @@ public:
  time_stamp() {};
 	 ~time_stamp() {}
 	 char s_buff[20];
-	 void time_stamp::time_stamping(ostream &to_stream, string stamp_tag, int start_or_end);
+	 void time_stamp::time_stamping(string stamp_tag, int start_or_end);
 }
 ;

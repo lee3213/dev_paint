@@ -13,8 +13,8 @@ Reference http://ice.dlut.edu.cn/lu/Project/CVPR13[yangchuan]/cvprsaliency.htm
 **************************************************/
 #pragma once
 #include "..\\stdafx.h"
-#include "opencv2\opencv.hpp"
-#include "opencv2\core.hpp"
+#include "opencv2\\opencv.hpp"
+#include "opencv2\\core.hpp"
 #ifndef _PREGRAPH_H
 #define _PREGRAPH_H
 

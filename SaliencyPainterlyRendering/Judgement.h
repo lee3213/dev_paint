@@ -1,10 +1,10 @@
 #pragma once
 #include "stdafx.h"
 
-#include "opencv2\\opencv.hpp"
-#include "opencv2\\core.hpp"
+#include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
 
-#include "RenderingImage.h"
+#include "brush.h"
 
 
 typedef struct ColorDistanceData
@@ -29,6 +29,6 @@ int JudgementImage(unsigned char * srcData, unsigned char * changedData_p, unsig
 	int c_w,int c_h,int c_c, int canvas_ROI_step1,
 	string tag);
 
-int JudgementBrush(cv::Mat &srcImg, int depth, int width, int height,vector <Brush*>_brush_set);
+int JudgementBrush(cv::Mat &srcImg, int depth, int width, int height,vector <Brush*>_brush_set,string tag);
 //, /* vector <Brush*> &brush, int nBrushNumber,*/int st_no,
 	//int paint_area_w_size, int paint_area_h_size,Point C_S,Point C_E,int first_try);

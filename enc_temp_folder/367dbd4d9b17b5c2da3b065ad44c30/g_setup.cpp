@@ -32,8 +32,7 @@ cout_func(string src_name, string deploy_name){
 
 	cout << "g_QT_method_N = " << g_QT_method_N << endl;
 	for (int i = 0; i < MAX_DEPTH; i++) {
-		cout << setw(3) << i << " : " << setw(5)<<g_paint_try_scale[i]
-			<<setw(10)<<g_brush_scale[i]<< endl;
+		cout << setw(3) << i << " : " << g_paint_try_scale[i] << endl;
 	}
 }
 int  set_global(string src_name,string deploy_name) {

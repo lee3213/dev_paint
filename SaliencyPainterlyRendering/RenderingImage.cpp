@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "RenderingImage.h"
+
 #include"image_util.h"
 #include "debug_image.h"
 #include "p_rendering.h"
@@ -10,8 +10,6 @@
 #include "render_.h"
 
 #include "time.h"
-
-
 
 
 int   render_::PainterlyRendering()
@@ -93,8 +91,10 @@ int   render_::PainterlyRendering()
 	int size_mismatch = 0;
 	int saved_depth=-1;
 	cv::Mat src_ROI_canvas;
+	cv::Mat src_ROI_canvas_clone;
 	int st_w_size, st_h_size;
 	Size stroke_size;
+	int times;
 	for (int uu_depth = 0; uu_depth < mm_depth; uu_depth++) {
 		
 		int paint_area_brush_count;
@@ -153,15 +153,15 @@ int   render_::PainterlyRendering()
 			brush_area_w_size = brush_size[astroke_depth];// brush size(painting area) per each depth
 			int brush_area_h_size_half = brush_area_h_size / 2 + brush_area_h_size%2;
 			int brush_area_w_size_half = brush_area_w_size / 2 + brush_area_w_size % 2;
-			
-				paint_area_brush_count = (st_w_size * st_h_size *g_paint_area_scale[astroke_depth]) /
-					(brush_area_h_size * brush_area_w_size);
+			 times = ((st_w_size * st_h_size) /
+				(brush_area_h_size * brush_area_w_size));
+				paint_area_brush_count = times*g_paint_try_scale[astroke_depth];
 		
 
 			if (paint_area_brush_count == 0) {
 				r_cout << "paint_area_brush_count == 0 depth " << astroke_depth
 					<< " st_size : " << st_w_size << ", " << st_h_size << " g_paint_area_Scale " <<
-					g_paint_area_scale[astroke_depth] << (st_w_size * st_h_size *g_paint_area_scale[astroke_depth]) << " m_brush_size " << brush_size[astroke_depth] <<
+					g_paint_try_scale[astroke_depth] << (st_w_size * st_h_size *g_paint_try_scale[astroke_depth]) << " m_brush_size " << brush_size[astroke_depth] <<
 					" : " <<
 					(brush_area_h_size * brush_area_w_size) <<
 					endl;
@@ -209,8 +209,8 @@ int   render_::PainterlyRendering()
 				centered_SrtPoint.x = fetch_color_Point.x - brush_area_w_size_half;
 				centered_SrtPoint.y = fetch_color_Point.y - brush_area_h_size_half;
 
-				centered_EndPoint.x = fetch_color_Point.x +(brush_area_w_size-brush_area_w_size_half);
-				centered_EndPoint.y = fetch_color_Point.y +(brush_area_h_size-brush_area_h_size_half);
+				centered_EndPoint.x = fetch_color_Point.x +(brush_area_w_size-brush_area_w_size_half);// to overcome odd brush size
+				centered_EndPoint.y = fetch_color_Point.y +(brush_area_h_size-brush_area_h_size_half);// to overcome odd brush size
 
 	
 			//	Point Point_X, Point_Y;
@@ -225,32 +225,32 @@ int   render_::PainterlyRendering()
 				rectangle(painting_area_canvas[astroke_depth], canvas_centered_ROI_rect, Scalar(0, 0, 0));//BLACK
 #endif
 				src_ROI_canvas = src_canvas(canvas_centered_ROI_rect);
-				debug_image("p" + to_string(astroke_depth) + "/src_ROI_canvas_" + m_tag_ + to_string(painting_try), src_ROI_canvas);
+				src_ROI_canvas_clone = src_canvas(canvas_centered_ROI_rect).clone();
+			//	debug_image("p" + to_string(astroke_depth) + "/src_ROI_canvas_" + m_tag_ + to_string(painting_try), src_ROI_canvas);
 
 				Mat before_canvas_ROI = rst_accu_canvas[astroke_depth](canvas_centered_ROI_rect);
-				Mat changed_canvas_ROI = rst_accu_canvas[astroke_depth](canvas_centered_ROI_rect).clone();
+				Mat before_canvas_ROI_clone = rst_accu_canvas[astroke_depth](canvas_centered_ROI_rect).clone();
+				Mat changed_canvas_ROI = rst_accu_canvas[astroke_depth](canvas_centered_ROI_rect);
+				Mat changed_canvas_ROI_clone = rst_accu_canvas[astroke_depth](canvas_centered_ROI_rect).clone();
 
 				Mat ing_ROI_canvas = ing_canvas[astroke_depth](canvas_centered_ROI_rect);
 				Mat ing_ROI_clone = ing_canvas[astroke_depth](canvas_centered_ROI_rect).clone();
 
-				int result = P_Rendering(//srcImg, 
-					//srcData, 
-					src_ROI_canvas,
-					before_canvas_ROI,
-					changed_canvas_ROI,
+				int result = P_Rendering(
+					src_ROI_canvas_clone,
+					before_canvas_ROI_clone,
+					changed_canvas_ROI_clone,
 					ing_ROI_clone,
-				//	rst_accu_canvas_data[astroke_depth],
-				//	beforeImg_canvas,
-					//testImg_resized,
+				
 					fetch_color_Point, centered_SrtPoint,
 					canvas_centered_SrtPoint,canvas_centered_EndPoint,
 					brush_area_w_size, brush_area_h_size,
-					//m_tag,
-					//stroke_no, 
+					
 					astroke_depth, painting_try, 
 					color_BGR_B, color_BGR_G, color_BGR_R,
 					astroke_depth,
-					painting_try
+					painting_try,
+					changed_canvas_ROI
 				);
 
 				//	current_fetched_map_data,fetched_color_data,r,g,b);
@@ -262,6 +262,7 @@ int   render_::PainterlyRendering()
 				}
 				else {//result==1/CHANGED_BETTER, 
 					changed_canvas_ROI.copyTo(before_canvas_ROI);
+					
 					r_s_changed_count[astroke_depth]++;
 					rst_accu_canvas[astroke_depth](canvas_centered_ROI_rect).clone();
 					ing_ROI_clone.copyTo(ing_ROI_canvas);
@@ -286,15 +287,16 @@ int   render_::PainterlyRendering()
 		char e_buff[20];
 		strftime(e_buff, 20, "%Y-%m-%d %H:%M:%S",&t_e );
 		*/
-		r_cout << setw(15) << m_tag << " :depth " << setw(3) << uu_depth << " paint scale : " <<
-			setw(3) << g_paint_area_scale[uu_depth] << " , Br_size " << setw(5) << mm_aStroke_set[uu_depth].stroke_list.size() <<
+		r_cout << setw(10) << m_tag << " :depth " << setw(3) << uu_depth << " : "<<setw(5)<<times<<" paint scale : " <<
+			setw(3) << g_paint_try_scale[uu_depth] << " , Br_size " << setw(5) << mm_aStroke_set[uu_depth].stroke_list.size() <<
+			", "<<setw(5)<<g_brush_scale<<
 			" br_cnt " << setw(4) << paint_area_brush_count <<
 			endl;
 		g_file_clog << m_tag << " ," << setw(3) << uu_depth << " ,size, " << mm_aStroke_set[uu_depth].stroke_list.size() <<
-			 " paint scale : " << setw(3) << g_paint_area_scale[uu_depth] <<
+			 " paint scale : " << setw(3) << g_paint_try_scale[uu_depth] <<
 			"," << setw(4) << paint_area_brush_count 
 			<< endl;
-		debug_image("ing/_i_" + to_string(uu_depth) + m_t +to_string(g_paint_area_scale[uu_depth]),  ing_canvas[uu_depth]);
+		debug_image("ing/_i_" + to_string(uu_depth) + m_t +to_string(g_paint_try_scale[uu_depth]),  ing_canvas[uu_depth]);
 #ifdef _DEBUG_RENDER
 		debug_image("ing/pa_" + to_string(uu) + "_" + m_tag + to_string(called), painting_area_canvas[uu_depth]);
 

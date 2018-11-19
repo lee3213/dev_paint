@@ -1,14 +1,14 @@
 #pragma once
 #include "stdafx.h"
 #include <list>
-#include "opencv2\\opencv.hpp"
-#include "opencv2\\core.hpp"
+#include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
 
 #include "define.h"
 #include "brush.h"
-
-#include "extern.h"
 #include "QuadTree.h"
+#include "debug_image.h"
+
 using namespace std;
 using namespace cv;
 //int draw_grid_2(Mat _Quad_TreeMap,
@@ -148,35 +148,15 @@ public:
 	int render_::calc_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth,
 		int _brush_size[], string tag);
 
-	int render_::P_Rendering(Mat & _src_ROI, Mat & _before_ROI, cv::Mat & _changed_ROI,
-		cv::Mat & ing_ROI, Point _fetch_color_Point, Point centered_SrtPoint,
+	int render_::P_Rendering(Mat & _src_ROI_clone, Mat & _before_ROI_clone, cv::Mat & _changed_ROI_clone,
+		cv::Mat & ing_ROI_clone, Point _fetch_color_Point, Point centered_SrtPoint,
 		Point canvas_centered_SrtPoint, Point canvas_centered_EndPoint, int brush_area_w_size,
 		int brush_area_h_size, int astroke_depth, int painting_try, int color_BGR_B, int color_BGR_G, int color_BGR_R,
-		int _depth,int _try_);
+		int _depth,int _try_,
+		Mat changed_canvas_ROI
+		);
 
-/*
-	int   render_::P_Rendering(//cv::Mat srcImg,
-							   //	unsigned char * srcData,
-							   //	unsigned char * changed_canvas_data,//rstImage
-		Mat & _src_ROI,
-		Mat & _before_ROI,//rstImage.clone()
-		cv::Mat & _changed_ROI,
-		cv::Mat & ing_ROI,
-		//vector <Brush*> &_brush_set,
-		Point _fetch_color_Point,
-		Point centered_SrtPoint,
-		Point canvas_centered_SrtPoint,
-		Point canvas_centered_EndPoint,
-		int brush_area_w_size, int brush_area_h_size,
-		//String tag,
-		//int astroke_number,
-		//int ing,
-		int astroke_depth, int painting_try,
-		int color_BGR_B, int color_BGR_G, int color_BGR_R//BGR order
-														  //unsigned char * _ing_canvas_data
 
-	);
-	*/
 	double TakeAvgS(cv::Mat &srcImg, Point srtPoint, Point endPoint, int depth, string quad);
 	Point render_::get_midPoint(cv::Mat &srcImg, Point s, Point e, double *D, int d, int child_QT_depth);
 	int  TakeQuadTree(cv::Mat &SaliencyMap, Stroke_set aStroke[], string tag);
@@ -188,68 +168,7 @@ public:
 
 	void brush_resize(
 		vector <Brush*> g_brush_set);
-	/*
-	Mat brush_at_brush_clone(vector <Brush*> & _brush_set, int no) {
-
-		vector <Brush*>::iterator it = _brush_set.begin();
-		for (; it != _brush_set.end(); it++) {
-			if ((*it)->brush_no == no)
-				return (*it)->brush.clone();
-		}
-		return _brush_set.front()->brush.clone();
-	}
-
-	Mat brush_at_brush_embose_clone(vector <Brush*> & _brush_set, int no) {
-
-		vector <Brush*>::iterator it = _brush_set.begin();
-		for (; it != _brush_set.end(); it++) {
-			if ((*it)->brush_no == no)
-				return (*it)->bump.clone();
-		}
-		return _brush_set.front()->bump.clone();
-	}
-	Mat brush_at_brush_gray_clone(vector <Brush*> & _brush_set, int no) {
-
-		vector <Brush*>::iterator it = _brush_set.begin();
-		for (; it != _brush_set.end(); it++) {
-			if ((*it)->brush_no == no)
-				return (*it)->brush_gray;
-		}
-		cerr << "at G " << no << endl;
-		return(*it)->brush_gray;
-	}
-	Mat brush_at_brush(vector <Brush*> & _brush_set, int no) {
-
-		vector <Brush*>::iterator it = _brush_set.begin();
-		for (; it != _brush_set.end(); it++) {
-			if ((*it)->brush_no == no)
-				return (*it)->brush;
-		}
-		return (*it)->brush;
-	}
-
-	Mat brush_at_brush_embose(vector <Brush*> & _brush_set, int no) {
-
-		vector <Brush*>::iterator it = _brush_set.begin();
-		for (; it != _brush_set.end(); it++) {
-			if ((*it)->brush_no == no)
-				return (*it)->bump;
-		}
-		return (*it)->bump;
-	}
-	Mat brush_at_brush_gray(vector <Brush*> & _brush_set, int no) {
-
-		vector <Brush*>::iterator it = _brush_set.begin();
-		for (; it != _brush_set.end(); it++) {
-			if ((*it)->brush_no == no)
-				return (*it)->brush_gray.clone();
-		}
-		cerr << "at G " << no << endl;
-		return (*it)->brush_gray;
-	}
-	*/
-
-
+	
 	inline void p_poke(unsigned char * p, int index, int p_0) {
 		p[index] = p_0;
 	}

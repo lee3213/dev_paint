@@ -266,13 +266,14 @@ template <typename Iter> Iter fixZerosInTheEnd(Iter begin, Iter end) {
 #endif
 #else
 #include <stdio.h>
-
+/*
 #if defined(_MSC_VER)
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
 #if !defined(snprintf)
 #define snprintf _snprintf
 #endif
 #endif
+*/
 #endif
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400 // VC++ 8.0
@@ -4217,11 +4218,12 @@ Value& Path::make(Value& root) const {
 #include <float.h>
 #define isfinite _finite
 #endif
-
+/*
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
 #if !defined(snprintf)
 #define snprintf _snprintf
 #endif
+*/
 #endif
 
 #if defined(__sun) && defined(__SVR4) // Solaris

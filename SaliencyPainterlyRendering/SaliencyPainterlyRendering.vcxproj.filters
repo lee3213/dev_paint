@@ -24,12 +24,6 @@
     <ClInclude Include="resource.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="SaliencyPainterlyRendering.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderingImage.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="bsShowImage.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -99,9 +93,6 @@
     <ClInclude Include="json_write.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="p_rendering.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="rgb2hsv.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -147,9 +138,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="SaliencyPainterlyRendering.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="RenderingImage.cpp">
@@ -209,9 +197,6 @@
     <ClCompile Include="brush_adjust.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="saliencyPainter.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="g_setup.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -264,6 +249,15 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="render_etc.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="prepare_rendering.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="run_render.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="PainterlyRendering.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

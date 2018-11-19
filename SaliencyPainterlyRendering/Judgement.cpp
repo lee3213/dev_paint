@@ -15,7 +15,8 @@ bool compareDistance(DisData a, double b);
 void TakeColorDistance(cv::Mat &testImg, list<DisData> &colorDis);
 
 bool compareDistance_rev(DisData a, double b);
-int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, vector <Brush*> &_brush_set)
+
+int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, vector <Brush*> &_brush_set,string tag)
 {
 	vector<DisData> colorDis;
 	colorDis.resize(g_BrushNumber);
@@ -25,10 +26,10 @@ int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, vector
 	//	int height = testImg.size().height;
 	string f_path;
 	int brush_no;
-
+	static int called = 0;
 	//colorDis.reserve(g_BrushNumber);
 	int nth = 0;
-	for (vector <Brush*>::iterator it = _brush_set.begin(); it != _brush_set.end(); it++, nth++)
+	for (vector <Brush*>::iterator it = _brush_set.begin(); it != _brush_set.end(); it++)
 	{
 		unsigned char* indexData = (unsigned char*)(*it)->brush_thumbnail.data;
 		int pixel_cnt = 0;
@@ -38,24 +39,34 @@ int  TakeColorDistance_thumbnail(cv::Mat &testImg, int width, int height, vector
 			for (int x = 0; x < width; x++)
 			{
 				size_t index = y * testImg.step1() + x;
-				if (indexData[index] <= 240) {
+			//	if (indexData[index] <= 240) {
 					cDis += abs(testData[index] - indexData[index]);
-					pixel_cnt++;
-				}
+					//pixel_cnt++;
+				//}
 			}
 		}
-		cDis /= pixel_cnt;
+		
+		cDis /= height*width;
 		vector<DisData>::iterator it2 = lower_bound(colorDis.begin(), colorDis.end(), (double)cDis, compareDistance);
 
 		newDistance.distance = cDis;
 		newDistance.nth = nth;
 		colorDis.insert(it2, newDistance);
 		//cout << " distance " << setw(10)<<cDis<< "b no "<<(*it).brush_no << " nth " << nth << endl;
+		nth++;
 	}
 	//if (g_brush_choice == 0) {
-//		nth = rand() % 5;
-	//}
-	//else 
+	//	nth = rand() % 5;
+//	}
+	//else
+	if (called < 40) {
+		for (int i = 0; i < 5; i++)
+		{
+			string f_name = tag + "_" + to_string(i);
+			debug_image(f_name, _brush_set.at(i)->brush_thumbnail);
+		}
+	}
+	called++;
 		nth = 0;
 	brush_no = colorDis.at(nth).nth;
 	return brush_no;
@@ -165,39 +176,10 @@ int JudgementImage(unsigned char * src_ROI_canvas_Data_p, unsigned char * change
 
 
 
-int  JudgementBrush(cv::Mat &testImg, int depth, int width, int height,vector <Brush*> _brush_set)
-	/* vector <Brush*> &brush_set, int nBrushNumber,*/
-//	 int stroke_no,int brush_area_w_size,int brush_area_h_size)// Point centered_SrtPoint,
-//	Point centered_EndPoint,int first_try)
+int  JudgementBrush(cv::Mat &testImg, int depth, int width, int height,vector <Brush*> _brush_set,string tag)
+	
 {
-	
-	//rangePoint.width = bEndPoint.x - bSrtPoint.x;
-	//rangePoint.height= bEndPoint.y - bSrtPoint.y;
-
-//	rangePoint.x = (*it)->info.endPoint.x - (*it)->info.srtPoint.x;
-//	rangePoint.y = (*it)->info.endPoint.y - (*it)->info.srtPoint.y;
-
-//	Point i_s, i_e;
-//	Point i_r;
-//	i_r = rangePoint;
-//	i_s = (*it)->info.srtPoint;
-//	i_e=(*it)->info.endPoint;
-
-	//Rect rect((*it)->info.srtPoint.x, (*it)->info.srtPoint.y, rangePoint.x, rangePoint.y);
-	
-	
-
-
-	//가장 적합한 Brush 확인(index Brush와 testImage간의 색상거리 확인)
-	//list<DisData> colorDis;
-	//colorDis.resize(BrushNumber);// room for total brush
-//	TakeColorDistance(brush, testImg, colorDis);
-
-	int brush_no=TakeColorDistance_thumbnail(testImg,width,height,_brush_set);
-
-
-	
-
+	int brush_no=TakeColorDistance_thumbnail(testImg,width,height,_brush_set,tag);
 	return brush_no;
 }
 

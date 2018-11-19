@@ -1,13 +1,14 @@
 #include "stdafx.h"
-#include "opencv2\opencv.hpp"
-#include "opencv2\core.hpp"
-#include "render_.h"
+#include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
+#include "define.h"
+#include "extern.h"
 
 #include "brush.h"
 #include "QuadTree.h"
 #include "debug_image.h"
-#include "define.h"
-#include "extern.h"
+
+#include "render_.h"
 using namespace std;
 using namespace cv;
 void image_save(string image_name, Mat result_image, Mat Quad_TreeMap) {
@@ -188,7 +189,7 @@ void render_::func_(){
 	int c_sum = 0;
 	int t_sum = 0;
 	//_painting_area[astroke_depth] += st_w_size*st_h_size;
-	r_cout << m_tag_+"    g_Scale = " << g_paint_area_scale << endl;
+	r_cout << m_tag_+"    g_Scale = " << g_paint_try_scale << endl;
 	r_cout << endl <<
 		setw(6) << "[]" <<
 		setw(12)<<"tag "<<
@@ -262,31 +263,40 @@ int render_::calc_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth
 {
 	int brush_step;
 	int k_depth;
-	if (render_method == RENDER_TWOPASS_ATTACH ) {
+	//basic depth 
+	if (render_method > RENDER_SALIENCY) {
 		if (render_sobel->mm_depth > render_saliency->mm_depth) {
-			k_depth = render_sobel->mm_depth; 
+			k_depth = render_sobel->mm_depth;
 		}
-		else 	k_depth = render_saliency->mm_depth; 
+		else 	k_depth = render_saliency->mm_depth;
+	}
+	else k_depth = mm_depth;
+
+		if (k_depth == 1)
+			brush_step = (int)(_BrushMinSize);
+		else
+			brush_step = (int)((_BrushMaxSize - _BrushMinSize) / (k_depth - 1));
+
+		for (int i = 0; i < k_depth; i++)
+		{
+				_brush_size[i] = (int)(_BrushMaxSize - (i)* brush_step)*g_brush_scale[i];
+
+				if (_brush_size[i] < _BrushMinSize)
+					_brush_size[i] = _BrushMinSize;
+		
+			g_file_cstat << g_para_method + "," << g_image_name << ", " << "brush_size" + to_string(i) + "," <<
+				_brush_size[i] << endl;
+		}
+
+
+
+	if (render_method == RENDER_TWOPASS_ATTACH ) {
+		
 		if ( k_depth == 1)
 			brush_step = (int)((_BrushMaxSize - _BrushMinSize));
 		else
 		 brush_step = (int)((_BrushMaxSize - _BrushMinSize) / (k_depth-1));
-		
-		 for (int i = 0; i < k_depth; i++)
-		 {
-			 if (i == g_first_layer) {
-				 _brush_size[g_first_layer] = (int)(_BrushMaxSize*g_BrushMax_scale);
-			 }
-			 else {
-				 _brush_size[i] = (int)(_BrushMaxSize - (i)* brush_step);
-
-				 if (_brush_size[i] < _BrushMinSize)
-					 _brush_size[i] = _BrushMinSize;
-			 }
-		//	r_cout << tag << "   Brush Size : " << i << ", " << setw(4) << _brush_size[i] << endl;
-			g_file_cstat << tag<<"   "<<g_para_method + "," << g_image_name << ", " << "brush_size" + to_string(i) + "," <<
-				_brush_size[i] << endl;
-		}
+	
 
 		 int _B = _brush_size[k_depth-1];
 		 int _brush_step;
@@ -298,32 +308,12 @@ int render_::calc_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth
 	
 		for (int i = 0; i < (mm_depth-k_depth); i++)
 		{
-			_brush_size[i+k_depth] = (int)(_B - (i+1)* _brush_step);
+			_brush_size[i+k_depth] = (int)(_B - (i+1)* _brush_step)*g_brush_scale[i];
 		}
 	//	r_cout << "_brush_step " << _brush_step << endl;
 	}
-	else {// except for attach
-		if (_depth == 1)
-			brush_step = (int)(_BrushMinSize) ;
-		else 
-			brush_step = (int)((_BrushMaxSize - _BrushMinSize) / (_depth-1));
 	
-	 for (int i = 0; i < _depth; i++)
-		{
-		 if (i == g_first_layer) {
-			 _brush_size[g_first_layer] = (int)(_BrushMaxSize*g_BrushMax_scale);
-		 }
-		 else {
-			 _brush_size[i] = (int)(_BrushMaxSize - (i)* brush_step);
 
-			 if (_brush_size[i] < _BrushMinSize)
-				 _brush_size[i] = _BrushMinSize;
-		 }
-		
-			g_file_cstat << g_para_method + "," << g_image_name << ", " << "brush_size" + to_string(i) + "," <<
-				_brush_size[i] << endl;
-		}
-	}
 	r_cout << tag + " image depth  " << _depth << ", size: " << g_src_image_width << ",  " << g_src_image_height << endl;
 	r_cout << "  _BrushMaxSize " << _BrushMaxSize  ;
 	r_cout << "  _BrushMinSize " << _BrushMinSize ;
@@ -331,7 +321,7 @@ int render_::calc_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth
 	r_cout << "  _depth  " << _depth;
 	r_cout << "  brush_step " << brush_step << endl;
 	for (int i = 0; i < _depth; i++) {
-		r_cout << tag <<" : Br size : " <<setw(5) << i << setw(3) << _brush_size[i] << endl;
+		r_cout << tag <<" : Br size : " <<setw(5) << i << setw(5) <<g_brush_scale[i]<<setw(10)<< _brush_size[i] << endl;
 	}
 	return _depth;
 }
@@ -429,9 +419,9 @@ int render_::prepare() {
 	int k_depth;
 
 	if (g_src_image_width < g_src_image_height)
-		BrushMaxSize = g_src_image_width / 10;
+		BrushMaxSize = g_src_image_width / g_image_divider;
 	else
-		BrushMaxSize = g_src_image_height / 10;
+		BrushMaxSize = g_src_image_height / g_image_divider;
 
 	canvas_size_bezel_size = BrushMaxSize; 
 
@@ -989,3 +979,35 @@ int render_::get_selected(double *_D, int n, int divider, int &selected_x, int &
 		}
 	return 1;
 };
+
+void render_::proof_box(Point &s, int i_width, int i_height) {
+	Rect rr;
+	if (s.x < 0)
+		r_cout << "error 1:" << s.x << endl;
+	if (s.x >= i_width)
+		r_cout << "error 2:" << s.x << endl;
+
+
+
+	if (s.y < 0) r_cout << "error 3:" << s.y << endl;
+
+	if (s.y >= i_height)
+		r_cout << "error 4:" << s.y << endl;
+
+}
+
+void render_::proof_box(Point &s, int i_width, int i_height, char * p) {
+	//Rect rr;
+	if (s.x < 0)
+		r_cout << "error 1:" << p << s.x << endl;
+	if (s.x >= i_width)
+		r_cout << "error 2:" << p << s.x << endl;
+
+
+
+	if (s.y < 0) r_cout << "error 3:" << p << s.y << endl;
+
+	if (s.y >= i_height)
+		r_cout << "error 4:" << p << s.y << endl;
+
+}

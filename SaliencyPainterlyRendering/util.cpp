@@ -64,14 +64,6 @@ void p_poke(unsigned char * p, int index, int p_0) {
 	p[index + 1] = p_1;
 	p[index + 2] = p_2;
 }
-void p_peek(unsigned char * p, int index, int &p_0, int &p_1, int &p_2) {
-	p_0 = p[index];
-	p_1 = p[index + 1];
-	p_2 = p[index + 2];
-}
- void p_peek_1c(unsigned char * p, int index, int &p_0) {
-	p_0 = p[index];
-}
 
 
 

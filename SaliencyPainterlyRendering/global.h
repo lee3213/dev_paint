@@ -13,6 +13,7 @@
 //debug_image_single *g_debug_brush_thumbnail;
 //debug_image_single *g_debug_brush_resized;
 //int g_brush_called_cnt = 0;
+int g_image_divider;// BrushMaxSize = g_src_image_height / g_image_divider;
 bool g_first_time = true;
 //FILE *g_log;
 //vector <Brush*> g_brush_set;//Brush set
@@ -36,7 +37,7 @@ int g_depth_limit;
 int g_min_gridsize;
 /////////////////////////////////////////////////////
 
-
+string g_debug_file;
 //////////////////Threshhold Á¶Àý////////////////////
 
 //int g_RetryTime;
@@ -95,9 +96,6 @@ int g_src_image_height;
 int g_src_image_channels;
 int g_src_image_step1;
 
-string g_saliency_method;//without_saliency, saliency, pregraph, blackandwhite,resudual,fine_sobelined
-string g_paint_method;
-
 vector <Brush*> g_brush_set;
 
 int g_QT_method_N;//N
@@ -120,11 +118,19 @@ int g_ET = 1;//positive ET=-1 negative
 int g_qt_s_scale=2;//
 int g_brush_choice = 1; //if (g_brush_choice == 0) {nth = rand() % 5;} else nth = 0;
 int g_trace_depth=7;
+
+string g_saliency_method;//Sobel, Itti, pregraph, Residual blackandwhite,fine_grained Perazzi
+string g_paint_mode_str;//alhpa  stencil
+
 string g_saliency_method_str[MAX_SALIENCY] = { "Sobel", "Itti","Pregraph","Residual","Blackandwhite","Fine_grained","Perazzi" };
 string g_sa_str[MAX_SALIENCY] = { "so","It","Pr","Re","Bw","Fg","Pe" };
-//int g_unique_id;
-int g_first_layer = 0;
-float  g_BrushMax_scale = 1.5;
-int g_paint_area_scale[MAX_DEPTH] ={ 20,10,8,6,4,4,4,4,4,4,4,4,4};
-int g_brush_scale    [MAX_DEPTH] = { 10, 4,4,4,4,4,4,4,4,4,4,4,4 };
 
+//int g_unique_id;
+//int g_first_layer = 0;
+//float  g_BrushMax_scale = 1.5;
+int g_paint_try_scale[MAX_DEPTH] ;
+int g_brush_scale[MAX_DEPTH];
+
+render_ *_render[RENDER_MAX];
+Mat g_srcImg_RO;
+int g_rendering_method;

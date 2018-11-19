@@ -32,3 +32,13 @@
 
 #define BEFORE_BETTER 0
 #define CHANGED_BETTER 1
+
+#define RUN_THREAD 1
+
+
+#define BRUSH_ALPHA 1
+#define BRUSH_STENCIL 2
+#define BRUSH_STENCIL_STR "Stencil"
+#define BRUSH_ALPHA_STR "Alpha"
+
+#define SALIENCY_STR_SOBEL "Sobel"
