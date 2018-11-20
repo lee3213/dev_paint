@@ -165,6 +165,7 @@
     <ClInclude Include="debug_define.h" />
     <ClInclude Include="debug_image.h" />
     <ClInclude Include="debug_image_compare.h" />
+    <ClInclude Include="define_local.h" />
     <ClInclude Include="dir.h" />
     <ClInclude Include="extern.h" />
     <ClInclude Include="fastmath.h" />
@@ -225,7 +226,7 @@
     <ClCompile Include="pregraph\saliency_pregraph_main.cpp" />
     <ClCompile Include="pregraph\saliency_PreGraph.cpp" />
     <ClCompile Include="pregraph\SLIC.cpp" />
-    <ClCompile Include="prepare_rendering.cpp" />
+    <ClCompile Include="render_prepare.cpp" />
     <ClCompile Include="p_rendering.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="RenderingImage.cpp" />

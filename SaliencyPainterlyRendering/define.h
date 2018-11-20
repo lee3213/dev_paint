@@ -42,3 +42,4 @@
 #define BRUSH_ALPHA_STR "Alpha"
 
 #define SALIENCY_STR_SOBEL "Sobel"
+#define MAX_BRUSH 64

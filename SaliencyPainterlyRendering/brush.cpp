@@ -12,19 +12,12 @@ using namespace std;
 
 int BrushInitialization(vector <Brush*> &_brush_set)
 {
-	cv::Mat temp_brush;
-	cv::Mat temp_index_brush;
+	cv::Mat temp_mask;
+	//cv::Mat temp_index_brush;
 	cv::Mat temp_thumbnail;
 	cv::Mat temp_bump;
 
-#ifdef DEBUG_BRUSH_IMAGE
-	debug_image_single *debug_image_mask = nullptr;
-	debug_image_single *debug_image_index = nullptr;
-	debug_image_single *debug_image_thumbnail = nullptr;
-	debug_image_single *debug_image_bump = nullptr;
-	debug_image_single *debug_image_cropped = nullptr;
-	
-#endif
+
 	int nth;
 	static bool run_once = false;
 	cv::Mat brush_cr, brush_th;
@@ -34,11 +27,8 @@ int BrushInitialization(vector <Brush*> &_brush_set)
 	Size sz;
 	
 	nth = 0;
-	Mat brush_gray;
-#ifdef BRUSH_BR2
-	Mat *brush_gray_x[4];
-	unsigned char * brush_gray_x_data[4];
-#endif
+	Mat mask_8UC1;
+
 	string fname;
 	Brush *__brush;
 	int b_step1, b_channels;
@@ -51,60 +41,31 @@ int BrushInitialization(vector <Brush*> &_brush_set)
 		string fn = cv::format("%02d.jpg",nth + 1);
 		fname = f_path + fn;
 		//	fname = cv::format("/render/brush/mask/%02d.jpg", nth + 1);
-		temp_brush = imread(fname.c_str(), IMREAD_COLOR);
+		temp_mask = imread(fname.c_str(), IMREAD_COLOR);
 
 		
-		if (temp_brush.size().width == 0 || temp_brush.size().height == 0)
+		if (temp_mask.size().width == 0 || temp_mask.size().height == 0)
 		{
 			cout << fname << endl;
 			continue;
 		}
 		
-		unsigned char * temp_brush_data = temp_brush.data;
-		bsize_w = temp_brush.size().width;
-		bsize_h = temp_brush.size().height;
-		s_step1 = b_step1 = (int)temp_brush.step1();
-		s_channels = b_channels = temp_brush.channels();
+		unsigned char * temp_brush_mask_data = temp_mask.data;
+		bsize_w = temp_mask.size().width;
+		bsize_h = temp_mask.size().height;
+		s_step1 = b_step1 = (int)temp_mask.step1();
+		s_channels = b_channels = temp_mask.channels();
 	
-#ifdef BRUSH_BR2
-		if (run_once) {
-			int _brush_Ts[] = { 100,150,200,230 };
-			for (int i = 0; i < 4; i++) {
-				brush_gray_x[i] = new Mat(bsize_h, bsize_w, CV_8UC3);
-				brush_gray_x_data[i] = brush_gray_x[i]->data;
-
-				for (int y = 0; y < bsize_h; y++)
-				{
-					for (int x = 0; x < bsize_w; x++) {
-						int pos = y*s_step1 + x*s_channels;
-						if (temp_brush_data[pos] > _brush_Ts[i]) {
-							brush_gray_x_data[i][pos] = 255;
-							brush_gray_x_data[i][pos + 1] = 255;
-							brush_gray_x_data[i][pos + 2] = 255;
-						}
-					}
-				}
-				debug_image(string("/br/g_") + fn+to_string(i), *brush_gray_x[i]);
-			}
-		}
-#endif
-		 cv::cvtColor(temp_brush, brush_gray, COLOR_RGB2GRAY);
-		 unsigned char * bestBrush_data_gray_resized = brush_gray.data;
+		 cv::cvtColor(temp_mask, mask_8UC1, COLOR_RGB2GRAY);
+		 unsigned char * bestBrush_data_gray_resized = mask_8UC1.data;
 	
-#ifdef DO_CENTERED_BRUSH
-		cv::Mat centered;
-		centered.create(bsize_x, bsize_y, CV_8UC1);
-		PaintBackGround(centered, 255, 255, 255);
-		unsigned char * centered_data = centered.data;
-#endif
 	
-		
 	//	PaintBackGround(b160x160, 255, 255, 255);
 		//unsigned char * b160x160_data = b160x160.data;
 	
-		sz=Size (g_INDEX_BRUSH_SIZE_WIDTH, g_INDEX_BRUSH_SIZE_HEIGHT);
+		//sz=Size (g_INDEX_BRUSH_SIZE_WIDTH, g_INDEX_BRUSH_SIZE_HEIGHT);
 		//	cout << s.height << "," << s.width << endl;
-		cv::resize(temp_brush, temp_index_brush, sz);
+		//cv::resize(temp_brush, temp_index_brush, sz);
 	
 
 		//fname = cv::format("/rst/br/i_%d.ppm", nth + 1);
@@ -118,7 +79,7 @@ int BrushInitialization(vector <Brush*> &_brush_set)
 			continue;
 		}
 		
-		int t_size=g_brush_thumbnail_size= temp_thumbnail.size().width;
+	//	int t_size=g_brush_thumbnail_size= temp_thumbnail.size().width;
 	
 
 		fname = cv::format("/render/brush/bump/%02d.jpg", nth + 1);
@@ -130,13 +91,13 @@ int BrushInitialization(vector <Brush*> &_brush_set)
 		}
 	
 		__brush = new Brush;
-		__brush->brush_thumbnail=temp_thumbnail.clone();
-		__brush->brush_gray = brush_gray.clone();
-		__brush->brush = temp_brush.clone();
+		__brush->brush_thumbnail = temp_thumbnail.clone();
+		__brush->brush_gray = mask_8UC1.clone();
+		__brush->brush_mask = temp_mask.clone();
 		__brush->brush_no = nth;
-	
-		__brush->bump=temp_bump.clone();
-		__brush->index_brush=temp_index_brush.clone();
+
+		__brush->bump = temp_bump.clone();
+		
 		_brush_set.push_back(__brush);
 #ifdef BRUSH_BR2
 		if ( run_once){

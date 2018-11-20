@@ -9,7 +9,8 @@
 #include "image_util.h"
 using namespace std;
 
-#define  DO_CENTERED_BRUSH true
+//#define  DO_CENTERED_BRUSH true
+#ifdef DO_CENTERED_BRUSH
 int Brush_adjust(vector <Brush*> &brush_set)
 {
 	cv::Mat temp_brush;
@@ -71,9 +72,11 @@ int Brush_adjust(vector <Brush*> &brush_set)
 			cout << fname << endl;
 			exit(-9998);
 		}
-		(*it)->brush.push_back(temp_brush);
+		(*it)->brush_mask.push_back(temp_brush);
+
 		(*it)->brush_no = nth;
 		//mat_print(temp_brush, "temp_brush");
+
 		Rect b_rect;
 		b_rect = rounding_box(temp_brush, bsize_x, bsize_y, 235);
 
@@ -81,12 +84,12 @@ int Brush_adjust(vector <Brush*> &brush_set)
 			//crop_s.y = b_rect.y;
 			//crop_e.x = crop_s.x + b_rect.width;
 		//	crop_e.y = crop_s.y + b_rect.height;
-#ifdef DO_CENTERED_BRUSH
+
 		cv::Mat centered;
 		centered.create(bsize_x, bsize_y, CV_8UC1);
 		PaintBackGround(centered, 255, 255, 255);
 		unsigned char * centered_data = centered.data;
-#endif
+
 		//	cv::Mat brush_roi = temp_brush(b_rect).clone();
 
 	//	unsigned char  *brush_roi_data = brush_roi.data;
@@ -112,12 +115,12 @@ int Brush_adjust(vector <Brush*> &brush_set)
 
 		//	PaintBackGround(b160x160, 255, 255, 255);
 			//unsigned char * b160x160_data = b160x160.data;
-#ifdef DO_CENTERED_BRUSH
+
 		mat_copyTo(temp_brush_data, centered_data, b_rect, b_rect2, bsize_x);
 		debug_image("br/br_centered", nth + 1, centered);
 		//f_name = format("/rst/br/br_%d_1centered.ppm", nth + 1);
 		//cv::imwrite(f_name, centered);// 1CH
-#endif
+
 									  //Make accumulated brush map 
 		unsigned char * s;
 		s = temp_brush.data;
@@ -148,8 +151,7 @@ int Brush_adjust(vector <Brush*> &brush_set)
 
 		//	fname = cv::format("/rst/br/b_%02d.ppm", nth + 1);
 		//	cv::imwrite(fname, b160x160);	
-
-#ifdef DO_CENTERED_BRUSH		
+		
 		cv::rectangle(centered, b_rect2, RGB(0, 0, 0));
 		cv::line(centered, Point(bsize_y / 2, 0), Point(bsize_y / 2, bsize_x), RGB(0, 0, 0));
 		cv::line(centered, Point(0, bsize_x / 2), Point(bsize_y, bsize_x / 2), RGB(0, 0, 0));
@@ -159,7 +161,7 @@ int Brush_adjust(vector <Brush*> &brush_set)
 		//debug_image("br/centered_2",nth+1,centered)
 		//f_name = format("/rst/br/br_%d_2centered.ppm", nth + 1);
 		//cv::imwrite(f_name, centered);// 1CH
-#endif		
+	
 
 		cv::Size siz = Size(g_INDEX_BRUSH_SIZE_WIDTH, g_INDEX_BRUSH_SIZE_HEIGHT);
 		//	cout << s.height << "," << s.width << endl;
@@ -196,7 +198,7 @@ int Brush_adjust(vector <Brush*> &brush_set)
 		crop_e.y = crop_s.y + b_rect.height;
 
 		//	cout << "Brush : " << setw(4)<<nth + 1 << " " << setw(4) << crop_s.x << ", " << setw(4) << crop_s.y << ", " << setw(4) << crop_e.x << ", " << setw(4) << crop_e.y << endl;
-#ifdef DO_CENTERED_BRUSH
+
 		brush_th = temp_thumbnail.clone();
 
 		cv::rectangle(brush_th, b_rect, RGB(0, 0, 0));
@@ -205,10 +207,10 @@ int Brush_adjust(vector <Brush*> &brush_set)
 
 		debug_image("br/th_crop", nth + 1, brush_th);
 
-#endif
+
 
 		//mat_print(temp_thumbnail,"temp_thumbnail");
-#ifdef DEBUG_BRUSH_IMAGE
+
 		if (nth == 0)
 		{
 			std::string fpath;
@@ -247,7 +249,7 @@ int Brush_adjust(vector <Brush*> &brush_set)
 		debug_image_bump->image_add(temp_bump);
 
 		//	delete brush_accumulation_map;
-#endif
+
 	}
 	Rect r = Rect(Point(0, 0), Point(bsize_x - 1, bsize_y - 1));
 	debug_image("br/acc", brush_accumulation_map);
@@ -298,7 +300,7 @@ int Brush_adjust(vector <Brush*> &brush_set)
 	debug_image("br/0_brush_centered_accumulation_map_crop", brush_centered_accumulation_map);
 
 
-#ifdef DEBUG_BRUSH_IMAGE
+
 	if (debug_image_mask != nullptr)
 		debug_image_mask->image_final();
 	if (debug_image_index != nullptr)
@@ -307,6 +309,7 @@ int Brush_adjust(vector <Brush*> &brush_set)
 		debug_image_thumbnail->image_final();
 	if (debug_image_bump != nullptr)
 		debug_image_bump->image_final();
-#endif
+
 	return 0;
 	}
+#endif

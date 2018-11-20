@@ -15,7 +15,7 @@ using namespace cv;
 #include "render_.h"
 
 void run_render(render_ * _render) {
-	//for (int j = 0; j < _render->mm_depth; j++)
+	//for (int j = 0; j < _render->render_depth; j++)
 		//if (_render->mm_aStroke_set[j].stroke_list.size() == 0) {
 			//cout << _render->m_tag << " stroke_size==0" << endl;
 		//	return ;
@@ -39,6 +39,7 @@ int do_rendering(){
 			<< std::thread::hardware_concurrency() << std::endl;
 		p_render[RENDER_SOBEL]->join();
 		_render[RENDER_SOBEL]->post_process();
+#ifdef LATER
 		if (g_saliency_method != SALIENCY_STR_SOBEL) {
 			p_render[RENDER_SALIENCY] = new thread(run_render, _render[RENDER_SALIENCY]);
 			p_render[RENDER_UNION] = new thread(run_render, _render[RENDER_UNION]);
@@ -64,7 +65,7 @@ int do_rendering(){
 			_render[RENDER_TWOPASS_MERGE]->post_process();
 			_render[RENDER_TWOPASS_ATTACH]->post_process();
 		}
-		
+#endif
 #else
 
 		std::thread *p_render[RENDER_MAX];
@@ -91,7 +92,7 @@ int do_rendering(){
 		}
 		
 #endif
-	
+
 	return 0;
 }
 

@@ -135,6 +135,9 @@
     <ClInclude Include="time_stamp.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="define_local.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -251,9 +254,6 @@
     <ClCompile Include="render_etc.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="prepare_rendering.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="run_render.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -261,6 +261,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="PainterlyRendering_main.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="render_prepare.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

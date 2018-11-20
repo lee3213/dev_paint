@@ -23,7 +23,8 @@ int  render_::TakeQuadTree(cv::Mat &SaliencyMap, Stroke_set aStroke_set[], strin
 	string quad = "0_whole";
 
 	double avgS = TakeAvgS(SaliencyMap, Point(0, 0), Point(width - 1, height - 1), 0, quad);
-	root = new Stroke_Node(Point(0, 0), Point(width - 1, height - 1), 0, avgS);
+	root = new Stroke_Node(Point(0, 0), Point(width - 1, height - 1), 0, avgS,g_no);
+	g_no++;
 	/*	 root.srtPoint.x = 0;
 	root_Info.srtPoint.y = 0;
 	root_Info.endPoint.x = width-1 ;
@@ -35,8 +36,7 @@ int  render_::TakeQuadTree(cv::Mat &SaliencyMap, Stroke_set aStroke_set[], strin
 	*/
 	last_depth = DivideImage(SaliencyMap, root, aStroke_set, string("root"), Quad_treeMap, stageMap, 0, tag);
 	//	cout		<< "after  aStroke size" << aStroke.size() << endl;
-
-
+	
 	//cv::String f_path = cv::format("%s/org_quad_tree.ppm", g_para_method_path.c_str());//1ch
 	//cv::imwrite(f_path, Quad_treeMap);
 	//return Quad_treeMap;
@@ -133,11 +133,12 @@ int render_::DivideImage(cv::Mat &SaliencyMap, Stroke_Node* me_node, Stroke_set 
 		{
 
 			avgS[quadrant] = TakeAvgS(SaliencyMap, c_srtPoint[quadrant], c_endPoint[quadrant], child_QT_depth, quad);
-			if (avgS[quadrant] != D[quadrant - 1]) {
-				cout << "depth mismatch " << child_QT_depth << " " << quad << D[quadrant - 1] << "!= " << avgS[quadrant] << endl;
-			}
+		//	if (avgS[quadrant] != D[quadrant - 1]) {
+			//	cout << "depth mismatch " << child_QT_depth << " " << quad << "["<<D[quadrant - 1] << "] != [" << avgS[quadrant] <<"]"<< endl;
+		//	}
 			if (avgS[quadrant] > g_QT_avgSThreshold) {
-				new_node[quadrant] = new Stroke_Node(c_srtPoint[quadrant], c_endPoint[quadrant], child_QT_depth, avgS[quadrant]);
+				new_node[quadrant] = new Stroke_Node(c_srtPoint[quadrant], c_endPoint[quadrant], child_QT_depth, avgS[quadrant],g_no);
+				g_no++;
 
 				get_depth = DivideImage(SaliencyMap, new_node[quadrant], aStroke_set,
 					quad + to_string(child_QT_depth), stageMap, gradient_src, child_QT_depth, tag);

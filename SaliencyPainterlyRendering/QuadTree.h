@@ -1,35 +1,14 @@
 #pragma once
 #include "stdafx.h"
 
-#include <opencv2\\opencv.hpp>
-#include <opencv2\\core.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
 #include <list>
-//#include "extern.h"
+#include "extern.h"
 
 using namespace std;
 using namespace cv;
 
-class Stroke_Node
-{
-public:
-	int depth;
-	cv::Point srtPoint;
-	cv::Point endPoint;
-	cv::Size stroke_size;
-	int avgS;
-	//int no; 
-	Stroke_Node() {};
-	Stroke_Node(cv::Point s, cv::Point e, int _depth, double S) {
-		srtPoint = s;
-		endPoint = e;
-		stroke_size.width = e.x - s.x;
-		stroke_size.height = e.y - s.y;
-		
-		depth = _depth;
-		avgS = (int)S;
-	}
-	~Stroke_Node() {};
-};
 	/*
 	bool ptrsorter(Img_node *a, Img_node *b) {
 		return (a->depth < b->depth ? true : false);

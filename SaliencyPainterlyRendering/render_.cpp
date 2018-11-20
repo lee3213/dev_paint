@@ -29,9 +29,10 @@ void image_save(string image_name, Mat result_image, Mat Quad_TreeMap) {
 	debug_image(g_para_method + string("_") + g_image_name, result_image);
 	debug_image(g_para_method + string("_") + g_image_name, Quad_TreeMap);
 }
-void render_::brush_delete(vector <Brush*> brush_set) {
+/*
+void render_::brush_delete(render_Brush* r_brush_array[]) {
 	int nth = 0;
-	for (std::vector <Brush*>::iterator i = brush_set.begin(), endI = brush_set.end(); i != endI; ++i, nth++)
+	for (std::vector <render_Brush*>::iterator i = brush_set.begin(), endI = brush_set.end(); i != endI; ++i, nth++)
 	{
 
 		(*i)->brush.release();
@@ -44,6 +45,7 @@ void render_::brush_delete(vector <Brush*> brush_set) {
 	brush_set.clear();
 
 }
+*/
 int render_ ::stroke_dump(Stroke_set _aStroke_set[], string tag__, int  depth) {
 	r_cout << tag__ << " " << depth << endl;
 	for (int i = 0; i < depth; i++) {
@@ -205,7 +207,7 @@ void render_::func_(){
 		setw(16) << "p_area/p_Area" <<
 		setw(4)<<"try_scale"<<
 		endl;
-	for (int i = 0; i < mm_depth; i++) {
+	for (int i = 0; i < render_depth; i++) {
 		
 		if (r_s_grid_painting_try[i] != 0 && r_s_painting_area[i] !=0  && QT_grid_count[i] !=0){
 		r_cout << setw(8) << i << "," <<m_tag<<
@@ -260,76 +262,6 @@ void render_::func_(){
 	r_cout << setw(12) << Qt_sum << setw(18) << try_sum << setw(8) << c_sum << endl;
 
 }
-int render_::calc_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth,
-	int _brush_size[], string tag)
-{
-	int brush_step;
-	int k_depth;
-	//basic depth 
-	if (render_method > RENDER_SALIENCY) {
-		if (render_sobel->mm_depth > render_saliency->mm_depth) {
-			k_depth = render_sobel->mm_depth;
-		}
-		else 	k_depth = render_saliency->mm_depth;
-	}
-	else k_depth = mm_depth;
-
-		if (k_depth == 1)
-			brush_step = (int)(_BrushMinSize);
-		else
-			brush_step = (int)((_BrushMaxSize - _BrushMinSize) / (k_depth - 1));
-
-		for (int i = 0; i < k_depth; i++)
-		{
-				_brush_size[i] = (int)(_BrushMaxSize - (i)* brush_step)*g_brush_scale[i];
-				if (_brush_size[i] > canvas_bezel_size)
-					_brush_size[i] = canvas_bezel_size;
-				if (_brush_size[i] < _BrushMinSize)
-					_brush_size[i] = _BrushMinSize;
-		
-			g_file_cstat << g_para_method + "," << g_image_name << ", " << "brush_size" + to_string(i) + "," <<
-				_brush_size[i] << endl;
-		}
-
-
-
-	if (render_method == RENDER_TWOPASS_ATTACH ) {
-		
-		if ( k_depth == 1)
-			brush_step = (int)((_BrushMaxSize - _BrushMinSize));
-		else
-		 brush_step = (int)((_BrushMaxSize - _BrushMinSize) / (k_depth-1));
-	
-
-		 int _B = _brush_size[k_depth-1];
-		 int _brush_step;
-		
-			 if ((mm_depth - k_depth) == 0)
-				 _brush_step = (_B - g_BrushAttachSize);
-			 else
-				 _brush_step = (_B - g_BrushAttachSize) / (mm_depth - k_depth);
-	
-		for (int i = 0; i < (mm_depth-k_depth); i++)
-		{
-			_brush_size[i+k_depth] = (int)(_B - (i+1)* _brush_step)*g_brush_scale[i];
-		}
-	//	r_cout << "_brush_step " << _brush_step << endl;
-	}
-	
-
-	r_cout << tag + " image depth  " << _depth << ", image size: " << g_src_image_width << ",  " << g_src_image_height << endl;
-	r_cout << "  _BrushMaxSize " << _BrushMaxSize <<", " <<canvas_bezel_size<< " " ;
-	r_cout << "  _BrushMinSize " << _BrushMinSize <<", at size "<<g_BrushAttachSize;
-	r_cout << "  _BrushAttachSize " << g_BrushAttachSize;
-	r_cout << "  _depth  " << _depth;
-	r_cout << "  brush_step " << brush_step << endl;
-	for (int i = 0; i < _depth; i++) {
-		r_cout << tag <<" : Br size : " <<setw(5) << i << 
-			setw(5) <<g_brush_scale[i]<<setw(10)<< _brush_size[i]<<" "<<
-			QT_grid_count[i]<< " * " << g_paint_try_scale[i]<< " = " << g_paint_try_scale[i] *QT_grid_count[i]<<endl;
-	}
-	return _depth;
-}
 
 void  render_::rectangle_canvas(cv::Mat mat, cv::Rect  rect, Scalar s) {
 
@@ -351,7 +283,7 @@ void  render_::post_process() {
 		image_save(m_t+g_image_name, result_image, r_grid_map_1c_accu);
 
 		
-			ret = draw_grid_2(result_image.clone(), mm_aStroke_set, "prst_" + m_t, mm_depth, //-1, 
+			ret = draw_grid_2(result_image.clone(), mm_aStroke_set, "prst_" + m_t, render_depth, //-1, 
 				255, m_t);
 
 		func_();
@@ -372,6 +304,7 @@ render_::render_(int _render_method, cv::Mat &_srcImg) {
 	m_tag_ = tag_[_render_method];
 	m__tag = _tag[_render_method];
 	m_t = _t[render_method];
+	m_t_ = _t_[render_method];
 	BrushMinSize = g_BrushMinSize;
 	m_srcImg_ = _srcImg.clone();
 	if (m_srcImg_.channels() == 1)
@@ -412,8 +345,8 @@ render_::~render_() {
 	//}
 	
 //	brush_delete(brush_set);
-	for(int i=0;i<MAX_DEPTH;i++)
-		brush_delete(brush_resized_set[i]);
+	//for(int i=0;i<MAX_DEPTH;i++)
+	//	brush_delete(brush_resized_set[i]);
 
 };
 
@@ -459,30 +392,31 @@ int render_::prepare() {
 		Stroke_set Stroke_set_saliency[MAX_DEPTH];
 		
 	
-		for (int l = 0; l < render_sobel->mm_depth; l++) {
+		for (int l = 0; l < render_sobel->render_depth; l++) {
 			Stroke_set_sobel[l] = render_sobel->mm_aStroke_set[l];
 
 		}
-		for (int l = 0; l < render_saliency->mm_depth; l++) {
+		for (int l = 0; l < render_saliency->render_depth; l++) {
 			Stroke_set_saliency[l] = render_saliency->mm_aStroke_set[l];
 
 		}
 
-			stroke_dump(Stroke_set_sobel, m_tag + " : sobel depth, count = ", render_sobel->mm_depth);
+			stroke_dump(Stroke_set_sobel, m_tag + " : sobel depth, count = ", render_sobel->render_depth);
 
-	//	for (int l = 0; l < render_saliency->mm_depth; l++)
-		stroke_dump(Stroke_set_saliency, m_tag + " : saliency depth, count  = ", render_saliency->mm_depth);
+	//	for (int l = 0; l < render_saliency->render_depth; l++)
+		stroke_dump(Stroke_set_saliency, m_tag + " : saliency depth, count  = ", render_saliency->render_depth);
 
 		int kk = 0;
 
-		for (int i = 0; i < render_sobel->mm_depth; i++) {
+		for (int i = 0; i < render_sobel->render_depth; i++) {
 			//	r_cout << "astroke.size(_sobel)= " + m_tag << ", " << mm_aStroke_set[i].size() << endl;
 			for (list<Stroke_Node*>::iterator Stroke_it = Stroke_set_sobel[i].stroke_list.begin(); Stroke_it != Stroke_set_sobel[i].stroke_list.end(); Stroke_it++) {
 			//	info = (*Stroke_it)->info;
 				k_depth = (*Stroke_it)->depth;
 				S = (*Stroke_it)->avgS;
 				me_node = new 
-					Stroke_Node((*Stroke_it)->srtPoint,(*Stroke_it)->endPoint, k_depth, S);
+					Stroke_Node((*Stroke_it)->srtPoint,(*Stroke_it)->endPoint, k_depth, S,g_no);
+				g_no++;
 				mm_aStroke_set[i].push_back(me_node);
 				kk++;
 			}
@@ -491,11 +425,11 @@ int render_::prepare() {
 		r_cout << " sobel added " << kk << " strokes : to depth  " << k_depth << endl;
 		depth_sobel = k_depth;
 		//mm_aStroke_set->sort();
-		stroke_dump(mm_aStroke_set, m_tag, mm_depth);
+		stroke_dump(mm_aStroke_set, m_tag, render_depth);
 		kk = 0;
 		k_depth = 0;
-		int s_depth = render_sobel->mm_depth-1;
-		for (int i = s_depth; i < render_saliency->mm_depth; i++) {
+		int s_depth = render_sobel->render_depth-1;
+		for (int i = s_depth; i < render_saliency->render_depth; i++) {
 			//r_cout << "astroke.size()= " + m_tag << ", " << mm_aStroke_set[i].size() << endl;
 			int mod = 0;
 			for (list<Stroke_Node*>::iterator Stroke_it = Stroke_set_saliency[i].stroke_list.begin(); Stroke_it != Stroke_set_saliency[i].stroke_list.end(); Stroke_it++) {
@@ -509,17 +443,18 @@ int render_::prepare() {
 
 			//	info = (*Stroke_it)->info;
 				S = (*Stroke_it)->avgS;
-				me_node = new Stroke_Node((*Stroke_it)->srtPoint,(*Stroke_it)->endPoint, k_depth, S);
+				me_node = new Stroke_Node((*Stroke_it)->srtPoint,(*Stroke_it)->endPoint, k_depth, S,g_no);
+				g_no++;
 				mm_aStroke_set[k_depth].push_back(me_node);
 				kk++;
 			}
 		}
 		r_cout << " saliency added " << kk << ": " << k_depth << endl;
 
-		//depth_saliency = render_saliency->mm_depth;
-		//mm_depth=depth_attach = k_depth+1;
-		mm_depth = k_depth + 1;
-		for (int i = 0; i < mm_depth; i++) {
+		//depth_saliency = render_saliency->render_depth;
+		//render_depth=depth_attach = k_depth+1;
+		render_depth = k_depth + 1;
+		for (int i = 0; i < render_depth; i++) {
 			r_cout << m_tag + "  _aStrokeset_size() : " <<i << ": " << mm_aStroke_set[i].stroke_list.size() << endl;
 		}
 	}
@@ -529,7 +464,7 @@ int render_::prepare() {
 
 //	sort(m_aStroke_set->begin(), m_aStroke_set->end());
 	//m_aStroke_set->sort();
-	mm_depth = draw_grid_depth(r_grid_map_1c, r_grid_map_1c_accu, mm_aStroke_set, m_t,
+	render_depth = draw_grid_depth(r_grid_map_1c, r_grid_map_1c_accu, mm_aStroke_set, m_t,
 		grid_map_sum, QT_grid_count//, true, -1, 0
 	);
 	/*
@@ -537,7 +472,7 @@ int render_::prepare() {
 	int astroke_depth;
 	int k = 0;
 	
-	for(int i=0;i<mm_depth;i++){
+	for(int i=0;i<render_depth;i++){
 		if (mm_aStroke_set[i].stroke_list.size() == 0) {
 			r_cout << m_tag + "Fail Sort check _aStrokeset_size() : " << k_depth << ": " << 
 				mm_aStroke_set[i].stroke_list.size() << endl;
@@ -568,26 +503,30 @@ int render_::prepare() {
 	}
 	*/
 	
-	QT_depth = mm_depth;
+	QT_depth = render_depth;
 	
-	//r_cout << "x depth " + m_tag + " = " << mm_depth  << endl;
+	//r_cout << "x depth " + m_tag + " = " << render_depth  << endl;
 	/*
-	for (int i = 0; i < mm_depth ; i++)
+	for (int i = 0; i < render_depth ; i++)
 	{
 		r_cout << setw(15) << m_tag + ", " + to_string(i) <<", "<< QT_grid_count[i] << endl;
 	}
 	*/
-	calc_brush_size(BrushMaxSize, BrushMinSize, mm_depth,
+	for (int i = 0; i < render_depth; i++) {
+		list<Stroke_Node*>::iterator Stroke_it = mm_aStroke_set[i].stroke_list.begin();
+		stroke_size[i] = (*Stroke_it)->stroke_size.width;
+	}
+	calc_brush_size(BrushMaxSize, BrushMinSize, render_depth,
 	brush_size, m_tag);
 
 	
-	brush_resize( g_brush_set);
+	brush_resize( g_brush_vector_set);
 
-	////for (int i = 0; i < mm_depth; i++) {
+	////for (int i = 0; i < render_depth; i++) {
 	//	r_cout << "Brush "<<i << ", " << brush_size[i] << endl;
 	//}
-//	for (int i = 0; i < mm_depth; i++) {
-//		r_cout << "QT stroke count(" + m_tag + ") " << QT_depth << " " << mm_depth << " : " << mm_aStroke_set[i].size() << endl;
+//	for (int i = 0; i < render_depth; i++) {
+//		r_cout << "QT stroke count(" + m_tag + ") " << QT_depth << " " << render_depth << " : " << mm_aStroke_set[i].size() << endl;
 	//	r_cout.flush();
 	//	if (mm_aStroke_set[i].size() == 0) {
 	//		r_cout << "unexpected Stroke Tree" + m_tag + " = 0" << endl;

@@ -19,9 +19,9 @@ using namespace std;
 //	root["indent"]["length"] = getCurrentIndentLength();
 //	root["indent"]["use_space"] = getCurrentIndentUseSpace();
 int sthresh[] = {110,120,130 };
-int _grid[] = { 5,10 };
+int _grid[] = { 5,7,10,15 };
 int depth[] = { 10 };
-int _br[] = { 7,10 }; //g_BrushMinSize
+int _br[] = { 5,7,10,15 }; //g_BrushMinSize
 int _at[] = { 5 }; //attach brush size
 
 int QT_N[] = {1};

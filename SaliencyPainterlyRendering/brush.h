@@ -10,14 +10,11 @@ using namespace cv;
 class Brush {
 public:
 	cv::Mat brush_gray;
-	cv::Mat brush;
-	cv::Mat brush_hsv;
-	cv::Mat index_brush;
+	cv::Mat brush_mask;
+	
 	cv::Mat brush_thumbnail;
 	cv::Mat bump;
 	int brush_no;
-	int m_depth;
-
 };
 
 

@@ -87,7 +87,7 @@ int  set_global(string src_name,string deploy_name) {
 	g_BrushNumber = 48;						//basic:64    expansion:48
 	g_brush_thumbnail_size = g_INDEX_BRUSH_SIZE_HEIGHT;
 
-	
+	g_brush_choice = 1;
 
 	int ret=json_deployment(deploy_name);
 	if (ret < 0) return -1;
@@ -114,7 +114,7 @@ int  set_global(string src_name,string deploy_name) {
 
 	g_para = string("s") + to_string(g_QT_avgSThreshold) + "d" + to_string(g_depth_limit)
 		+ "g" + to_string(g_min_gridsize) + "_b" + to_string(g_BrushMinSize) +
-		"_N" + to_string(g_QT_method_N);// + "_ps" + to_string(g_paint_try_scale[0]) ;
+		"_N" + to_string(g_QT_method_N)+"_bn"+to_string(g_BrushNumber);// + "_ps" + to_string(g_paint_try_scale[0]) ;
 		// + "_gth" + to_string(g_grid_threshold);
 
 	 cout << "g_para " << g_para << endl;
@@ -190,7 +190,7 @@ int  set_global(string src_name,string deploy_name) {
 
 	
 		cout_func(src_name, deploy_name);
-
+		
 	g_unique_id = 0;//QT->no
 	g_debug_method = "";
 	g_debug_method.append("org");

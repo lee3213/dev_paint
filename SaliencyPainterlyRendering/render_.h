@@ -9,13 +9,36 @@
 #include "QuadTree.h"
 #include "debug_image.h"
 
+class Stroke_Node
+{
+	//static int g_stroke_no;
+public:
+	int depth;
+	cv::Point srtPoint;
+	cv::Point endPoint;
+	cv::Size stroke_size;
+	int avgS;
+	int no;
+	Stroke_Node() {};
+	Stroke_Node(cv::Point s, cv::Point e, int _depth, double S, int n) {
+		srtPoint = s;
+		endPoint = e;
+		stroke_size.width = e.x - s.x;
+		stroke_size.height = e.y - s.y;
+		no = n;
+
+		depth = _depth;
+		avgS = (int)S;
+	};
+	~Stroke_Node() {};
+};
 using namespace std;
 using namespace cv;
 //int draw_grid_2(Mat _Quad_TreeMap,
 	//list<Img_node*> *aStroke_set, string tag, int  depth, int draw_depth, int c, string _tag);
 class Stroke_set {
 public:
-	Stroke_Node a;
+	//Stroke_Node *a;
 	list<Stroke_Node *> stroke_list;
 	//int stroke_cnt;
 	int depth;
@@ -32,24 +55,31 @@ public:
 		depth = _depth;
 	};
 	int push_back(Stroke_Node * _p) {
-
 		stroke_list.push_back(_p);
-
-
 		return 0;//Good
 	};
-	
 
 };
+
+
+class render_Brush {
+public:
+	cv::Mat brush_8UC1;
+//	cv::Mat brush_mask;
+	cv::Mat brush_thumbnail;
+	cv::Mat brush_thumbnail_minimum;
+//	cv::Mat bump;
+	int brush_no;
+	unsigned char * brush_8UC1_data;
+	unsigned char * brush_thumbnail_data;
+	unsigned char *brush_thumbnail_minimum_data;
+};
+
 class render_ {
 public:
-	Stroke_set *a_mm_aStroke_set;
+	//Stroke_set *a_mm_aStroke_set;
 	Stroke_set mm_aStroke_set[MAX_DEPTH];
-	fstream r_cout;
-	//	streambuf* r_stream_cout;
-	fstream r_clog;
-	//	streambuf* r_stream_clog;
-	fstream r_cstat;
+	int stroke_size[MAX_DEPTH];
 	//	streambuf* r_stream_cstat;
 	Mat depth_map_8UC1;
 	unsigned char * depth_map_8UC1_data;
@@ -83,13 +113,15 @@ public:
 	Mat r_grid_map_1c_accu;
 	Mat r_try_map_1c[MAX_DEPTH + 1];
 	unsigned char * r_try_map_1c_data[MAX_DEPTH];
-	int mm_depth;
-
-
+	int render_depth;
+	int render_stroke;
+	int render_try;
+	int u_no=0;
+	int brush_minimum_size;
 
 	int depth_sobel, depth_saliency;//, depth_attach;
 
-	vector <Brush*> brush_resized_set[MAX_DEPTH];
+	render_Brush* brush_resized_array[MAX_DEPTH][MAX_BRUSH];
 	int QT_depth;
 
 	int brush_size[MAX_DEPTH];
@@ -105,6 +137,7 @@ public:
 	std::string m__tag;
 	std::string m_tag_;
 	string m_t;
+	string m_t_;
 	int *random_x;
 	int *random_y;
 	//int get_depth;
@@ -139,7 +172,7 @@ public:
 	}
 	void p_peek_canvas(unsigned char * p, int index, int y, int &r, int &g, int &b);
 	//void  render_::p_poke_canvas(unsigned char * p, int p_x, int p_y, int p_0, int p_1, int p_2);
-	void render_::brush_delete(vector <Brush*> brush_set);
+	//void render_::brush_delete(vector <render_Brush*> brush_set);
 	//void  render_::p_poke_canvas(unsigned char * p, int p_x, int p_y, int p_0, int p_1, int p_2);
 	void add_render(render_ *_sobel_render, render_ *_saliency_render) {
 		render_sobel = _sobel_render;
@@ -157,7 +190,9 @@ public:
 		Point canvas_centered_SrtPoint, Point canvas_centered_EndPoint, int brush_area_w_size,
 		int brush_area_h_size, int astroke_depth, int painting_try, int color_BGR_B, int color_BGR_G, int color_BGR_R,
 		int _depth,int _try_,
-		Mat changed_canvas_ROI
+		Mat &changed_canvas_ROI,
+		unsigned char * accu_ptr,
+		unsigned char * ing_ptr
 		);
 
 
@@ -169,9 +204,10 @@ public:
 		string  quad,
 		Mat & gradient_src,
 		Mat stageMap, int depth, string tag);
-
+	int  render_::TakeColorDistance_thumbnail(cv::Mat &testImg, int thumb_width, int thumb_height, string tag, int depth);
+	int  render_::JudgementBrush(cv::Mat &testImg, int depth, int width, int height, string tag);
 	void brush_resize(
-		vector <Brush*> g_brush_set);
+		vector <Brush*> _brush_set);
 	
 	inline void p_poke(unsigned char * p, int index, int p_0) {
 		p[index] = p_0;
@@ -205,6 +241,10 @@ public:
 	double double_2xarray_max(double *a, int w, int h, int n);
 	double double_2xarray_max_at(double *a, int w, int h, int n);
 	int get_selected(double *_D, int n, int divider, int &selected_x, int &selected_y);
-
+	fstream r_cout;
+	//	streambuf* r_stream_cout;
+	fstream r_clog;
+	//	streambuf* r_stream_clog;
+	fstream r_cstat;
 };
 

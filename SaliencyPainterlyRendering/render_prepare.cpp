@@ -487,7 +487,7 @@ int   prepare_Rendering(char * src_name, char * deploy_name)
 	int ret = set_global(string(src_name), string(deploy_name));
 	if (ret < 0)
 		return -7777;
-	ret = BrushInitialization(g_brush_set);
+	ret = BrushInitialization(g_brush_vector_set);
 	if (ret != 0) {
 		cout << "Brush Initialization Error_" << endl;
 		cerr << "Brush Initialization Error_" << endl;
@@ -760,12 +760,12 @@ int   prepare_Rendering(char * src_name, char * deploy_name)
 		cout << "++++++++++++++++++ prepare " + _render[i]->m_tag +
 			" ++++++++++++++++++++++++++++++++++++++++" << endl;
 		int tot = 0;
-		for (int j = 0; j < _render[i]->mm_depth; j++) {
+		for (int j = 0; j < _render[i]->render_depth; j++) {
 			cout << _render[i]->m_tag << " : "
 				<< _render[i]->mm_aStroke_set[j].stroke_list.size() << endl;
 			tot += (int)_render[i]->mm_aStroke_set[j].stroke_list.size();
 		}
-		cout << _render[i]->mm_depth << "  " << tot << endl;
+		cout << _render[i]->render_depth << "  " << tot << endl;
 		strftime(p_s_buff, 20, "%Y-%m-%d %H:%M:%S", &p_t_s[i]);
 		strftime(p_e_buff, 20, "%Y-%m-%d %H:%M:%S", &p_t_e[i]);
 		cout << " Prepare Finished " << _render[i]->m_tag << " " << p_s_buff << " : " << p_e_buff << endl;

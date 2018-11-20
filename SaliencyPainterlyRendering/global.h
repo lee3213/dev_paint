@@ -84,7 +84,7 @@ std::string tag[] = { "0_sobel","1_saliency","2_union","3_merge","4_attach" };
 std::string tag_[] = { "0_sobel_", "1_saliency_", "2_union_", "3_merge_","4_attach_" };
 std::string _tag[] = { "_0_sobel", "_1_saliency", "_2_union", "_3_merge_","_4_attach_" };
 string _t[] = { "_0so","_1sa","_2un","_3me","_4at" };
-
+string _t_[] = { "_0so_","_1sa_","_2un_","_3me_","_4at_" };
 
 #ifdef G_DEBUG_TOUCH
 cv::Mat g_touch;
@@ -96,7 +96,7 @@ int g_src_image_height;
 int g_src_image_channels;
 int g_src_image_step1;
 
-vector <Brush*> g_brush_set;
+vector <Brush*> g_brush_vector_set;
 
 int g_QT_method_N;//N
 
@@ -116,7 +116,7 @@ int g_ET = 1;//positive ET=-1 negative
 
 
 int g_qt_s_scale=2;//
-int g_brush_choice = 1; //if (g_brush_choice == 0) {nth = rand() % 5;} else nth = 0;
+int g_brush_choice = 0; //if (g_brush_choice == 0) {nth = rand() % 5;} else nth = 0;
 int g_trace_depth=7;
 
 string g_saliency_method;//Sobel, Itti, pregraph, Residual blackandwhite,fine_grained Perazzi
@@ -134,3 +134,4 @@ int g_brush_scale[MAX_DEPTH];
 render_ *_render[RENDER_MAX];
 Mat g_srcImg_RO;
 int g_rendering_method;
+int g_no;

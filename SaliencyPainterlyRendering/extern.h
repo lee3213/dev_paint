@@ -92,6 +92,7 @@ extern std::string tag[];//
 extern std::string tag_[]; //
 extern std::string _tag[];//
 extern string _t[];
+extern string _t_[];
 extern int g_image_divider;// BrushMaxSize = g_src_image_height / g_image_divider;
 //extern float g_BrushMax_scale;
 extern int g_qt_s_scale;
@@ -105,10 +106,11 @@ extern string g_sa_str[MAX_SALIENCY];
 extern int g_paint_try_scale[MAX_DEPTH];
 extern int g_brush_scale[MAX_DEPTH];
 
-extern vector <Brush*> g_brush_set;
+extern vector <Brush*> g_brush_vector_set;
 
 extern Mat g_srcImg_RO;
 extern int g_rendering_method;
 
 
 extern render_ *_render[RENDER_MAX];
+extern int g_no;
