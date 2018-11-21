@@ -48,8 +48,8 @@ int Brush_adjust(vector <Brush*> &brush_set)
 
 
 
-//	brush_accumulation_map.create(m_brush_size_x, m_brush_size_y, CV_8UC1);
-	//brush_centered_accumulation_map.create(m_brush_size_x, m_brush_size_y, CV_8UC1);
+//	brush_accumulation_map.create(m_render_brush_size_x, m_render_brush_size_y, CV_8UC1);
+	//brush_centered_accumulation_map.create(m_render_brush_size_x, m_render_brush_size_y, CV_8UC1);
 	//	unsigned char * s;
 	//unsigned char *d;
 	unsigned char * accumulation_data = brush_accumulation_map.data;

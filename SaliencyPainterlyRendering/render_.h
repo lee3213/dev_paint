@@ -77,58 +77,64 @@ public:
 
 class render_ {
 public:
-	//Stroke_set *a_mm_aStroke_set;
-	Stroke_set mm_aStroke_set[MAX_DEPTH];
+	cv::Mat x_srcImg_;
+	unsigned char * x_src_ptr;
+	Size x_src_image_size;
+	int x_src_step1;
+	Stroke_set render_Stroke_set[MAX_DEPTH];
 	int stroke_size[MAX_DEPTH];
-	//	streambuf* r_stream_cstat;
-	Mat depth_map_8UC1;
-	unsigned char * depth_map_8UC1_data;
-		Mat paint_map_8UC1[MAX_DEPTH+1];
-		unsigned char * paint_map_8UC1_data[MAX_DEPTH+1];
-		Mat paint_map_accu_8UC1[MAX_DEPTH + 1];
-		unsigned char * paint_map_accu_8UC1_data[MAX_DEPTH + 1];
+
+	
+	Mat depth_map_canvas_8UC1;
+	unsigned char * depth_map_canvas_8UC1_data;
+		Mat paint_map_canvas_8UC1[MAX_DEPTH+1];
+		unsigned char * paint_map_canvas_8UC1_data[MAX_DEPTH+1];
+		Mat paint_map_accu_canvas_8UC1[MAX_DEPTH + 1];
+		unsigned char * paint_map_accu_canvas_8UC1_data[MAX_DEPTH + 1];
 	int success_or_fail;
 	int render_method;
 	//Mat render_::PainterlyRendering();
 	cv::Mat gradient_map[MAX_Gradient];
-	cv::Mat m_srcImg_;
-	unsigned char * m_srcData;
+	
 	//cv::Mat Quad_TreeMap;
 	cv::Mat result_image;
 
 	Mat src_canvas;
-	cv::Mat rst_accu_canvas[MAX_DEPTH];
+	cv::Mat accu_canvas[MAX_DEPTH];
 	cv::Mat ing_canvas[MAX_DEPTH];
-	unsigned char * rst_accu_canvas_data[MAX_DEPTH];
+	unsigned char * accu_canvas_data[MAX_DEPTH];
 	unsigned char * ing_canvas_data[MAX_DEPTH];
 
-	int canvas_size_width;
-	int canvas_size_height;
-	int canvas_bezel_size;
-	int  BrushMaxSize;						//1024size에는 130, 3072size에는 400으로 설정했습니다..
-	int  BrushMinSize;
+	int x_canvas_size_width;
+	int x_canvas_size_height;
+	int x_canvas_step1;
+	int x_canvas_bezel_size;
+
+	int  x_BrushMaxSize;						//1024size에는 130, 3072size에는 400으로 설정했습니다..
+	int  x_BrushMinSize;
 	int brush_step;
 	int grid_map_sum = 0, grid_count_sum = 0;
+	int x_strk_times[MAX_DEPTH];
 	Mat r_grid_map_1c[MAX_DEPTH + 1];
 	Mat r_grid_map_1c_accu;
 	Mat r_try_map_1c[MAX_DEPTH + 1];
 	unsigned char * r_try_map_1c_data[MAX_DEPTH];
 	int render_depth;
-	int render_stroke;
+	int render_stroke_no;
 	int render_try;
 	int u_no=0;
 	int brush_minimum_size;
 
-	int depth_sobel, depth_saliency;//, depth_attach;
+	int depth_sobel, depth_saliency;//, depth_Enhance;
 
 	render_Brush* brush_resized_array[MAX_DEPTH][MAX_BRUSH];
 	int QT_depth;
 
-	int brush_size[MAX_DEPTH];
+	int render_brush_size[MAX_DEPTH];
 	int QT_grid_count[MAX_DEPTH];
 	int r_s_changed_count[MAX_DEPTH];
-	int r_s_grid_painting_try[MAX_DEPTH];
-	long int r_s_painting_area[MAX_DEPTH];
+	int grid_try_sum[MAX_DEPTH];
+//	long int r_s_painting_area[MAX_DEPTH];
 
 	render_ * render_sobel;
 	render_ * render_saliency;
@@ -138,15 +144,17 @@ public:
 	std::string m_tag_;
 	string m_t;
 	string m_t_;
-	int *random_x;
-	int *random_y;
+	int random_x;
+	int random_y;
+	int extended_try[MAX_DEPTH];
+	int x_last_depth;
 	//int get_depth;
 	render_(int _render_method, Mat &_srcImg);
 	~render_();
 	void render_::func_();
 	int  PainterlyRendering();
 
-	void func_p_map(Mat & a_map_8UC1, string tag);
+	void func_p_map(Mat & a_map_8UC1, string tag,Rect);
 
 	int stroke_dump(Stroke_set _aStroke_set[], string tag, int  depth);
 	//int stroke_dump(Stroke_set _aStroke_set, string tag, int  depth);
@@ -157,7 +165,7 @@ public:
 	void proof_box(Point &s, int i_width, int i_height, char * p);
 	void proof_box(Point &s, int i_width, int i_height);
 	//	list<Img_node*> *get_Stroke_set_ptr(int i) {
-		//	return &mm_aStroke_set[i];
+		//	return &render_Stroke_set[i];
 	//	}
 	void add_gradient_map(int i, Mat a_map);
 	int render_::prepare();
@@ -165,7 +173,7 @@ public:
 	void  render_::rectangle_canvas(cv::Mat mat, cv::Rect  rect, Scalar s);
 	//void p_poke_canvas(unsigned char * p, int index, int y, int r, int g, int b);
 	void  render_::p_poke_canvas(unsigned char * p, int p_x, int p_y, int p_0, int p_1, int p_2) {
-		int index = ((p_x + canvas_bezel_size) + (p_y + canvas_bezel_size) * canvas_size_width) * 3;
+		int index = ((p_x + x_canvas_bezel_size) + (p_y + x_canvas_bezel_size) * x_canvas_size_width) * 3;
 		p[index] = p_0;
 		p[index + 1] = p_1;
 		p[index + 2] = p_2;
@@ -182,17 +190,26 @@ public:
 	int draw_grid_2(Mat _Quad_TreeMap,
 		Stroke_set aStroke_set[], string ftag, int  depth,// int draw_depth, 
 		int c, string _tag);
-	int render_::calc_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth,
-		int _brush_size[], string tag);
+	int render_::calc_render_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth,
+		int _render_brush_size[], string tag);
 
-	int render_::P_Rendering(Mat & _src_ROI_clone, Mat & _before_ROI_clone, cv::Mat & _changed_ROI_clone,
-		cv::Mat & ing_ROI_clone, Point _fetch_color_Point, Point centered_SrtPoint,
-		Point canvas_centered_SrtPoint, Point canvas_centered_EndPoint, int brush_area_w_size,
-		int brush_area_h_size, int astroke_depth, int painting_try, int color_BGR_B, int color_BGR_G, int color_BGR_R,
-		int _depth,int _try_,
-		Mat &changed_canvas_ROI,
-		unsigned char * accu_ptr,
-		unsigned char * ing_ptr
+	int render_::P_Rendering(Mat & _src_ROI_clone, Mat & _before_ROI_clone,
+		cv::Mat & _changed_ROI_clone,
+		cv::Mat & ing_ROI_clone, Mat &changed_canvas_ROI,
+		Mat & _accu_canvas,
+		Rect centered_ROI_canvas_Rect,
+		Point _fetch_color_Point, Point centered_SrtPoint,
+		Point centered_SrtPoint_canvas, Point centered_EndPoint_canvas,
+		int brush_area_w_size,
+		int brush_area_h_size,
+		int astroke_depth, int painting_try, 
+		int color_BGR_B, int color_BGR_G, int color_BGR_R,
+	
+		int x_image_step1,
+		int x_canvas_step1,
+		unsigned char * _src_ptr,
+		unsigned char * _accu_ptr,
+		unsigned char * _ing_ptr
 		);
 
 
@@ -204,8 +221,8 @@ public:
 		string  quad,
 		Mat & gradient_src,
 		Mat stageMap, int depth, string tag);
-	int  render_::TakeColorDistance_thumbnail(cv::Mat &testImg, int thumb_width, int thumb_height, string tag, int depth);
-	int  render_::JudgementBrush(cv::Mat &testImg, int depth, int width, int height, string tag);
+	int  render_::TakeColorDistance_thumbnail(cv::Mat &testImg, int thumb_width, int thumb_height,int src_step1, string tag, int depth);
+	int  render_::JudgementBrush(cv::Mat &testImg, int depth, int width, int height,int src_step1, string tag);
 	void brush_resize(
 		vector <Brush*> _brush_set);
 	

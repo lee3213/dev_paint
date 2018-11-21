@@ -179,7 +179,7 @@ std::vector< float > Saliency::uniqueness( const std::vector< SuperpixelStatisti
 			Vec3f dc = stat[j].mean_color_ - c;
 			Vec2f dp = stat[j].mean_position_ - p;
 			
-			float w = fast_exp( - sp * dp.dot(dp) );
+			float w = faStrk_exp( - sp * dp.dot(dp) );
 			u += w*dc.dot(dc);
 			norm += w;
 		}
@@ -202,7 +202,7 @@ std::vector< float > Saliency::distribution( const std::vector< SuperpixelStatis
 		// Find the mean position
 		for( int j=0; j<N; j++ ) {
 			Vec3f dc = stat[j].mean_color_ - c;
-			float w = fast_exp( - sc * dc.dot(dc) );
+			float w = faStrk_exp( - sc * dc.dot(dc) );
 			p += w*stat[j].mean_position_;
 			norm += w;
 		}
@@ -212,7 +212,7 @@ std::vector< float > Saliency::distribution( const std::vector< SuperpixelStatis
 		for( int j=0; j<N; j++ ) {
 			Vec3f dc = stat[j].mean_color_ - c;
 			Vec2f dp = stat[j].mean_position_ - p;
-			float w = fast_exp( - sc * dc.dot(dc) );
+			float w = faStrk_exp( - sc * dc.dot(dc) );
 			u += w*dp.dot(dp);
 		}
 		r[i] = u / norm;

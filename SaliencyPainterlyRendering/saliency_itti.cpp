@@ -451,7 +451,7 @@ void SaliencyMap::OFMGetFM(cv::Mat & I, cv::Mat dst[24])
   }
 }
 
-void SaliencyMap::MFMGetFM(cv::Mat& I, cv::Mat dst_x[6], cv::Mat dst_y[6])
+void SaliencyMap::MFMGetFM(cv::Mat& I, cv::Mat dStrk_x[6], cv::Mat dStrk_y[6])
 {
   int height = I.rows;
   int width = I.cols;
@@ -474,8 +474,8 @@ void SaliencyMap::MFMGetFM(cv::Mat& I, cv::Mat dst_x[6], cv::Mat dst_y[6])
   //}
 
   // create Gaussian pyramid
-  FMGaussianPyrCSD(flowx, dst_x,"dst_x");
-  FMGaussianPyrCSD(flowy, dst_y,"dst_y");
+  FMGaussianPyrCSD(flowx, dStrk_x,"dStrk_x");
+  FMGaussianPyrCSD(flowy, dStrk_y,"dStrk_y");
 
   // update
   //this->prev_frame = cvCloneMat(I8U);

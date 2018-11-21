@@ -4,6 +4,7 @@
 #include "json/json.h"
 using namespace std;
 #include "extern.h"
+
 int  json_deployment(string path) {
 //	Json::Value root;
 	cout << "path" << path<< " : "<<path.c_str()<<endl;
@@ -59,10 +60,10 @@ int  json_deployment(string path) {
 	
 	g_QT_method_N= root.get("g_QT_method_N",1).asInt();
 //	g_Render_method = root.get("g_Render_method", "Only").asString();
-//	string str_g_merge_method = root.get("g_merge_method","attach").asString();
+//	string str_g_merge_method = root.get("g_merge_method","Enhance").asString();
 //	if ( str_g_merge_method == "Attach" ||
-//		str_g_merge_method == "attach")
-//	g_merge_method = DEF_ATTACH;
+//		str_g_merge_method == "Enhance")
+//	g_merge_method = DEF_ENHANCE;
 //	else
 	//	g_merge_method = DEF_MERGE;
 //

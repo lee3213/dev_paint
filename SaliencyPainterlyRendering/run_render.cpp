@@ -16,7 +16,7 @@ using namespace cv;
 
 void run_render(render_ * _render) {
 	//for (int j = 0; j < _render->render_depth; j++)
-		//if (_render->mm_aStroke_set[j].stroke_list.size() == 0) {
+		//if (_render->render_Stroke_set[j].stroke_list.size() == 0) {
 			//cout << _render->m_tag << " stroke_size==0" << endl;
 		//	return ;
 	//	}
@@ -39,6 +39,7 @@ int do_rendering(){
 			<< std::thread::hardware_concurrency() << std::endl;
 		p_render[RENDER_SOBEL]->join();
 		_render[RENDER_SOBEL]->post_process();
+
 #ifdef LATER
 		if (g_saliency_method != SALIENCY_STR_SOBEL) {
 			p_render[RENDER_SALIENCY] = new thread(run_render, _render[RENDER_SALIENCY]);
@@ -46,24 +47,25 @@ int do_rendering(){
 			
 			p_render[RENDER_TWOPASS_MERGE] = new thread(run_render, _render[RENDER_TWOPASS_MERGE]);
 		
-			p_render[RENDER_TWOPASS_ATTACH] = new thread(run_render, _render[RENDER_TWOPASS_ATTACH]);
+			
 			
 			cout << "p_saliency t_id: " << p_render[RENDER_SALIENCY]->get_id() << endl;
 			cout << "p_union    t_id: " << p_render[RENDER_UNION]->get_id() << endl;
 			cout << "p_twopass MERGE t_id: " << p_render[RENDER_TWOPASS_MERGE]->get_id() << endl;
-			cout << "p_twopass  ATTACH t_id: " << p_render[RENDER_TWOPASS_ATTACH]->get_id() << endl;
+			cout << "p_twopass  ENHANCE t_id: " << p_render[RENDER_TWOPASS_ENHANCE]->get_id() << endl;
 			std::cout << "Number of threads Twopass = "
 				<< std::thread::hardware_concurrency() << std::endl;
 			
 			p_render[RENDER_SALIENCY]->join();
 			p_render[RENDER_UNION]->join();
+			p_render[RENDER_TWOPASS_ENHANCE] = new thread(run_render, _render[RENDER_TWOPASS_ENHANCE]);
 			p_render[RENDER_TWOPASS_MERGE]->join();
-			p_render[RENDER_TWOPASS_ATTACH]->join();
+			p_render[RENDER_TWOPASS_ENHANCE]->join();
 			
 			_render[RENDER_SALIENCY]->post_process();
 			_render[RENDER_UNION]->post_process();
 			_render[RENDER_TWOPASS_MERGE]->post_process();
-			_render[RENDER_TWOPASS_ATTACH]->post_process();
+			_render[RENDER_TWOPASS_ENHANCE]->post_process();
 		}
 #endif
 #else
@@ -80,15 +82,15 @@ int do_rendering(){
 			p_render[RENDER_UNION]->join();
 			p_render[RENDER_TWOPASS_MERGE] = new thread(run_render, _render[RENDER_TWOPASS_MERGE]);
 			p_render[RENDER_TWOPASS_MERGE]->join();
-			p_render[RENDER_TWOPASS_ATTACH] = new thread(run_render, _render[RENDER_TWOPASS_ATTACH]);
-			p_render[RENDER_TWOPASS_ATTACH]->join();
+			p_render[RENDER_TWOPASS_ENHANCE] = new thread(run_render, _render[RENDER_TWOPASS_ENHANCE]);
+			p_render[RENDER_TWOPASS_ENHANCE]->join();
 				
 			
 
 			_render[RENDER_SALIENCY]->post_process();
 			_render[RENDER_UNION]->post_process();
 			_render[RENDER_TWOPASS_MERGE]->post_process();
-			_render[RENDER_TWOPASS_ATTACH]->post_process();
+			_render[RENDER_TWOPASS_ENHANCE]->post_process();
 		}
 		
 #endif

@@ -138,12 +138,12 @@
     <ClInclude Include="define_local.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="json_util.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderingImage.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="bsShowImage.cpp">
@@ -201,9 +201,6 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="g_setup.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="p_rendering.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="rgb2hsv.cpp">
@@ -264,6 +261,15 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="render_prepare.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="grad_direction.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="render_pixel.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="render_image.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

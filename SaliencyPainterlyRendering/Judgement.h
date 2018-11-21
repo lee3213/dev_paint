@@ -27,8 +27,9 @@ int JudgementImage(unsigned char * srcData, unsigned char * changedData_p, unsig
 	int astroke_depth,
 	int b_w, int b_h, int b_c, int b_step1,
 	int c_w,int c_h,int c_c, int canvas_ROI_step1,
-	string tag);
+	string tag,
+	int image_channel1);
 
-int JudgementBrush(cv::Mat &srcImg, int depth, int width, int height,vector <Brush*>_brush_set,string tag);
-//, /* vector <Brush*> &brush, int nBrushNumber,*/int st_no,
-	//int paint_area_w_size, int paint_area_h_size,Point C_S,Point C_E,int first_try);
+int JudgementBrush(cv::Mat &srcImg, int depth, int width, int height,vector <Brush*>_brush_set,int src_step1,string tag);
+//, /* vector <Brush*> &brush, int nBrushNumber,*/int Strk_no,
+	//int paint_area_w_size, int paint_area_h_size,Point C_S,Point C_E,int fitry);

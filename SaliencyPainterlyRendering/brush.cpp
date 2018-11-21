@@ -234,8 +234,8 @@ int BrushInitialization(vector <Brush*> &_brush_set)
 					/*
 					for (int i = 0; i < _brush_depth; i++) {
 
-						cv::resize(R, R_resized, Size(brush_size[i], brush_size[i]));
-						debug_image("br2/R_resized_" + to_string(color_BGR_B) + to_string(brush_size[i]), nth, R_resized);
+						cv::resize(R, R_resized, Size(render_brush_size[i], render_brush_size[i]));
+						debug_image("br2/R_resized_" + to_string(color_BGR_B) + to_string(render_brush_size[i]), nth, R_resized);
 						R_resized.release();
 
 					}

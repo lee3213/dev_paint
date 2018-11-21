@@ -19,4 +19,4 @@ public:
 
 
 int BrushInitialization(vector <Brush*> &brush);
-//, int _called_once, int brush_size[]);
+//, int _called_once, int render_brush_size[]);

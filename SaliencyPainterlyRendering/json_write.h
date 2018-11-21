@@ -5,4 +5,4 @@ using namespace std;
 #include "extern.h"
 
 int  json_write_method(string deploy_path, 
-	string list_path);
+	string liStrk_path);

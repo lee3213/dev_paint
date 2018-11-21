@@ -86,6 +86,8 @@ extern int g_alpha_TH;
 extern int g_ET;//positive ET=-1 negative
 
 //extern Mat Sgrid_grid_map_1c[];
+extern Mat g_src_gray_Map;
+
 extern Mat gradient_Map_C_8UC1;
 extern Mat gradient_Map_G_8UC1;
 extern std::string tag[];// 
@@ -101,11 +103,11 @@ extern int g_trace_depth ;
 extern string g_saliency_method_str[MAX_SALIENCY];// = { "Sobel", "Itti","Pregraph","Residual","Blackandwhite","Fine_grained","Perazzi" };
 //extern int g_unique_id;
 extern string g_sa_str[MAX_SALIENCY];
-//extern int g_first_layer;
+//extern int g_filayer;
 //
 extern int g_paint_try_scale[MAX_DEPTH];
 extern int g_brush_scale[MAX_DEPTH];
-
+extern int g_enhance_scale[MAX_DEPTH];
 extern vector <Brush*> g_brush_vector_set;
 
 extern Mat g_srcImg_RO;
@@ -114,3 +116,5 @@ extern int g_rendering_method;
 
 extern render_ *_render[RENDER_MAX];
 extern int g_no;
+extern Mat enhance_brush[3];
+extern unsigned char * enhance_brush_ptr[3];

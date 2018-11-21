@@ -5,40 +5,40 @@
 using namespace std;
 #include "extern.h"
 
-int  file_read(string f_name_list_csv, string str_file[], int &file_cnt,int EOF_FLAG=0) {
+int  file_read(string f_name_liStrk_csv, string str_file[], int &file_cnt,int EOF_FLAG=0) {
 	file_cnt = 0;
-	fstream file_list_csv;
+	fstream file_liStrk_csv;
 
-	file_list_csv.open(f_name_list_csv.c_str(),ios::in);
+	file_liStrk_csv.open(f_name_liStrk_csv.c_str(),ios::in);
 
-	if (!file_list_csv)  // operator! is used here
+	if (!file_liStrk_csv)  // operator! is used here
 	{
-		std::cout << f_name_list_csv<<":: File opening failed\n";
+		std::cout << f_name_liStrk_csv<<":: File opening failed\n";
 		return -1;
 	}
 
-	if (file_list_csv.fail()) {
-		 cout << f_name_list_csv << ":: file_ fail " << endl;
+	if (file_liStrk_csv.fail()) {
+		 cout << f_name_liStrk_csv << ":: file_ fail " << endl;
 		return -1;
 	}
-	while (!file_list_csv.eof()) {
+	while (!file_liStrk_csv.eof()) {
 
 		string str_csv_name = "";
-		file_list_csv >> str_csv_name;
+		file_liStrk_csv >> str_csv_name;
 		if (str_csv_name.size() != 0) {
 			str_file[file_cnt] = str_csv_name;
 			file_cnt++;
 		}
 		else {
-			if (!file_list_csv.eof()) {
+			if (!file_liStrk_csv.eof()) {
 				cout << "[" << str_csv_name.size() << "]" << endl;
-				cout << __FUNCTION__ << " Error size == 0) " << f_name_list_csv << "::" << file_cnt << endl;
+				cout << __FUNCTION__ << " Error size == 0) " << f_name_liStrk_csv << "::" << file_cnt << endl;
 			}
 			continue;
 		}
 	}
 
-	file_list_csv.close();
+	file_liStrk_csv.close();
 	//for (int i = 0; i < file_cnt; i++)
 	//{
 	//	cout << setw(4) << i << " : " << str_file[i] << endl;
@@ -110,18 +110,18 @@ int call_file_write(string f_name, string image_file[], int file_image_cnt,
 
 string image_csv_file[100];
 int image_csv_cnt = 0;
-int find_image_idx(string lst_name)
+int find_image_idx(string lStrk_name)
 {
 	int i;
 	for (i = 0; i < image_csv_cnt; i++) {
-		if (lst_name == image_csv_file[i])
+		if (lStrk_name == image_csv_file[i])
 			break;
 	}
 	if (i == image_csv_cnt) return -1;
 	return i;
 }
 string method_para_cfg_file[1000];
-int make_batches(string image_list_csv_path, string  deploy_path, string list_cfg_path,
+int make_batches(string image_liStrk_csv_path, string  deploy_path, string liStrk_cfg_path,
 	string batch_render_method_path,
 	string batch_render_para_path,
 	string batch_render_para_method_path,
@@ -134,22 +134,22 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
  {
 	int ret;
 
-	string f_name_list_csv = image_list_csv_path + "\\image_lst.csv";
-	ret=file_read( f_name_list_csv, image_csv_file,image_csv_cnt);
+	string f_name_liStrk_csv = image_liStrk_csv_path + "\\image_lst.csv";
+	ret=file_read( f_name_liStrk_csv, image_csv_file,image_csv_cnt);
 	
 	string meta_cfg_file[100];
 	int file_meta_cnt=0;
-	string f_name_meta_cfg = list_cfg_path + "\\para_meta.cfg";
+	string f_name_meta_cfg = liStrk_cfg_path + "\\para_meta.cfg";
 	ret = file_read(f_name_meta_cfg, meta_cfg_file,file_meta_cnt);
 	
 	string method_cfg_file[100];
 	int file_method_cnt = 0;
-	string f_name_method_cfg = list_cfg_path + "\\method_meta.cfg";
+	string f_name_method_cfg = liStrk_cfg_path + "\\method_meta.cfg";
 	ret = file_read(f_name_method_cfg, method_cfg_file, file_method_cnt);
 
 	
 	int method_para_cnt = 0;
-	string f_name_method_para_cfg = list_cfg_path + "\\method_para_meta.cfg";
+	string f_name_method_para_cfg = liStrk_cfg_path + "\\method_para_meta.cfg";
 	
 	ret = file_read(f_name_method_para_cfg, method_para_cfg_file, method_para_cnt);
 
@@ -157,14 +157,14 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
 	string f_name_json;
 	string meta_json_file[1000];
 //	for (int json_file_idx = 0; json_file_idx < file_meta_cnt; json_file_idx++) {
-//		f_name_json = list_cfg_path + "\\"+meta_cfg_file[json_file_idx]; 
+//		f_name_json = liStrk_cfg_path + "\\"+meta_cfg_file[json_file_idx]; 
 //		ret = file_read(f_name_json, meta_json_file,meta_json_cnt);
 //	}
 	int image_file_cnt = 0;
 	string f_name_image;
 	string image_file[1000];
 //	for (int image_idx = 0; image_idx < file_image_csv_cnt; image_idx++) {
-//		f_name_image = image_list_csv_path + "\\" + image_csv_file[image_idx];
+//		f_name_image = image_liStrk_csv_path + "\\" + image_csv_file[image_idx];
 //		ret = file_read(f_name_image, image_file, image_file_cnt);
 //	}
 	
@@ -172,7 +172,7 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
 	string f_name_method_json;
 	string method_json_file[1000];
 //	for (int method_json_file_idx = 0; method_json_file_idx < file_meta_cnt; method_json_file_idx++) {
-//		f_name_method_json = list_cfg_path + "\\" + method_cfg_file[method_json_file_idx];
+//		f_name_method_json = liStrk_cfg_path + "\\" + method_cfg_file[method_json_file_idx];
 //		ret = file_read(f_name_method_json, method_json_file, file_method_json_cnt);
 //	}
 	int para_method_json_cnt = 0;
@@ -185,12 +185,12 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
 	string f_name_para_bat;
 	for (int meta_file_idx = 0; meta_file_idx < file_meta_cnt; meta_file_idx++) {
 		
-					f_name_json = list_cfg_path + "\\"+meta_cfg_file[meta_file_idx]; 
+					f_name_json = liStrk_cfg_path + "\\"+meta_cfg_file[meta_file_idx]; 
 
 					ret = file_read(f_name_json, meta_json_file,meta_json_cnt);
 
 					for (int image_idx = 0; image_idx < image_csv_cnt; image_idx++) {
-						f_name_image = image_list_csv_path + "\\" + image_csv_file[image_idx];
+						f_name_image = image_liStrk_csv_path + "\\" + image_csv_file[image_idx];
 			
 						ret = file_read(f_name_image, image_file, image_file_cnt);
 
@@ -207,11 +207,11 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
 	string f_name_method_bat;
 
 	for (int method_file_idx = 0; method_file_idx < file_method_cnt; method_file_idx++) {
-		f_name_method_json = list_cfg_path + "\\" + method_cfg_file[method_file_idx];
+		f_name_method_json = liStrk_cfg_path + "\\" + method_cfg_file[method_file_idx];
 				ret = file_read(f_name_method_json, method_json_file, method_json_cnt);
 		
 			for (int image_idx = 0; image_idx < image_csv_cnt; image_idx++) {
-				f_name_image = image_list_csv_path + "\\" + image_csv_file[image_idx];
+				f_name_image = image_liStrk_csv_path + "\\" + image_csv_file[image_idx];
 				ret = file_read(f_name_image, image_file, image_file_cnt);
 
 				f_name_method_bat = batch_render_method_path + "\\" + image_csv_file[image_idx] + "_" + method_cfg_file[method_file_idx] + ".bat";
@@ -227,12 +227,12 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
 	string f_name_para_method_cfg;
 	for (int para_method_idx = 0; para_method_idx < method_para_cnt; para_method_idx++) {
 
-		f_name_para_method_cfg = list_cfg_path + "\\" + method_para_cfg_file[para_method_idx];
+		f_name_para_method_cfg = liStrk_cfg_path + "\\" + method_para_cfg_file[para_method_idx];
 
 		ret = file_read(f_name_para_method_cfg, para_method_json_file, para_method_json_cnt);
 
 		for (int image_idx = 0; image_idx < image_csv_cnt; image_idx++) {
-			f_name_image = image_list_csv_path + "\\" + image_csv_file[image_idx];
+			f_name_image = image_liStrk_csv_path + "\\" + image_csv_file[image_idx];
 
 			ret = file_read(f_name_image, image_file, image_file_cnt);
 
@@ -244,14 +244,14 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
 		}
 		int find = find_image_idx("paper.lst");
 		if (find != -1) {
-			f_name_image = image_list_csv_path + "\\" + image_csv_file[find];
+			f_name_image = image_liStrk_csv_path + "\\" + image_csv_file[find];
 			ret = file_read(f_name_image, image_file, image_file_cnt);
 			string image_file_1[1];
 			
 			string f_name_para_method_cfg;
 			for (int para_method_idx = 0; para_method_idx < method_para_cnt; para_method_idx++) {
 
-				f_name_para_method_cfg = list_cfg_path + "\\" + method_para_cfg_file[para_method_idx];
+				f_name_para_method_cfg = liStrk_cfg_path + "\\" + method_para_cfg_file[para_method_idx];
 
 				ret = file_read(f_name_para_method_cfg, para_method_json_file, para_method_json_cnt);
 
@@ -270,7 +270,7 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
 		//	string f_name_para_method_cfg;
 			for (int para_idx = 0; para_idx < file_meta_cnt; para_idx++) {
 
-				f_name_json = list_cfg_path + "\\" + meta_cfg_file[para_idx];
+				f_name_json = liStrk_cfg_path + "\\" + meta_cfg_file[para_idx];
 
 				ret = file_read(f_name_json, meta_json_file, meta_json_cnt);
 				
@@ -288,7 +288,7 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
 			}
 			for (int method_idx = 0; method_idx < file_method_cnt; method_idx++) {
 
-				f_name_json = list_cfg_path + "\\" + method_cfg_file[method_idx];
+				f_name_json = liStrk_cfg_path + "\\" + method_cfg_file[method_idx];
 
 				ret = file_read(f_name_json, method_json_file, method_json_cnt);
 
@@ -311,53 +311,53 @@ int make_batches(string image_list_csv_path, string  deploy_path, string list_cf
 	return 1;
 }
 /*
-int make_a_batch(string lst_f_path, string list_cfg_path, string b_render_path, int para_cnt, string para[], int k_depth, string tag) {
+int make_a_batch(string lStrk_f_path, string liStrk_cfg_path, string b_render_path, int para_cnt, string para[], int k_depth, string tag) {
 
 	std::ofstream file_meta_cfg;
 	string f_name_meta_cfg;
-	f_name_meta_cfg = list_cfg_path + string("meta_cfg.cfg");
+	f_name_meta_cfg = liStrk_cfg_path + string("meta_cfg.cfg");
 	file_meta_cfg.open(f_name_meta_cfg.c_str());
 
 
-	string lst_f_name = lst_f_path + string("image_lst.lst");
-	std::ifstream file_lst_name;
+	string lStrk_f_name = lStrk_f_path + string("image_lst.lst");
+	std::ifstream file_lStrk_name;
 	std::ifstream file_name;
-	string lst_list_name;
-	string list_name2[100];
+	string lStrk_liStrk_name;
+	string liStrk_name2[100];
 	string f_name[100];
-	string lst_f_name_2;
+	string lStrk_f_name_2;
 	//int i = 0;
 	int f_cnt = 0;
-	int list_cnt;
+	int liStrk_cnt;
 	string cmd;
 	string img_name;
-	file_lst_name.open(lst_f_name.c_str());
-	if (!file_lst_name)  // operator! is used here
+	file_lStrk_name.open(lStrk_f_name.c_str());
+	if (!file_lStrk_name)  // operator! is used here
 	{
-		std::cout << "file_lst_name File opening failed\n";
+		std::cout << "file_lStrk_name File opening failed\n";
 		return -1;
 	}
 
-	if (file_lst_name.fail()) {
-		cout << "file_lst_name fail " << endl;
+	if (file_lStrk_name.fail()) {
+		cout << "file_lStrk_name fail " << endl;
 		return -1;
 	}
-	while (!file_lst_name.eof()) {
+	while (!file_lStrk_name.eof()) {
 		f_cnt = 0;
-		lst_list_name = "";
-		file_lst_name >> lst_list_name;
-		if (lst_list_name.size() > 1) {
-			f_name[f_cnt] = lst_list_name;
+		lStrk_liStrk_name = "";
+		file_lStrk_name >> lStrk_liStrk_name;
+		if (lStrk_liStrk_name.size() > 1) {
+			f_name[f_cnt] = lStrk_liStrk_name;
 			f_cnt++;
 		}
 		else {
-			cout << "size <= 1 : 1) " << lst_f_name << "  " <<  "   " << b_render_path << "  " << lst_list_name.size() << "::::" << f_cnt << " " << tag << endl;
+			cout << "size <= 1 : 1) " << lStrk_f_name << "  " <<  "   " << b_render_path << "  " << lStrk_liStrk_name.size() << "::::" << f_cnt << " " << tag << endl;
 			continue;
 		}
-		//	cout << setw(5) << i << list_name << endl;
+		//	cout << setw(5) << i << liStrk_name << endl;
 		//i++;
-		lst_f_name_2 = lst_f_path + lst_list_name;
-		file_name.open(lst_f_name_2.c_str());
+		lStrk_f_name_2 = lStrk_f_path + lStrk_liStrk_name;
+		file_name.open(lStrk_f_name_2.c_str());
 		if (!file_name)  // operator! is used here
 		{
 			std::cout << "file_name File opening failed\n";
@@ -371,7 +371,7 @@ int make_a_batch(string lst_f_path, string list_cfg_path, string b_render_path, 
 		std::ofstream bat_call;
 		string bat_cmd;
 		string bat_f;
-		bat_f = "\\batch\\" + to_string(k_depth) + "_" + lst_list_name + "_Itti_Sobel.bat";
+		bat_f = "\\batch\\" + to_string(k_depth) + "_" + lStrk_liStrk_name + "_Itti_Sobel.bat";
 		bat_call.open(bat_f.c_str());
 		if (!bat_call)  // operator! is used here
 		{
@@ -383,31 +383,31 @@ int make_a_batch(string lst_f_path, string list_cfg_path, string b_render_path, 
 			cout << "bat_call fail " << endl;
 			return -1;
 		}
-		list_cnt = 0;
+		liStrk_cnt = 0;
 		while (!file_name.eof()) {
 			img_name = "";
 			file_name >> img_name;
 			if (img_name.size() > 1) {
-				list_name2[list_cnt] = img_name;
-				list_cnt++;
+				liStrk_name2[liStrk_cnt] = img_name;
+				liStrk_cnt++;
 			}
 			else {
-				cout << "size <= 1 : 2) " << bat_f << "  " << img_name.size() << "::::" << list_cnt << " " << tag << endl;
+				cout << "size <= 1 : 2) " << bat_f << "  " << img_name.size() << "::::" << liStrk_cnt << " " << tag << endl;
 				continue;
 			}
 
-			//cout << list_name2[list_cnt]<<endl;
-			//add_batch_a("\\batch", b_render_path, list_name2[list_cnt], para, para_cnt);
+			//cout << liStrk_name2[liStrk_cnt]<<endl;
+			//add_batch_a("\\batch", b_render_path, liStrk_name2[liStrk_cnt], para, para_cnt);
 			std::ofstream file_call;
 			string bat_fcall_name;
-			if (img_name == lst_list_name) {
-				cout << img_name << ", " << list_cnt << endl;
+			if (img_name == lStrk_liStrk_name) {
+				cout << img_name << ", " << liStrk_cnt << endl;
 				continue;
 			}
-			bat_fcall_name = "\\batch\\" + to_string(k_depth) + "_" + lst_list_name + "_" +
+			bat_fcall_name = "\\batch\\" + to_string(k_depth) + "_" + lStrk_liStrk_name + "_" +
 				img_name + ".bat";
 			file_call.open(bat_fcall_name.c_str());
-			string T_bat_fcall_name = "\\batch\\" + to_string(k_depth) + "_" + lst_list_name + "_" +
+			string T_bat_fcall_name = "\\batch\\" + to_string(k_depth) + "_" + lStrk_liStrk_name + "_" +
 				img_name + "_smItti_Sobel.bat";
 			std::ofstream T_file_call;
 			if (k_depth == 0)
@@ -434,16 +434,16 @@ int make_a_batch(string lst_f_path, string list_cfg_path, string b_render_path, 
 		file_name.close();
 		bat_call.close();
 	}
-	file_lst_name.close();
+	file_lStrk_name.close();
 	return 1;
 }
 */
-int  get_para(string lst_f_para, string para[], int &para_cnt) {
+int  get_para(string lStrk_f_para, string para[], int &para_cnt) {
 	std::ifstream file_para;
-	file_para.open(lst_f_para.c_str());
+	file_para.open(lStrk_f_para.c_str());
 	if (!file_para)  // operator! is used here
 	{
-		std::cout << "File opening failed\n" << lst_f_para << endl;
+		std::cout << "File opening failed\n" << lStrk_f_para << endl;
 		return -1;
 	}
 
@@ -464,7 +464,7 @@ int  get_para(string lst_f_para, string para[], int &para_cnt) {
 			para_cnt++;
 		}
 		else {
-			cout << "size <= 1 : 3) " << lst_f_para << "   " << para[para_cnt].size() << "::::" << para_cnt << endl;
+			cout << "size <= 1 : 3) " << lStrk_f_para << "   " << para[para_cnt].size() << "::::" << para_cnt << endl;
 		}
 	}
 	file_para.close();

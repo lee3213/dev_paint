@@ -22,7 +22,7 @@ int sthresh[] = {110,120,130 };
 int _grid[] = { 5,7,10,15 };
 int depth[] = { 10 };
 int _br[] = { 5,7,10,15 }; //g_BrushMinSize
-int _at[] = { 5 }; //attach brush size
+int _at[] = { 5 }; //Enhance brush size
 
 int QT_N[] = {1};
 string paint_method_str = BRUSH_STENCIL_STR;
@@ -81,7 +81,7 @@ int write_json_content(string from_jsonfolderPath) {
 }
 //int br, th, de, gr, sm, qt, re, mm, gs, ps;
 int  json_write_method(string from_jsonfolderPath,//render/deployument
-	string list_cfg_path)
+	string liStrk_cfg_path)
  {
 	string cfg_file_name;
 
@@ -115,25 +115,25 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 	std::ofstream file_para_method_meta_cfg;
 	string f_name_method_para_meta_cfg;
 
-	f_name_all_cfg = list_cfg_path + "\\" + string("para_all_cfg.cfg");
+	f_name_all_cfg = liStrk_cfg_path + "\\" + string("para_all_cfg.cfg");
 	file_all_cfg.open(f_name_all_cfg.c_str());
 	if (!file_all_cfg.is_open()) {
 		return -1;
 	}
-	f_name_para_meta_cfg = list_cfg_path + "\\"+string("para_meta.cfg");
+	f_name_para_meta_cfg = liStrk_cfg_path + "\\"+string("para_meta.cfg");
 	file_para_meta_cfg.open(f_name_para_meta_cfg.c_str());
 	if (!file_para_meta_cfg.is_open()) {
 		return - 1;
 	}
 
 	
-	f_name_method_meta_cfg = list_cfg_path + "\\" + string("method_meta.cfg");
+	f_name_method_meta_cfg = liStrk_cfg_path + "\\" + string("method_meta.cfg");
 	file_method_meta_cfg.open(f_name_method_meta_cfg.c_str());
 	if (!file_method_meta_cfg.is_open()) {
 		return -1;
 	}
 	int method_para_cnt = 0;
-	f_name_method_para_meta_cfg = list_cfg_path + "\\method_para_meta.cfg";
+	f_name_method_para_meta_cfg = liStrk_cfg_path + "\\method_para_meta.cfg";
 	file_para_method_meta_cfg.open(f_name_method_para_meta_cfg.c_str());
 	if (!file_para_method_meta_cfg.is_open()) {
 		return -1;
@@ -154,8 +154,8 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 			f_loc = th*n_gr + gr;
 			f_name_para_cfg[f_loc] ="s_" + to_string(sthresh[th]) +
 				"_g" + to_string(_grid[gr]) + ".cfg";
-			file_para_cfg[f_loc].open(list_cfg_path +"\\"+ f_name_para_cfg[f_loc]);
-			cout << setw(5)<<f_loc<<" : "<<list_cfg_path + "\\" + f_name_para_cfg[f_loc] << endl;
+			file_para_cfg[f_loc].open(liStrk_cfg_path +"\\"+ f_name_para_cfg[f_loc]);
+			cout << setw(5)<<f_loc<<" : "<<liStrk_cfg_path + "\\" + f_name_para_cfg[f_loc] << endl;
 			if (!file_para_cfg[f_loc].is_open())  // operator! is used here
 			{
 				std::cout << f_name_para_cfg << ":: File opening failed\n";
@@ -168,8 +168,8 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 				int mf_loc = th*n_gr*MAX_SALIENCY + gr*MAX_SALIENCY+sm;
 				f_name_para_method_cfg[mf_loc] = "M"+g_saliency_method_str[sm]+"_s_" + to_string(sthresh[th]) +
 					"_g" + to_string(_grid[gr]) + ".cfg";
-				file_para_method_cfg[mf_loc].open(list_cfg_path + "\\" + f_name_para_method_cfg[mf_loc]);
-				cout << setw(5) << mf_loc << " : " << list_cfg_path + "\\" + f_name_para_method_cfg[mf_loc] << endl;
+				file_para_method_cfg[mf_loc].open(liStrk_cfg_path + "\\" + f_name_para_method_cfg[mf_loc]);
+				cout << setw(5) << mf_loc << " : " << liStrk_cfg_path + "\\" + f_name_para_method_cfg[mf_loc] << endl;
 				if (!file_para_method_cfg[mf_loc].is_open())  // operator! is used here
 				{
 					std::cout << f_name_para_method_cfg << ":: File opening failed\n";
@@ -231,7 +231,7 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 	std::ofstream file_method_cfg;
 	//clock deployment 
 	for (sm = 0; sm < MAX_SALIENCY; sm++) { //saliency method
-		string f_name_method_cfg = list_cfg_path + "\\" + g_saliency_method_str[sm] + ".cfg";
+		string f_name_method_cfg = liStrk_cfg_path + "\\" + g_saliency_method_str[sm] + ".cfg";
 	
 		file_method_cfg.open(f_name_method_cfg.c_str());
 
@@ -283,15 +283,15 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 	return fail_flag;
 }
 
-void add_batch_a(string batch_path, string b_render_path,string  list_name2, string para[], int para_cnt) {
+void add_batch_a(string batch_path, string b_render_path,string  liStrk_name2, string para[], int para_cnt) {
 
 	std::ofstream file_id;
 	string bat_f_name;
 	for (int i = 0; i < para_cnt;i++) {
 		bat_f_name = batch_path + string("\\") + para[i]+ string("_") +
-			list_name2+".bat";
+			liStrk_name2+".bat";
 		file_id.open(bat_f_name.c_str());
-		file_id << "call " + b_render_path + para[i] + ".bat "+list_name2;
+		file_id << "call " + b_render_path + para[i] + ".bat "+liStrk_name2;
 		file_id.close();
 	}
 }

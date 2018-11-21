@@ -80,18 +80,8 @@ void set_result_path(std::string para_path, string method_path, int depth) {
 		check_and_create(sub_dirs, true);
 	}
 }
-int  set_global(string src_name,string deploy_name) {
-	
-	g_INDEX_BRUSH_SIZE_WIDTH = 20;//changed by cwlee from 10 to same as thumbnail
-	g_INDEX_BRUSH_SIZE_HEIGHT = 20; //changed by cwlee from 10 to same as thumbnail
-	g_BrushNumber = 48;						//basic:64    expansion:48
-	g_brush_thumbnail_size = g_INDEX_BRUSH_SIZE_HEIGHT;
 
-	g_brush_choice = 1;
-
-	int ret=json_deployment(deploy_name);
-	if (ret < 0) return -1;
-
+void filename_without_ext(string src_name, string &g_image_name) {
 	char buf2[100];
 	memset(buf2, 0, 100);
 	char * s_p, *p;
@@ -111,16 +101,43 @@ int  set_global(string src_name,string deploy_name) {
 	memcpy_s(buf, 100, s, e - s);
 	g_image_name = string(buf);
 	cout << g_image_name << endl;
+}
+int  set_global(string src_name,string deploy_name) {
+	
+	g_INDEX_BRUSH_SIZE_WIDTH = 20;//changed by cwlee from 10 to same as thumbnail
+	g_INDEX_BRUSH_SIZE_HEIGHT = 20; //changed by cwlee from 10 to same as thumbnail
+	g_BrushNumber = 48;						//basic:64    expansion:48
+	g_brush_thumbnail_size = g_INDEX_BRUSH_SIZE_HEIGHT;
 
+	g_brush_choice = 1;// one of 5 random 
+
+	enhance_brush[0].create(2, 2, CV_8UC1);
+	enhance_brush[0].setTo(255);
+	enhance_brush_ptr[0] = enhance_brush[0].data;
+	enhance_brush[1].create(3, 3, CV_8UC1);
+	enhance_brush[1].setTo(255);
+	enhance_brush_ptr[1] = enhance_brush[1].data;
+	enhance_brush[2].create(4, 4, CV_8UC1);
+	enhance_brush[2].setTo(255);
+	enhance_brush_ptr[2] = enhance_brush[2].data;
+	
+	unsigned char * enhance_brush_ptr[3];
+
+	int ret=json_deployment(deploy_name);
+	if (ret < 0) return -1;
+	filename_without_ext( src_name,g_image_name);
+	
 	g_para = string("s") + to_string(g_QT_avgSThreshold) + "d" + to_string(g_depth_limit)
 		+ "g" + to_string(g_min_gridsize) + "_b" + to_string(g_BrushMinSize) +
-		"_N" + to_string(g_QT_method_N)+"_bn"+to_string(g_BrushNumber);// + "_ps" + to_string(g_paint_try_scale[0]) ;
-		// + "_gth" + to_string(g_grid_threshold);
-
+		"_N" + to_string(g_QT_method_N)+"_bn"+to_string(g_BrushNumber);
+	
+	g_unique_id = 0;//QT->no
+	g_debug_method = "";
+	g_debug_method.append("org");
 	 cout << "g_para " << g_para << endl;
 
 	g_para_method = g_para + "_m" + g_saliency_method //+ g_Render_method +
-	//	+"_p" + g_paint_mode_str//+"_q"+to_string(g_merge_method)
+
 		;
 
 	g_para_path = g_root_path + string("/") + g_para;
@@ -142,9 +159,7 @@ int  set_global(string src_name,string deploy_name) {
 	check_and_create(g_root_path_win + string("\\csv_log\\") + g_para, false);
 	check_and_create(g_root_path_win + string("\\cerr\\") + g_para, false);
 	check_and_create(g_root_saliency_path,false);
-	//g_method_path_win=g_root_path_win + string("\\") + g_method;// "\\rst\\org";
-	//waitKey();
-	//std::exit(1);
+	
 
 	cout_func(src_name,deploy_name);
 	string f_path_cerr = g_root_path_win + string("\\cerr\\") + g_para + "\\cerr_" + g_para_method + "_" + g_image_name + string(".txt");
@@ -190,12 +205,8 @@ int  set_global(string src_name,string deploy_name) {
 
 	
 		cout_func(src_name, deploy_name);
-		
-	g_unique_id = 0;//QT->no
-	g_debug_method = "";
-	g_debug_method.append("org");
-	//g_merge_skip_count = 1;
-	//g_merge_method = DEF_MERGE;
+	
+	
 		set_result_path(g_para,g_para_method,g_depth_limit);
 
 	if (g_paint_mode_str == BRUSH_ALPHA_STR)

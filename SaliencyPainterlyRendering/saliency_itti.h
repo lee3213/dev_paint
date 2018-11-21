@@ -120,7 +120,7 @@ public:
   void IFMGetFM(Mat & src, Mat  dst[6]);
   void CFMGetFM(Mat & R, Mat  &G, Mat  &B, Mat  RGFM[6], Mat  BYFM[6]);
   void OFMGetFM(Mat & I, Mat  dst[24]);
-  void MFMGetFM(Mat & I, Mat  dst_x[6], Mat  dst_y[6]);
+  void MFMGetFM(Mat & I, Mat  dStrk_x[6], Mat  dStrk_y[6]);
   // normalization
   void normalizeFeatureMaps(Mat  FM[6], Mat  NFM[6], int width, int height, int num_maps);
   Mat SMNormalization(cv::Mat & src); // Itti normalization
