@@ -64,9 +64,9 @@ int result = P_Rendering(
 			tbrush_cnt = 0;
 		}
 		
-	cv::Mat bestBrush_8UC1_resized;
+	cv::Mat *bestBrush_8UC1_resized;
 
-	cv::Mat bestBrush_embossed_resized;//R
+//	cv::Mat bestBrush_embossed_resized;//R
 	
 	int Alpha;
 
@@ -87,28 +87,32 @@ int result = P_Rendering(
 	int canvas_ROI_height = _changed_canvas_ROI.size().height;
 	int canvas_ROI_step1 = (int)_changed_canvas_ROI.step1();
 	int canvas_ROI_channels = (int)_changed_canvas_ROI.channels();
+
 	int canvas_clone_ROI_step1 = (int)_changed_canvas_ROI_clone.step1();
 	int canvas_clone_ROI_channels = (int)_changed_canvas_ROI_clone.channels();
-	Mat src_ROI_canvas_resized_8UC1;
+
+	Mat src_ROI_canvas_clone_resized_8UC1;
 	Mat a;
 	int s_w, s_h;
-	if (canvas_ROI_width < g_brush_thumbnail_size)
-		s_w = canvas_ROI_width;
-	else s_w = g_brush_thumbnail_size;
-	if (canvas_ROI_height < g_brush_thumbnail_size)
-		s_h = canvas_ROI_height;
-	else s_h = g_brush_thumbnail_size;
+	//if (canvas_ROI_width > g_brush_thumbnail_size)
+	//	s_w = canvas_ROI_width;
+	//else
+	s_w = g_brush_thumbnail_size;
+	//if (canvas_ROI_height > g_brush_thumbnail_size)
+		//s_h = canvas_ROI_height;
+	//else
+	s_h = g_brush_thumbnail_size;
 
 	resize(_src_canvas_ROI, a, cv::Size(s_w, s_h));
-	cv::cvtColor(a,src_ROI_canvas_resized_8UC1, COLOR_RGB2GRAY);
-	int src_resized_8UC1_step1 = (int)src_ROI_canvas_resized_8UC1.step1();
+	cv::cvtColor(a,src_ROI_canvas_clone_resized_8UC1, COLOR_RGB2GRAY);
+	int src_resized_8UC1_step1 = (int)src_ROI_canvas_clone_resized_8UC1.step1();
 	
 	string f_name = "p" + to_string(astroke_depth) + "/" + m_t_ + to_string(astroke_depth) + "_t_" + to_string(_try_);
 	string br_tag = "/br/" + f_name;
 
 	if (tbrush_cnt < DEBUG_BRUSH_CNT) {
 		debug_image( f_name+"_0src_ROI_ ", _src_canvas_ROI);
-		debug_image(f_name +"_1RsizROI_ ", src_ROI_canvas_resized_8UC1);
+		debug_image(f_name +"_1RsizROI_ ", src_ROI_canvas_clone_resized_8UC1);
 		debug_image(f_name+ "_2bef_ROI_ ", _before_ROI_canvas_clone);
 		debug_image(f_name  +"_3chg_ROI_", _changed_canvas_ROI_clone);
 	}
@@ -116,9 +120,9 @@ int result = P_Rendering(
 
 	int brush_no;
 #ifdef _USE_PGM
-	 brush_no = JudgementBrush_pgm(src_ROI_canvas_resized_8UC1, /*added by cwlee*/astroke_depth,
+	 brush_no = JudgementBrush_pgm(src_ROI_canvas_clone_resized_8UC1, /*added by cwlee*/astroke_depth,
 		s_w, s_h, src_resized_8UC1_step1, br_tag);
-	bestBrush_8UC1_resized = brush_resized_array[astroke_depth][brush_no]->brush_8UC1;
+	bestBrush_8UC1_resized = &(brush_resized_array[astroke_depth][brush_no]->brush_8UC1);
 #else
 	 brush_no = JudgementBrush(src_ROI_canvas_resized_8UC1, /*added by cwlee*/astroke_depth,
 		s_w, s_h, src_resized_8UC1_step1, br_tag);
@@ -126,13 +130,13 @@ int result = P_Rendering(
 #endif
 	
 //	bestBrush_embossed_resized = brush_resized_array[astroke_depth][brush_no]->bump;
-	unsigned char * bestBrush_data_8UC1_resized = (unsigned char *)bestBrush_8UC1_resized.data;
+	unsigned char * bestBrush_data_8UC1_resized = (unsigned char *)bestBrush_8UC1_resized->data;
 	//unsigned char * bestBrush_embossed_resized_data = bestBrush_embossed_resized.data;
 	
-	int b_width = bestBrush_8UC1_resized.size().width;
-	int b_height = bestBrush_8UC1_resized.size().height;
-	int b_step1 = (int)bestBrush_8UC1_resized.step1();
-	int b_channels = bestBrush_8UC1_resized.channels();
+	int b_width = bestBrush_8UC1_resized->size().width;
+	int b_height = bestBrush_8UC1_resized->size().height;
+	int b_step1 = (int)bestBrush_8UC1_resized->step1();
+	int b_channels = bestBrush_8UC1_resized->channels();
 
 
 	for (int bx = 0; bx < b_width; bx++)
@@ -144,7 +148,7 @@ int result = P_Rendering(
 		//	int canvas_ROI_Index_3c = by *canvas_clone_ROI_step1 + bx * canvas_clone_ROI_channels;
 			int canvas_clone_ROI_Index_3c = by *canvas_clone_ROI_step1 + bx * canvas_clone_ROI_channels;
 			int gray_bIndex_1c = by*b_step1 + bx*b_channels;
-				Alpha = bestBrush_data_8UC1_resized[gray_bIndex_1c];
+				 p_peek_1c(bestBrush_data_8UC1_resized,gray_bIndex_1c,Alpha);
 				if (Alpha < g_alpha_TH) {
 					p_poke(changed_canvas_ROI_clone_data, canvas_clone_ROI_Index_3c, color_BGR_B, color_BGR_G, color_BGR_R);
 				}
@@ -157,19 +161,19 @@ int result = P_Rendering(
 //#ifdef DEBUG_ALPHA
 	if (tbrush_cnt < DEBUG_BRUSH_CNT) {
 
-			debug_image("br/" + f_name + "_brN_" + to_string(brush_no), bestBrush_8UC1_resized);
+		//	debug_image("br/" + f_name + "_brN_" + to_string(brush_no), bestBrush_8UC1_resized);
 			debug_image(f_name +"_6acc_ROI_", _changed_canvas_ROI_clone);
 			tbrush_cnt++;
 	}
 //#endif
-	int l_judge_image = 1;
+	int l_judge_image = 0;
 
 		int  int_result;
 	if (l_judge_image == 0) {
 
 		 int_result = JudgementImage(src_canvas_ROI_data, changed_canvas_ROI_clone_data, before_ROI_canvas_clone_data,
 			b_width, b_height,
-			centered_SrtPoint,
+			centered_SrtPoint_canvas,
 			//_fetch_color_Point,
 			astroke_depth,
 			b_width, b_height, b_channels, b_step1,
@@ -179,7 +183,8 @@ int result = P_Rendering(
 		);
 	}
 	else int_result = CHANGED_BETTER;
-	int p_step = (int)paint_map_canvas_8UC1[0].step1();
+
+	int p_step_1c = (int)paint_map_canvas_8UC1[0].step1();
 
 	if (int_result == CHANGED_BETTER) {
 
@@ -188,10 +193,10 @@ int result = P_Rendering(
 			for (int bx = 0; bx < b_width; bx++)
 			{
 			//	int canvas_ROI_clone_Index_3c = by *canvas_ROI_clone_step1 + bx * canvas_ROI_clone_channels;
-				int canvas_Index_1c = (centered_SrtPoint_canvas.y+by) *p_step + (centered_SrtPoint_canvas.x+bx) ;
+				int canvas_Index_1c = (centered_SrtPoint_canvas.y+by) *p_step_1c + (centered_SrtPoint_canvas.x+bx) ;
 				int canvas_Index_3c = (centered_SrtPoint_canvas.y + by) *canvas_ROI_step1 + (centered_SrtPoint_canvas.x+bx) * canvas_ROI_channels;
 				int gray_bIndex_1c = by*b_width + bx;
-				int bIndex_3c = by *b_step1 + bx * b_channels;
+			//	int bIndex_1c = by *b_step1 + bx * b_channels;
 
 					Alpha = bestBrush_data_8UC1_resized[gray_bIndex_1c];
 					if (Alpha < g_alpha_TH) {

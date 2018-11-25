@@ -38,6 +38,12 @@ void render_::func_p_map(Mat & a_map_canvas_8UC1,string tag,Rect x_src_canvas_Re
 	r_cout << " zero pixel = " << zero_pixel_cnt << " / " << (x_src_image_size.height*x_src_image_size.width) <<
 		" = " << std::fixed << setprecision(2) << ((float)zero_pixel_cnt / (float)(x_src_image_size.height*x_src_image_size.width))*100.0 << endl;
 }
+void  render_::p_peek_canvas_1c(unsigned char * p, int p_x, int p_y, int &p_0) {
+	int index = ((p_x + x_canvas_bezel_size) + (p_y + x_canvas_bezel_size) * x_canvas_size_width);
+
+	p_0 = p[index];
+
+}
 int render_::paint_a_stroke(partition_Node* strk_p, int layer_0) {
 	//partition_Node* strk_p = (*it_partition_it);
 	int x_image_channels = g_src_image_channels;
@@ -56,17 +62,26 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_0) {
 	int saved_depth = -1;
 	Size Strk_size;
 	int Strk_w_size, Strk_h_size;
-	
+
+	int astroke_depth;
 	Point Strk_point_canvas;
 	//int times;
 	
-	int astroke_depth;
+	Mat before_canvas_ROI ;
+	Mat before_canvas_ROI_clone ;
+
+	Mat changed_canvas_ROI ;
+	Mat changed_canvas_ROI_clone ;
+
+	Mat ing_ROI_canvas ;
+
 	cv::Mat src_canvas_ROI;
-	//cv::Mat src_canvas_ROI_clone;
 	Mat retry_map_1c;
+
 	retry_map_1c.create(x_src_image_size.height, x_src_image_size.width, CV_8UC1);
 	retry_map_1c.setTo(255);
 	unsigned char * retry_map_1c_data = retry_map_1c.data;
+
 	random_device rand_x[MAX_DEPTH];
 	random_device rand_y[MAX_DEPTH];
 	if (layer_0 == 0) {
@@ -102,9 +117,9 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_0) {
 
 	if (times == 0) times = 1;
 	x_strk_times[astroke_depth] = times;
-	if (layer_0 == 0)
-		x_paint_area_brush_count = times*g_paint_try_scale[astroke_depth]*2;
-	else
+//	if (layer_0 == 0)
+//		x_paint_area_brush_count = times*g_paint_try_scale[astroke_depth]*2;
+	//else
 		x_paint_area_brush_count = times*g_paint_try_scale[astroke_depth];
 	uniform_int_distribution<int> diStrk_x(0, (int)(Strk_w_size));
 	uniform_int_distribution<int> diStrk_y(0, (int)(Strk_h_size));
@@ -113,6 +128,9 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_0) {
 	grid_try_sum[astroke_depth] += x_paint_area_brush_count;//
 	int extended_paint_area_brush_count = x_paint_area_brush_count;
 	int extend_retry = 0;
+	Mat mat_accu=accu_canvas[astroke_depth];
+	Mat mat_ing=ing_canvas[astroke_depth];
+
 	for (render_try = 0; render_try < extended_paint_area_brush_count; render_try++)
 	{
 		
@@ -126,7 +144,9 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_0) {
 		fetch_color_Point.y = Strk_srtPoint.y + random_y;
 	
 		if (layer_0 == 0) {
-			int depth_value = *(depth_map_canvas_8UC1_data + fetch_color_Point.x + fetch_color_Point.y*x_canvas_size_width);
+		
+			int depth_value;
+			render_::p_peek_canvas_1c(depth_map_canvas_8UC1_data, fetch_color_Point.x, fetch_color_Point.y,depth_value);
 			if (depth_value != 255 && (depth_value > (changed_depth))) {
 				extended_paint_area_brush_count++;
 				extend_retry++;
@@ -137,8 +157,8 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_0) {
 		int fetch_Index = (fetch_color_Point.x + (fetch_color_Point.y*x_src_image_size.width))*(x_image_channels);
 		int fetch_Index_1c = (fetch_color_Point.x + fetch_color_Point.y*x_src_image_size.width);
 
-		//int fetch_canvas_Index = ((fetch_color_Point.x +x_canvas_bezel_size)
-		//+ (fetch_color_Point.y +x_canvas_bezel_size)*(x_src_image_size.width +x_canvas_bezel_size))*x_image_channels;
+		int fetch_canvas_Index = ((fetch_color_Point.x +x_canvas_bezel_size)
+		+ (fetch_color_Point.y +x_canvas_bezel_size)*(x_src_image_size.width +x_canvas_bezel_size))*x_image_channels;
 
 		p_peek(x_src_ptr, fetch_Index, color_BGR_B, color_BGR_G, color_BGR_R);
 		if (layer_0 == 0) {
@@ -146,12 +166,13 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_0) {
 			p_poke(retry_map_1c_data, fetch_Index_1c, 0);
 		}
 		p_poke(r_try_map_1c_data[astroke_depth], fetch_Index_1c, 50);
-		if (brush_area_w_size_half < x_canvas_bezel_size)
+	
+		if (brush_area_w_size_half > x_canvas_bezel_size)
 			adjusted_w_size = x_canvas_bezel_size;
 		else
 			adjusted_w_size = brush_area_w_size_half;
 
-		if (brush_area_h_size_half < x_canvas_bezel_size)
+		if (brush_area_h_size_half > x_canvas_bezel_size)
 			adjusted_h_size = x_canvas_bezel_size;
 		else
 			adjusted_h_size = brush_area_w_size_half;
@@ -159,12 +180,8 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_0) {
 		centered_SrtPoint.x = fetch_color_Point.x - adjusted_w_size;
 		centered_SrtPoint.y = fetch_color_Point.y - adjusted_h_size;
 
-		centered_EndPoint.x = fetch_color_Point.x + (adjusted_w_size - brush_area_w_size_half);// to overcome odd brush size
-		centered_EndPoint.y = fetch_color_Point.y + (adjusted_h_size - brush_area_h_size_half);// to overcome odd brush size
-
-
-																							   //	Point Point_X, Point_Y;
-
+		centered_EndPoint.x = fetch_color_Point.x + (adjusted_w_size );// to overcome odd brush size
+		centered_EndPoint.y = fetch_color_Point.y + (adjusted_h_size );// to overcome odd brush size
 
 		centered_SrtPoint_canvas.x = centered_SrtPoint.x + x_canvas_bezel_size;
 		centered_SrtPoint_canvas.y = centered_SrtPoint.y + x_canvas_bezel_size;
@@ -179,14 +196,16 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_0) {
 		src_canvas_ROI = src_canvas(centered_ROI_canvas_Rect);
 		//	src_canvas_ROI_clone = src_canvas(centered_ROI_canvas_Rect).clone();
 
+		
+		 //before_canvas_ROI = mat_accu(centered_ROI_canvas_Rect);
+		 before_canvas_ROI_clone.release();
+		 before_canvas_ROI_clone = mat_accu(centered_ROI_canvas_Rect).clone();
 
-		Mat before_canvas_ROI = accu_canvas[astroke_depth](centered_ROI_canvas_Rect);
-		Mat before_canvas_ROI_clone = accu_canvas[astroke_depth](centered_ROI_canvas_Rect).clone();
+		 changed_canvas_ROI = mat_accu(centered_ROI_canvas_Rect);
+		 changed_canvas_ROI_clone.release();
+		 changed_canvas_ROI_clone = mat_accu(centered_ROI_canvas_Rect).clone();
 
-		Mat changed_canvas_ROI = accu_canvas[astroke_depth](centered_ROI_canvas_Rect);
-		Mat changed_canvas_ROI_clone = accu_canvas[astroke_depth](centered_ROI_canvas_Rect).clone();
-
-		Mat ing_ROI_canvas = ing_canvas[astroke_depth](centered_ROI_canvas_Rect);
+		 ing_ROI_canvas = mat_ing(centered_ROI_canvas_Rect);
 
 		//Mat ing_ROI_clone = ing_canvas[astroke_depth](centered_ROI_canvas_Rect).clone();
 
@@ -197,7 +216,7 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_0) {
 			changed_canvas_ROI_clone,
 			ing_ROI_canvas,
 			changed_canvas_ROI,
-			accu_canvas[astroke_depth],
+			mat_accu,
 			centered_ROI_canvas_Rect,
 			fetch_color_Point,
 			centered_SrtPoint,
@@ -246,6 +265,16 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_0) {
 		r_cout << "extend_retry = "<< extended_paint_area_brush_count<<" : "<<extend_retry << endl;
 		debug_image("ing/"+tag[render_method]+ "_retry_map", retry_map_1c);
 	}
+	 before_canvas_ROI.release();
+	 before_canvas_ROI_clone.release();
+
+ changed_canvas_ROI.release();
+ changed_canvas_ROI_clone.release();
+
+ ing_ROI_canvas.release();
+
+	 src_canvas_ROI.release();
+ retry_map_1c.release();
 	return times;
 }
 int   render_::PainterlyRendering()

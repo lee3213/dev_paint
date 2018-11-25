@@ -273,13 +273,6 @@ void  render_::rectangle_canvas(cv::Mat mat, cv::Rect  rect, Scalar s) {
 	cv::rectangle(mat, rect, s);
 }
 
-void  render_::p_peek_canvas(unsigned char * p, int p_x, int p_y, int &p_0, int &p_1, int &p_2) {
-	int index = ((p_x + x_canvas_bezel_size) + (p_y + x_canvas_bezel_size) * x_canvas_size_width) * 3;
-
-	p_0 = p[index];
-	p_1 = p[index + 1];
-	p_2 = p[index + 2];
-}
 void  render_::post_process() {
 	int ret;
 	if (success_or_fail == 0) {

@@ -106,7 +106,7 @@ int  set_global(string src_name,string deploy_name) {
 	
 	g_INDEX_BRUSH_SIZE_WIDTH = 20;//changed by cwlee from 10 to same as thumbnail
 	g_INDEX_BRUSH_SIZE_HEIGHT = 20; //changed by cwlee from 10 to same as thumbnail
-	g_BrushNumber = 48;						//basic:64    expansion:48
+	//g_BrushNumber = 48;						//basic:64    expansion:48
 	g_brush_thumbnail_size = g_INDEX_BRUSH_SIZE_HEIGHT;
 
 	g_brush_choice = 1;// one of 5 random 

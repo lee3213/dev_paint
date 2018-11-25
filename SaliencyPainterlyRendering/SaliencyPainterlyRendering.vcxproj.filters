@@ -281,6 +281,9 @@
     <ClCompile Include="render_prepare.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="render_.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SaliencyPainterlyRendering.rc">

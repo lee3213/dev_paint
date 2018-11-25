@@ -232,6 +232,7 @@
     <ClCompile Include="pregraph\saliency_PreGraph.cpp" />
     <ClCompile Include="pregraph\SLIC.cpp" />
     <ClCompile Include="rendering_prepare.cpp" />
+    <ClCompile Include="render_.cpp" />
     <ClCompile Include="render_pixel.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="render_image.cpp" />

@@ -173,18 +173,21 @@ void render_::brush_pgm_resize(vector <Brush_pgm*> _brush_pgm_list)
 
 	int no = 0;
 	vector <Brush_pgm*>::iterator it = _brush_pgm_list.begin();
-
+	Size sz_pgm;
 	for (int j = 0; it != _brush_pgm_list.end(); it++, j++) {
 		for (int i = 0; i < render_depth; i++) {
 			if (render_brush_size[i] == 0) continue;
 			brush_pgm_resized = new (render_Brush_pgm);
-
-			resize((*it)->brush_8UC1, brush_pgm_resized->brush_8UC1, Size(render_brush_size[i], render_brush_size[i]));
+			sz_pgm.height = render_brush_size[i];
+			sz_pgm.width = render_brush_size[i];
+			resize((*it)->brush_8UC1, brush_pgm_resized->brush_8UC1,sz_pgm);
 			//resize((*it)->bump, brush_resized->bump, Size(render_brush_size[i], render_brush_size[i]));
 			//	resize((*it)->brush_8UC1, brush_resized->brush_8UC1, Size(render_brush_size[i], render_brush_size[i]));
 			//	cvtColor(brush_resized->brush, brush_resized->brush_hsv, CV_BGR2HSV);
 			resize((*it)->brush_8UC1,brush_pgm_resized->brush_thumbnail,Size(g_brush_thumbnail_size,g_brush_thumbnail_size));
 			brush_pgm_resized->brush_no = j;
+			brush_pgm_resized->brush_size = render_brush_size[i];
+			brush_pgm_resized->pgm_size = sz_pgm;
 			//resize(brush_pgm_resized->brush_thumbnail, brush_pgm_resized->brush_thumbnail_minimum,
 				//Size(brush_minimum_size, brush_minimum_size));
 

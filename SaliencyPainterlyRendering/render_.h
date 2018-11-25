@@ -77,12 +77,13 @@ public:
 class render_Brush_pgm {
 public:
 	cv::Mat brush_8UC1;
-	Size pgm;
+	Size pgm_size;
 	//	cv::Mat brush_mask;
 	cv::Mat brush_thumbnail;
 	//cv::Mat brush_thumbnail_minimum;
 	//	cv::Mat bump;
 	int brush_no;
+	int brush_size;
 	unsigned char * brush_8UC1_data;
 	unsigned char * brush_thumbnail_data;
 	//unsigned char *brush_thumbnail_minimum_data;
@@ -186,13 +187,22 @@ public:
 	void post_process();
 	void  render_::rectangle_canvas(cv::Mat mat, cv::Rect  rect, Scalar s);
 	//void p_poke_canvas(unsigned char * p, int index, int y, int r, int g, int b);
-	void  render_::p_poke_canvas(unsigned char * p, int p_x, int p_y, int p_0, int p_1, int p_2) {
+	inline void  render_::p_poke_canvas(unsigned char * p, int p_x, int p_y, int p_0, int p_1, int p_2);
+	/*{
 		int index = ((p_x + x_canvas_bezel_size) + (p_y + x_canvas_bezel_size) * x_canvas_size_width) * 3;
 		p[index] = p_0;
 		p[index + 1] = p_1;
 		p[index + 2] = p_2;
+	}*/
+	inline void  render_::p_poke_canvas_1c(unsigned char * p, int p_x, int p_y, int p_0);
+	/*{
+		int index = ((p_x + x_canvas_bezel_size) + (p_y + x_canvas_bezel_size) * x_canvas_size_width) * 1;
+		p[index] = p_0;
+		
 	}
-	void p_peek_canvas(unsigned char * p, int index, int y, int &r, int &g, int &b);
+	*/
+	inline void p_peek_canvas(unsigned char * p, int p_x, int y, int &r, int &g, int &b);
+	inline void p_peek_canvas_1c(unsigned char * p, int p_x, int y, int &r);
 	//void  render_::p_poke_canvas(unsigned char * p, int p_x, int p_y, int p_0, int p_1, int p_2);
 	//void render_::brush_delete(vector <render_Brush*> brush_set);
 	//void  render_::p_poke_canvas(unsigned char * p, int p_x, int p_y, int p_0, int p_1, int p_2);

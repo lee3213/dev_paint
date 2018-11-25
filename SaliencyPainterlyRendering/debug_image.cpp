@@ -146,6 +146,29 @@ void debug_image(string str, Mat &a, int ftype )
 		path = format("%s/%s.%s", g_para_method_image_path.c_str(), str.c_str(),ext);
 	imwrite(path.c_str(), b);
 }
+void debug_image(string str, Mat *a, int ftype)
+{
+	string path;
+
+	Mat b;
+	if ((a->type() & CV_MAT_DEPTH_MASK) == CV_32F) {
+		//cout << type2str(a.type());
+		a->convertTo(b, CV_8UC3, 255.);
+	}
+
+	else b = *a;
+
+	//	path = g_para_method_image_path + string("/") + str + string(".ppm");
+#ifdef _DEBUG_IMAGE 
+	cout << path << endl;
+#endif
+
+	char ext[10];
+	get_ext(ext, b.channels(), ftype);
+
+	path = format("%s/%s.%s", g_para_method_image_path.c_str(), str.c_str(), ext);
+	imwrite(path.c_str(), b);
+}
 
 
 void debug_image(char * p, Mat &a, int ftype )

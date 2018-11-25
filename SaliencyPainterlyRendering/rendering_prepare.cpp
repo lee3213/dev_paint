@@ -131,6 +131,7 @@ int   prepare_Rendering(char * src_name, char * deploy_name)
 	int ret = set_global(string(src_name), string(deploy_name));
 	if (ret < 0)
 		return -7777;
+//#define BRUSH_ADJUST
 #ifdef BRUSH_ADJUST
 	Brush_adjust(g_brush_vector_set);
 	return -999999;

@@ -108,16 +108,16 @@ int  render_::JudgementBrush(cv::Mat &testImg_canvas, int depth, int t_image_wid
 	return brush_no;
 }
 
-int  render_::JudgementBrush_pgm(cv::Mat &testImg_canvas, int depth, int t_image_width, int t_image_height, int _canvas_step1, string tag)
+int  render_::JudgementBrush_pgm(cv::Mat &testImg_canvas_clone, int depth, int _t_image_width, int _t_image_height, int __canvas_step1, string tag)
 {
 	vector<DisData> colorDis;
 	colorDis.resize(g_BrushNumber);
 	DisData newDistance;
-	unsigned char* testData = (unsigned char*)testImg_canvas.data;
+	unsigned char* testData = (unsigned char*)testImg_canvas_clone.data;
 
-	int t_width = testImg_canvas.size().width;
-	int t_height = testImg_canvas.size().height;
-	int t_step1 = (int)testImg_canvas.step1();
+	int t_width = testImg_canvas_clone.size().width;
+	int t_height = testImg_canvas_clone.size().height;
+	int t_step1 = (int)testImg_canvas_clone.step1();
 	unsigned char* indexData;
 	int loop_w, loop_h;
 	//string f_path;
@@ -135,6 +135,8 @@ int  render_::JudgementBrush_pgm(cv::Mat &testImg_canvas, int depth, int t_image
 	//if (t_width < g_brush_thumbnail_size) {
 	loop_w = t_width;
 	loop_h = t_height;
+
+	
 	//	flag = true;
 	//}
 	//else {
@@ -223,9 +225,9 @@ bool compareDistance_rev(DisData a, double b)
 //int  result = JudgementImage(srcData, changedData, beforeData, brush_area_w_size, brush_area_h_size, centered_SrtPoint,
 	//astroke_depth, s_width, s_height, s_channels);
 
-int JudgementImage(unsigned char * src_ROI_ptr, unsigned char * changed_ROI_clone_canvas_Data_p, unsigned char * before_ROI_clone_canvas_Data_p, 
+int JudgementImage(unsigned char * src_ROI_canvas_ptr, unsigned char * changed_ROI_clone_canvas_ptr, unsigned char * before_ROI_clone_canvas_ptr, 
 	int brush_area_w_size, int brush_area_h_size,
-	Point centered_SrtPoint,//, Point _fetch_color_point,
+	Point centered_SrtPoint_canvas,//, Point _fetch_color_point,
 	int astroke_depth,
 	int b_w, int b_h, int b_c, int b_step1,
 	int canvas_w, int canvas_h, int canvas_c,int canvas_ROI_step1,
@@ -279,9 +281,9 @@ int JudgementImage(unsigned char * src_ROI_ptr, unsigned char * changed_ROI_clon
 			int c_0, c_1, c_2;
 
 
-			p_peek(src_ROI_ptr,canvas_ROI_index, s_0, s_1, s_2);
-			p_peek(before_ROI_clone_canvas_Data_p, canvas_clone_ROI_index, b_0, b_1, b_2);
-			p_peek(changed_ROI_clone_canvas_Data_p, canvas_clone_ROI_index, c_0, c_1, c_2);
+			p_peek(src_ROI_canvas_ptr,canvas_ROI_index, s_0, s_1, s_2);
+			p_peek(before_ROI_clone_canvas_ptr, canvas_clone_ROI_index, b_0, b_1, b_2);
+			p_peek(changed_ROI_clone_canvas_ptr, canvas_clone_ROI_index, c_0, c_1, c_2);
 #ifdef DEBUG_
 			p_poke(sr_data, b_index, s_0, s_1, s_2);
 			p_poke(ch_data, b_index, c_0, c_1, c_2);
