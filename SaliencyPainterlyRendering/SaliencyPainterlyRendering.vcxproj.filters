@@ -141,6 +141,12 @@
     <ClInclude Include="json_util.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="brush_adjust.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="brush_pgm.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -215,9 +221,6 @@
     <ClCompile Include="saliency_itti.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="render_.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="brush_resize.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -260,9 +263,6 @@
     <ClCompile Include="PainterlyRendering_main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="render_prepare.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="grad_direction.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -270,6 +270,15 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="render_image.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="brush_pgm.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="rendering_prepare.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="render_prepare.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,423 +1,550 @@
-
 #include "stdafx.h"
-
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
-#include <opencv2/saliency.hpp>
+#include "define.h"
+#include "extern.h"
+
+#include "brush.h"
+#include "QuadTree.h"
+#include "debug_image.h"
+
+#include "render_.h"
 using namespace std;
 using namespace cv;
-using namespace saliency;
-#include "define.h"
-#include "util.h"
+void image_save(string image_name, Mat result_image, Mat Quad_TreeMap) {
+	debug_image_abs(g_root_image_path, g_para_method + string("_") + image_name, result_image);
+	debug_image_abs(g_root_image_path, g_para_method + string("_") + image_name+"_Q" , Quad_TreeMap);
 
-#include "debug_image.h"
-#include "use_json.h"
-#include "set_result_path.h"
+	debug_image_abs(g_para_path + string("/"), g_para_method + string("_") + image_name, result_image);
+	debug_image_abs(g_para_path + string("/"), g_para_method + string("_") + image_name + string("_Q"), Quad_TreeMap);
 
-// 유일한 응용 프로그램 개체입니다.
-#include "util.h"
-#include "time_stamp.h"
+	debug_image_abs(g_para_method_path + string("/"), g_para_method + string("_") + image_name, result_image);
+	debug_image_abs(g_para_method_path + string("/"), g_para_method + string("_") + image_name + string("_Q"), Quad_TreeMap);
 
-#include "json_read.h"
-#include "saliency_main.h"
-#include "g_setup.h"
+		debug_image_abs(g_para_method_image_path, g_para_method + string("_") + image_name, result_image);
+	debug_image_abs(g_para_method_image_path, g_para_method + string("_") + image_name + string("_Q"), Quad_TreeMap);
 
 
-#include "dir.h"
 
-
-int  saliency_union(Mat saliency_map_C, Mat saliency_map_G, Mat & _union_map) {
-
-
-	unsigned char * saliency_map_C_data = saliency_map_C.data;
-	unsigned char * saliency_map_G_data = saliency_map_G.data;
-	int width = saliency_map_C.cols;
-	int height = saliency_map_C.rows;
-
-	unsigned char * union_map_data = _union_map.data;
-	for (int y = 0; y < height; y++) {
-		for (int x = 0; x < width; x++) {
-			int ind = y*width + x;
-			if (*(saliency_map_C_data + ind) < *(saliency_map_G_data + ind))
-			{
-				*(union_map_data + ind) = *(saliency_map_G_data + ind);
-			}
-			else
-			{
-				*(union_map_data + ind) = *(saliency_map_C_data + ind);
-			}
-
-		}//x
-
-	}//y
-
-	return width*height;
+	debug_image(g_para_method + string("_") + g_image_name, result_image);
+	debug_image(g_para_method + string("_") + g_image_name, Quad_TreeMap);
 }
+/*
+void render_::brush_delete(render_Brush* r_brush_array[]) {
+	int nth = 0;
+	for (std::vector <render_Brush*>::iterator i = brush_set.begin(), endI = brush_set.end(); i != endI; ++i, nth++)
+	{
 
-cv::Mat get_sobel_map(Mat & srcImg) {
-	//cv::Mat gray_Map;
-	cv::Mat org_Gaussian_Map;
-	cv::Mat sobel_map;
-//	cv::Mat sobel_bi_map;
-	//Take GradientImg from source Image
-	static int called = 0;
+		(*i)->brush.release();
+		(*i)->brush_thumbnail.release();
+		(*i)->bump.release();
+		(*i)->index_brush.release();
+		(*i)->brush_8UC1.release();
+	}
 
-	cv::cvtColor(srcImg, g_src_gray_Map, CV_BGR2GRAY);							//3ch -> 1ch
-																			//f_path = cv::format("%s/src_1ch.ppm", g_para_method_path.c_str());
-																			//cv::imwrite(f_path, gray_Map);
-	debug_image("src_1ch" + to_string(called), g_src_gray_Map);
-	int gray_map_width = g_src_gray_Map.size().width;
-	int gray_map_height = g_src_gray_Map.size().height;
+	brush_set.clear();
 
-	//	org_Gaussian_Map = bsShowImage::TakeGaussianBlurImg(gray_Map);
-	//cv::Mat bilaterial_Map;
-	//cv::bilateralFilter(gray_Map, bilaterial_Map, 10, 10, 10);
-	//debug_image("src_bilaterial_10_10_10", bilaterial_Map);
-	cv::GaussianBlur(g_src_gray_Map, org_Gaussian_Map, Size(3, 3), 0);
-	debug_image("src_take_blur" + to_string(called), org_Gaussian_Map);
-	int ddepth = CV_16S;
-	double scale = 1.0;
-	int delta = 0;
-	//org_sobeldient_Map = bsShowImage::TakeGradient(org_Gaussian_Map);
-
-	cv::Mat grad_x, grad_y, abs_sobeld_x, abs_sobeld_y;
-	cv::Mat grad_bi_x, grad_bi_y, abs_sobeld_bi_x, abs_sobeld_bi_y;
-	//org_Gaussian_Map=
-	cv::Sobel(org_Gaussian_Map, grad_x, ddepth, 1, 0, 3, scale, delta);
-	cv::convertScaleAbs(grad_x, abs_sobeld_x);
-	cv::Sobel(org_Gaussian_Map, grad_y, ddepth, 0, 1, 3, scale, delta);
-	cv::convertScaleAbs(grad_y, abs_sobeld_y);
-
-	//cv::Sobel(bilaterial_Map, grad_bi_x, ddepth, 1, 0, 3, scale, delta);
-	//cv::convertScaleAbs(grad_bi_x, abs_sobeld_bi_x);
-//	cv::Sobel(bilaterial_Map, grad_bi_y, ddepth, 0, 1, 3, scale, delta);
-//	cv::convertScaleAbs(grad_bi_y, abs_sobeld_bi_y);
-
-	mat_print(grad_x, "grad_x");
-	mat_print(abs_sobeld_y, "abs_sobeld_y");
-	
-	cv::addWeighted(abs_sobeld_x, 0.5, abs_sobeld_y, 0.5, 0, sobel_map);
-	//cv::addWeighted(abs_sobeld_bi_x, 0.5, abs_sobeld_bi_y, 0.5, 0, sobel_bi_map);
-	//debug_image("sobel_bilaterial", sobel_bi_map);
-	debug_image("sobel_gaussian", sobel_map);
-	return sobel_map;
 }
-
-
-int   prepare_Rendering(char * src_name, char * deploy_name)
-{
-	//time_t now = time(NULL);
-
-	//	cv::Mat org_saliency_sobeld_Map;
-	//, org_QuadTreeMap, org_DensityMap, org_rstImg;
-
-	
-
-	Mat sobel_8UC1;
-	Mat sobel_8UC3;
-	Mat gradient_Union_8UC1;
-	Mat gradient_Map_C_8UC3;
-	Mat gradient_Map_G_8UC3;
-	string fname_saliency_G;
-	string fname_saliency_C;
-	string f_saliency_img;
-
-	Mat saliency_8UC1;
-	Mat saliency_32F;
-
-	int saved_depth = -1;
-
-
-	int ret = set_global(string(src_name), string(deploy_name));
-	if (ret < 0)
-		return -7777;
-
-	ret = BrushInitialization(g_brush_vector_set);
-	if (ret != 0) {
-		cout << "Brush Initialization Error_" << endl;
-		cerr << "Brush Initialization Error_" << endl;
-		return -1001;
-	}
-	
-	g_srcImg_RO = cv::imread(src_name, CV_LOAD_IMAGE_COLOR);
-
-	if (g_srcImg_RO.cols == 0
-		|| g_srcImg_RO.rows == 0)
-	{
-		cout << "Src " << src_name << " size 0" << endl;
-		return -100;
-	}
-
-	g_src_image_width = g_srcImg_RO.size().width;
-	g_src_image_height = g_srcImg_RO.size().height;
-	g_src_image_channels = g_srcImg_RO.channels();
-	g_src_image_step1 = (int)g_srcImg_RO.step1();
-
-	g_file_cstat << g_para_method + "," << g_image_name << ", " << "image size," <<
-		to_string(g_src_image_width) + "," + to_string(g_src_image_height) << endl;
-	cout << g_para_method + "," << g_image_name << ", " << "image size," <<
-		to_string(g_src_image_width) + "," + to_string(g_src_image_height) << endl;
-
-	gradient_Union_8UC1.create(g_src_image_height, g_src_image_width, CV_8UC1);
-	debug_image("src_image", g_srcImg_RO);
-
-	
-
-
-	cout << "Saliency Method " << g_saliency_method << endl;
-	//	cout << "g_Render_method " << g_Render_method << endl;
-
-
-	sobel_8UC1 = get_sobel_map(g_srcImg_RO);
-	if (sobel_8UC1.cols == 0 ||
-		sobel_8UC1.rows == 0)
-	{
-		cout << "unexpected sobel_gradient_Map = 0" << endl;
-		return -20002;
-	}
-
-	debug_image("0_sobel_gradient", sobel_8UC1);
-
-#ifdef CANNY
-	Mat canny_map = get_canny_map(g_srcImg_RO);
-#endif
-
-	cv::cvtColor(sobel_8UC1, sobel_8UC3, CV_GRAY2RGB);
-
-
-#ifdef BING
-	Mat sa;
-	//	if (g_saliency_method == string("ObjectnessBING")) {
-
-	Mat saliency_Objectness_C, saliency_Objectness_G;
-	string training_path = "/render/ObjectnessTrainedModel";
-	//Mat saliency_residual_8UC1;
-	Ptr<ObjectnessBING> saliencyAlgorithm_O = ObjectnessBING::create();
-	//saliencyAlgorithm = ObjectnessBING::create();
-	vector<Vec4i> saliencyMap;
-	saliencyAlgorithm_O.dynamicCast<ObjectnessBING>()->setTrainingPath(training_path);
-	saliencyAlgorithm_O.dynamicCast<ObjectnessBING>()->setBBResDir("/rst/Results");
-	sa = saliencyAlgorithm_O->computeSaliency(g_srcImg_RO, saliencyMap);
-
-	int ndet = int(saliencyMap.size());//int(sa_size);
-	int maxd = 7, step = 255 / maxd, jitter = 9; // jitter to seperate single rects
-	Mat draw = g_srcImg_RO.clone();
-	for (int i = 0; i < std::min(maxd, ndet); i++) {
-		Vec4i bb = saliencyMap[i];
-		Scalar col = Scalar(((i*step) % 255), 50, 255 - ((i*step) % 255));
-		Point off(theRNG().uniform(-jitter, jitter), theRNG().uniform(-jitter, jitter));
-		rectangle(draw, Point(bb[0] + off.x, bb[1] + off.y), Point(bb[2] + off.x, bb[3] + off.y), col, 2);
-		rectangle(draw, Rect(20, 20 + i * 10, 10, 10), col, -1); // mini temperature scale
-		debug_image("BING_" + to_string(i), draw);
-	}
-
-	Mat mag1u, mag1u_rgb, mag1u_hsv;
-	gradientGray(g_srcImg_RO, mag1u);
-	debug_image("BING_g_Gray", mag1u);
-	gradientRGB(g_srcImg_RO, mag1u_rgb);
-	debug_image("BING_g_RGB", mag1u_rgb);
-	gradientHSV(g_srcImg_RO, mag1u_hsv);
-	debug_image("BING_g_HSV", mag1u_hsv);
-	*/
-
-#endif		
-
-
-		f_saliency_img = g_root_saliency_path + "/" + g_image_name + "_" + g_saliency_method;
-	fname_saliency_G = f_saliency_img + "_G_8UC3.jpg";
-	fname_saliency_C = f_saliency_img + "_C_8UC3.jpg";
-
-	if (g_saliency_method != SALIENCY_STR_SOBEL) {
-
-		bool exists;
-		int flag = 0;
-
-		exists = fileExists(fname_saliency_C);
-		if (exists == true) {
-			flag += 1;
-
-			gradient_Map_C_8UC3 = cv::imread(fname_saliency_C, CV_LOAD_IMAGE_COLOR);
-			cvtColor(gradient_Map_C_8UC3, gradient_Map_C_8UC1, CV_BGR2GRAY);
-			exists = fileExists(fname_saliency_G);
-			if (exists == true) {
-				flag += 1;
-				gradient_Map_G_8UC3 = cv::imread(fname_saliency_G, CV_LOAD_IMAGE_COLOR);
-				cvtColor(gradient_Map_G_8UC3, gradient_Map_G_8UC1, CV_BGR2GRAY);
-				//gradient_Map_G_8UC3.convertTo(gradient_Map_G_8UC1, CV_8UC1);
-			}
-		}
-
-		if (flag == 0) {
-			if (g_saliency_method == string("Residual")) {
-
-				//Mat saliency_residual_8UC1;
-				Ptr<StaticSaliencySpectralResidual> saliencyAlgorithm = StaticSaliencySpectralResidual::create();
-				saliencyAlgorithm->computeSaliency(g_srcImg_RO, saliency_8UC1);
-				//	mat_print(saliency_8UC1, "Residual");
-				gradient_Map_C_8UC1 = saliency_8UC1.clone();
-				//	if (g_Render_method != "Saliency") {
-				saliencyAlgorithm->computeSaliency(sobel_8UC3, saliency_8UC1);
-				gradient_Map_G_8UC1 = saliency_8UC1.clone();
-				//	}
-
-			}
-			else if (g_saliency_method == string("Fine_grained")) {
-				//	Mat saliency_finegrained_8UC1;
-				Ptr<StaticSaliencyFineGrained> saliencyAlgorithmG = StaticSaliencyFineGrained::create();
-				saliencyAlgorithmG->computeSaliency(g_srcImg_RO, saliency_8UC1);
-				gradient_Map_C_8UC1 = saliency_8UC1.clone();
-				//	if (g_Render_method != "Saliency") {
-				saliencyAlgorithmG->computeSaliency(sobel_8UC3, saliency_8UC1);
-				gradient_Map_G_8UC1 = saliency_8UC1.clone();
-				//	}
-
-			}
-			else if (g_saliency_method == string("Blackandwhite")) {
-
-				//Mat saliency_blackandwhite_8UC1;
-				saliency_8UC1 = saliency_blackandwhite_main(g_srcImg_RO);
-				gradient_Map_C_8UC1 = saliency_8UC1.clone();
-				//	if (g_Render_method != "Saliency") {
-				saliency_8UC1 = saliency_blackandwhite_main(sobel_8UC3);
-				gradient_Map_G_8UC1 = saliency_8UC1.clone();
-				//	}
-			}
-			else if (g_saliency_method == string("Pregraph")) {
-
-				saliency_32F = preGraph_main(g_srcImg_RO);
-				saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-				gradient_Map_C_8UC1 = saliency_8UC1.clone();
-				//	if (g_Render_method != "Saliency") {
-				saliency_32F = preGraph_main(sobel_8UC3);
-				saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-				gradient_Map_G_8UC1 = saliency_8UC1.clone();
-				//	}
-
-			}
-			else if (g_saliency_method == string("Itti")) {
-				//Mat saliency_itti_32F;
-
-				saliency_32F = saliency_itti_main(g_srcImg_RO.clone(), "C");
-				saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-				gradient_Map_C_8UC1 = saliency_8UC1.clone();
-				//	if (g_Render_method != "Saliency") {
-				saliency_32F = saliency_itti_main(sobel_8UC3.clone(), "G");
-				saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-				gradient_Map_G_8UC1 = saliency_8UC1.clone();
-				//	}
-			}
-			else if (g_saliency_method == string("Perazzi")) {
-
-				saliency_32F = saliency_Perazzi_main(g_srcImg_RO);
-				saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-				gradient_Map_C_8UC1 = saliency_8UC1.clone();
-				//	if (g_Render_method != "Saliency") {
-				saliency_32F = saliency_Perazzi_main(sobel_8UC3);
-				saliency_32F.convertTo(saliency_8UC1, CV_8UC1, 255.);
-				gradient_Map_G_8UC1 = saliency_8UC1.clone();
-				//	}
-
-			}
-
-			else {
-				cout << "No Saliency method assigned" << endl;
-				return -5555;
-			}
-			vector<int> compression_params;
-			compression_params.push_back(CV_IMWRITE_PXM_BINARY);
-			compression_params.push_back(0);
-
-			cvtColor(gradient_Map_C_8UC1, gradient_Map_C_8UC3, CV_GRAY2BGR);
-			cvtColor(gradient_Map_G_8UC1, gradient_Map_G_8UC3, CV_GRAY2BGR);
-			//	gradient_Map_C_8UC1.convertTo(gradient_Map_C_8UC3, CV_8UC3);
-			//	gradient_Map_G_8UC1.convertTo(gradient_Map_G_8UC3, CV_8UC3);
-			//cv::imwrite(saliency_C, gradient_Map_C_8UC3, compression_params);
-			//cv::imwrite(saliency_G, gradient_Map_G_8UC3, compression_params);
-			cv::imwrite(fname_saliency_C, gradient_Map_C_8UC3);
-			cv::imwrite(fname_saliency_G, gradient_Map_G_8UC3);
-		}
-		else {//flag != 0 
-			if (flag != 2)
-				return -1;
-
-		}
-	}// if sobel
-
-	for (int i = 0; i < RENDER_MAX; i++) {//SOBEL SALIENCY UNION TWO_MERGE TWO_ENHANCE
-		_render[i] = new  render_(i, g_srcImg_RO);
-
-		if (g_saliency_method == g_saliency_method_str[i])
-		{
-			g_saliency_method = i;
-		}
-	}
-		_render[RENDER_SOBEL]->add_gradient_map(Gradient_Sobel, sobel_8UC1);
+*/
+int render_ ::stroke_dump(Stroke_set _aStroke_set[], string tag__, int  depth) {
+	r_cout << tag__ << " " << depth << endl;
+	for (int i = 0; i < depth; i++) {
 		
-	if (g_saliency_method != SALIENCY_STR_SOBEL) {
+			r_cout << tag__ << " " << i << " : " << _aStroke_set[i].stroke_list.size() << endl;
+		
+	}
+/*	int __saved_depth = -1;
+	int  _grid[MAX_DEPTH];
 
-		debug_image("0_Saliency_C_" + g_saliency_method, gradient_Map_C_8UC1);
-		//if (g_Render_method != "Sobel") {
-		debug_image("0_Saliency_G_" + g_saliency_method
-			, gradient_Map_G_8UC1);
+	r_cout << tag << endl;
+	for (int i = 0; i <MAX_DEPTH; i++) {
+		_grid[i] = 0;
+	}
 
-		int size_union = saliency_union(gradient_Map_C_8UC1, gradient_Map_G_8UC1, gradient_Union_8UC1);
-		debug_image("0_Saliency_union_" + g_saliency_method, gradient_Union_8UC1);
+	for (int i = 0; i < depth; i++) {
+		for (list<Img_node*>::iterator partition_it = _aStroke_set[i]->begin(); partition_it != _aStroke_set[i]->end(); partition_it++)
+		{
 
-		//}
+			_grid[(*partition_it)->depth]++;
+			__saved_depth = (*partition_it)->depth;
+		}//end of QuadTree dump
+	}
+		for (int i = 0; i < depth; i++) {
+			r_cout << setw(4) << i << ", " << _grid[i] << endl;
+	}
+	*/
+	return depth;
+}
 
+int render_::draw_grid_2(Mat _Quad_TreeMap,
+	Stroke_set aStroke_set[], string ftag, int  depth, 
+	//int draw_depth, 
+	int c,string _tag) {
+	int __saved_depth = -1;
+	Mat overlay_grid_map[MAX_DEPTH];
+	
+	static int called_cnt = 0;
+	if (aStroke_set->stroke_list.size() == 0) {
+		r_cout << "aStroke_Set size() = 0 " + _tag << +": " << ftag << " : "// << to_string(draw_depth) 
+			<< endl;
+		return depth;
+	}
 
-		for (int i = RENDER_SALIENCY; i < RENDER_MAX; i++) {
-			_render[i]->add_gradient_map(Gradient_Sobel, sobel_8UC1);
-			_render[i]->add_gradient_map(Gradient_Saliency_C, gradient_Map_C_8UC1);
+	for (int i = 0; i <MAX_DEPTH; i++) {
+		overlay_grid_map[i] = _Quad_TreeMap.clone();
+	}
+	for (int i = 0; i < depth; i++) {
 
-			_render[i]->add_gradient_map(Gradient_Saliency_G, gradient_Map_G_8UC1);
-			_render[i]->add_gradient_map(Gradient_Union, gradient_Union_8UC1);
-			_render[i]->add_gradient_map(Gradient_Twopass, gradient_Union_8UC1);
-			//	}
+		for (list<partition_Node *>::iterator partition_it = render_Stroke_set[i].stroke_list.begin(); partition_it != render_Stroke_set[i].stroke_list.end(); partition_it++)
+		{
+		//	if (draw_depth != -1 && __saved_depth != draw_depth) {
+		//		continue;
+		//	}
+			__saved_depth = (*partition_it)->depth;
+
+			//if (draw_depth == -1 || __saved_depth == draw_depth)
+			rectangle_canvas(overlay_grid_map[__saved_depth], Rect((*partition_it)->srtPoint,
+				(*partition_it)->endPoint), Scalar(c, c, c));
+
+		}//end of QuadTree dump
+	}// for depth
+	for (int i = 0; i <= __saved_depth; i++) {
+	//	if (draw_depth == -1 || i == draw_depth) {
+			debug_image("ing/"+to_string(called_cnt)+"_o_" + ftag, i, overlay_grid_map[i]);
+			called_cnt++;
+	//	}
+	}
+	 depth = __saved_depth + 1;
+	r_cout << tag[depth] << " " << __FUNCTION__ << " finalized Depth : " << depth << " : " << grid_map_sum << endl;
+
+	called_cnt++;
+	return depth;
+}
+int render_::draw_grid_depth(Mat  _grid_map_1c[], Mat _grid_map_1c_accu,
+	Stroke_set aStroke_set[], string tag, int & grid_map_sum,
+	 int _QT_grid_count[]//, bool do_grid_cnt//, int draw_depth, int c
+	) {
+	int __saved_depth = -1;
+	Mat overlay_grid_map[MAX_DEPTH];
+	static int called_cnt = 0;
+	list<partition_Node*>::iterator outbox = aStroke_set[0].stroke_list.begin();
+	//Point p;
+//	p.x=(*outbox)->info.endPoint.x - 1;
+	//p.y=(*outbox)->info.endPoint.y - 1;
+	for (int i = 0; i < MAX_DEPTH; i++) {
+		overlay_grid_map[i] = _grid_map_1c[MAX_DEPTH].clone();
+		cv::rectangle(_grid_map_1c[i], cv::Rect((*outbox)->srtPoint,
+			(*outbox)->endPoint)
+			, RGB(0, 0,0));
+		//	debug_image("ing/_ok_grid_" + tag +
+			//	"_" + to_string(called_cnt) + "_", i, overlay_grid_map[i]);
+		_QT_grid_count[i] = 0;
+	}
+	
+	for (int i = 0; i < MAX_DEPTH; i++) {
+		int ssize=(int) aStroke_set[i].stroke_list.size();
+		//r_cout << "z : stroke " << i<<" : "<<__saved_depth <<" , "<<aStroke_set[i].size() << endl;
+		if (ssize == 0) 
+			break;
+		
+		for (list<partition_Node*>::iterator partition_it = aStroke_set[i].stroke_list.begin(); 
+			partition_it != aStroke_set[i].stroke_list.end(); partition_it++)
+		{
+			__saved_depth = (*partition_it)->depth;
+
+			cv::rectangle(_grid_map_1c_accu, Rect((*partition_it)->srtPoint,
+				(*partition_it)->endPoint), RGB(255, 255, 255));
+			cv::rectangle(_grid_map_1c[__saved_depth], Rect((*partition_it)->srtPoint,
+				(*partition_it)->endPoint), RGB(0,0, 0));
+			cv::rectangle(overlay_grid_map[__saved_depth], Rect((*partition_it)->srtPoint,
+				(*partition_it)->endPoint), RGB(255, 255, 255));
+
+				_QT_grid_count[__saved_depth]++;
+		}//end of for list
+	}//end of for i
+	for (int i = 0; i <= __saved_depth; i++) {
+		
+			debug_image("ing/_og" +m_t, i, overlay_grid_map[i]);
+			debug_image("_g" + m_t, i, _grid_map_1c[i]);
+			debug_image("ing/_g" + m_t, i, _grid_map_1c[i]);
+
+			r_cout << tag<<" "<<setw(6) << i << " : " << setw(10)<<_QT_grid_count[i] << endl;
+				
+			grid_map_sum += _QT_grid_count[i];
+	
+	}
+
+	debug_image("QT" + m_t + "_" + to_string(__saved_depth) + "_f", _grid_map_1c_accu);
+
+	//r_cout << "z depth " + tag << setw(5) << __saved_depth << " : QT_" << _QT_grid_count[__saved_depth] << endl;
+	
+	int depth = __saved_depth + 1;
+	r_cout << tag <<" "<<__FUNCTION__<<"finalized Depth : " << depth << " : " << grid_map_sum<< endl;
+	
+	called_cnt++;
+	return depth;
+}
+void render_::func_(){
+//void func_(int _depth, int _changed_count[], int _QT_grid_count[], int _Sgrid_painting_try[], int _m_render_brush_size[], long int _painting_area[]) {
+	int Qt_sum = 0;
+	int try_sum = 0;
+	int c_sum = 0;
+	int t_sum = 0;
+	//_painting_area[astroke_depth] += Strk_w_size*Strk_h_size;
+	
+	r_cout << endl <<
+		setw(3) << "[]" <<
+		setw(9)<<"tag "<<
+		setw(6) << "QT_cnt" <<
+		setw(6)<<"times"<<
+		setw(5) << "try" <<
+		setw(8)<<"extend"<<
+		setw(7) << "try/QT" <<
+		setw(8) << "changed" <<
+		setw(9) << "ch ratio " <<
+		setw(4) << "b_size" <<
+	//	setw(8) << "b_scale" <<
+		//setw(10) << "p_Area" <<
+		//setw(14) << "p_area/try" <<
+		//setw(16) << "p_area/p_Area" <<
+		setw(4)<<"try_scale"<<
+		endl;
+	for (int i = 0; i < render_depth; i++) {
+		
+		if (grid_try_sum[i] != 0 && QT_grid_count[i] !=0){
+		r_cout << setw(2) << i << "," <<setw(8)<<m_tag<<
+			setw(6) << QT_grid_count[i] << "," <<
+			setw(6)<<x_strk_times[i]<<
+			setw(5) << grid_try_sum[i] << "," <<
+			setw(7)<< extended_try[i]<<
+			fixed<<setw(7) << setprecision(1)<<(float)((float)grid_try_sum[i] / (float)QT_grid_count[i]) <<
+			setw(8) << r_s_changed_count[i] << ",  " <<
+			std::fixed <<
+			std::setw(6) << fixed<<std::setprecision(1) <<
+			(float)((float)r_s_changed_count[i] / (float)(grid_try_sum[i])* 100.) <<
+			setw(6) << render_brush_size[i] <<
+			//setw(6) << render_brush_size[i] * render_brush_size[i] <<
+			//setw(10) << render_brush_size[i] * render_brush_size[i] * grid_try_sum[i]<<
+			//<< setw(12) << r_s_painting_area[i]
+		//	<< setw(12) << (int)((r_s_painting_area[i] / grid_try_sum[i])*100.)
+
+		//	<< setw(12) << (int)(render_brush_size[i] * render_brush_size[i] * grid_try_sum[i] / r_s_painting_area[i])<<
+			"  " <<g_paint_try_scale[i] << endl; 
+		
 		}
-	}// if != Sobel
+		else {
+			r_cout << setw(15) << to_string(i)+","+m_tag<< "," <<
+				setw(6) << QT_grid_count[i] << ", " <<
+				setw(6) << grid_try_sum[i] << ", " <<
 
-	//t1.time_stamping(cout, "saliency_finished", TIME_STAMP_END);
-	int how_many_render;
-	if (g_saliency_method == SALIENCY_STR_SOBEL) {
-		how_many_render = 1;
+				setw(8) << "**/0"//(int)(grid_painting_try[i] / QT_grid_count[i])
+				<<
+				setw(8) << r_s_changed_count[i] << ",  " <<
+				std::fixed <<
+				std::setw(9) << std::setprecision(2) <<"******/0"<<
+				//(int)((float)changed_count[i] / (float)(grid_painting_try[i])* 100.) <<
+				setw(6) << render_brush_size[i] <<
+				setw(6) << render_brush_size[i] * render_brush_size[i] <<
+				setw(10) << render_brush_size[i] * render_brush_size[i] * grid_try_sum[i]
+				//<< setw(17) << r_s_painting_area[i]
+				//<< setw(15) << "**/0"//nt)((painting_area[i] / grid_painting_try[i])*100.)
+
+			//	<< setw(12) <<"**/0"// (int)(render_brush_size[i] * render_brush_size[i] * grid_painting_try[i] / painting_area[i])
+				<< endl;
+		}
+		Qt_sum += QT_grid_count[i];
+		try_sum += grid_try_sum[i];
+		//	t_sum += try_count[i];
+		c_sum += r_s_changed_count[i];
+
+		g_file_cstat << g_para_method + "," << g_image_name << ", " << "depth:pr_count changed: " + to_string(i) + "," <<
+
+			grid_try_sum[i] << "," << to_string(r_s_changed_count[i]) << endl;
+	}
+
+	r_cout << setw(12) <<"qt_sum "<< Qt_sum << setw(18) << "try sum "<<try_sum << setw(8) << "c_sum" <<c_sum << endl;
+
+}
+
+void  render_::rectangle_canvas(cv::Mat mat, cv::Rect  rect, Scalar s) {
+
+	rect.x = rect.x + x_canvas_bezel_size;
+	rect.y = rect.y + x_canvas_bezel_size;
+	cv::rectangle(mat, rect, s);
+}
+
+void  render_::p_peek_canvas(unsigned char * p, int p_x, int p_y, int &p_0, int &p_1, int &p_2) {
+	int index = ((p_x + x_canvas_bezel_size) + (p_y + x_canvas_bezel_size) * x_canvas_size_width) * 3;
+
+	p_0 = p[index];
+	p_1 = p[index + 1];
+	p_2 = p[index + 2];
+}
+void  render_::post_process() {
+	int ret;
+	if (success_or_fail == 0) {
+		image_save(m_t+g_image_name, result_image, r_grid_map_1c_accu);
+
+		
+			ret = draw_grid_2(result_image.clone(), render_Stroke_set, "p" + m_t, render_depth, //-1, 
+				255, m_t);
+
+		func_();
+	}
+	//m_depth, changed_count, QT_grid_count, grid_painting_try, render_brush_size, painting_area);
+}
+void  render_::add_gradient_map(int render_method, Mat a_map) {
+	gradient_map[render_method] = a_map;
+}
+render_::render_(int _render_method, cv::Mat &_srcImg) {
+	string r_cout_fname = g_root_path_win + string("\\cout\\") + g_para
+		+ "\\cout_" + g_para_method + "_" + g_image_name + _tag[_render_method] + string(".txt");
+	cout << " file name " << _tag[_render_method] <<" "<< r_cout_fname<< endl;
+	r_cout.open(r_cout_fname.c_str(), ios::out);
+	
+	render_method = _render_method;
+	m_tag = tag[_render_method];
+	m_tag_ = tag_[_render_method];
+	m__tag = _tag[_render_method];
+	m_t = _t[render_method];
+	m_t_ = _t_[render_method];
+	x_BrushMinSize = g_BrushMinSize;
+	x_srcImg_ = _srcImg.clone();
+
+	if (x_srcImg_.channels() == 1)
+	{
+		mat_print(x_srcImg_, "x_Src" + tag[_render_method]);
+	}
+	x_src_ptr = x_srcImg_.data;
+	QT_depth = g_depth_limit;
+
+	for (int i = 0; i <= MAX_DEPTH; i++) {
+		x_strk_times[i] = 0;
+		QT_grid_count[i] = 0;
+		grid_try_sum[i] = 0;
+		render_brush_size[i]=0;
+		r_s_changed_count[i]=0;
+		
+		r_grid_map_1c[i].create(g_src_image_height, g_src_image_width, CV_8UC1);
+		r_grid_map_1c[i].setTo(255);
+		r_try_map_1c[i].create(g_src_image_height, g_src_image_width, CV_8UC1);
+		r_try_map_1c[i].setTo(255);
+		
+		render_Stroke_set[i].set_depth(i);
+	}
+	
+
+	r_grid_map_1c_accu.create(g_src_image_height, g_src_image_width, CV_8UC1);
+};
+render_::~render_() {
+//	x_srcImg_.release();
+	//Quad_TreeMap.release();
+	//result_image.release();
+//	for (int i = 0; i < MAX_DEPTH; i++) {
+	//	r_grid_map_1c[i].release();
+		/*
+	for (list<Img_node*>::iterator partition_it = render_Stroke_set[i].stroke_list.begin(); 
+		partition_it != render_Stroke_set[i].stroke_list.end(); partition_it++) {
+		delete (*partition_it);
+	}*/
+	//}
+	
+//	brush_delete(brush_set);
+	//for(int i=0;i<MAX_DEPTH;i++)
+	//	brush_delete(brush_resized_set[i]);
+
+};
+
+int render_::prepare() {
+
+	int ret;
+	
+	int k_depth;
+
+	if (g_src_image_width < g_src_image_height)
+		x_BrushMaxSize = g_src_image_width / g_image_divider;
+	else
+		x_BrushMaxSize = g_src_image_height / g_image_divider;
+
+	x_canvas_bezel_size = x_BrushMaxSize*g_brush_scale[0];
+
+	//Rendering
+	x_canvas_size_width = g_src_image_width + x_canvas_bezel_size * 2;
+	x_canvas_size_height = g_src_image_height + x_canvas_bezel_size * 2;
+	x_canvas_step1 = x_canvas_size_width * 3;
+
+	//paint_map = new Mat(canvas_size_height, canvas_size_width, CV_8UC3);
+	//	paint_map_data = paint_map->data;
+	//	paint_map->setTo(255);
+	
+	r_cout << "************* prepare start >" << m_tag << " <********************************************" << endl;
+	
+	r_grid_map_1c_accu = gradient_map[render_method].clone();
+	r_grid_map_1c[MAX_DEPTH] = gradient_map[render_method].clone();
+
+	//m_aStroke_set = new list<Img_node*>();
+	//for (int i = 0; i < MAX_DEPTH; i++)
+	//	r_cout << "aStroke_set[" << setw(2) << to_string(i) + "]->size().initialize = " + m_tag << ", " << render_Stroke_set[i].size() << endl;
+
+	if (render_method != RENDER_TWOPASS_ENHANCE && render_method != RENDER_TWOPASS_MERGE) {
+		//if (render_method != RENDER_SOBEL) {
+		//	ret = QuadTree::TakeQuadTree_grid(gradient_map[render_method], render_Stroke_set, m_tag);
+		//}
+		//else
+		ret = TakeQuadTree(gradient_map[render_method], render_Stroke_set, m_tag);
 	}
 	else {
-		how_many_render = RENDER_MAX;
-		_render[RENDER_UNION]->add_render(_render[0], _render[2]);
-		_render[RENDER_TWOPASS_ENHANCE]->add_render(_render[0], _render[2]);//render_sobel, render_union
-		_render[RENDER_TWOPASS_MERGE]->add_render(_render[0], _render[2]);
-	}
-	time_t p_s_time[RENDER_MAX], p_e_time[RENDER_MAX];
-	tm p_t_s[RENDER_MAX], p_t_e[RENDER_MAX];
-	char p_s_buff[100];
-	char p_e_buff[100];
+		int saved_depth = -1;
+		partition_Node *me_node;
+	//	Imginfo info;
+		int  S;
+		Stroke_set Stroke_set_sobel[MAX_DEPTH];
+		Stroke_set Stroke_set_saliency[MAX_DEPTH];
+		
+	
+		for (int l = 0; l < render_sobel->render_depth; l++) {
+			Stroke_set_sobel[l] = render_sobel->render_Stroke_set[l];
 
-	for (int i = 0; i < how_many_render; i++) {
-		time(&p_s_time[i]);
-		localtime_s(&p_t_s[i], &p_s_time[i]);
-
-		_render[i]->prepare();
-
-		time(&p_e_time[i]);
-		localtime_s(&p_t_e[i], &p_e_time[i]);
-	}
-	for (int i = 0; i < how_many_render; i++) {
-		cout << "++++++++++++++++++ prepare " + _render[i]->m_tag +
-			" ++++++++++++++++++++++++++++++++++++++++" << endl;
-		int tot = 0;
-		for (int j = 0; j < _render[i]->render_depth; j++) {
-			cout << _render[i]->m_tag << " : "
-				<< _render[i]->render_Stroke_set[j].stroke_list.size() << endl;
-			tot += (int)_render[i]->render_Stroke_set[j].stroke_list.size();
 		}
-		cout << _render[i]->render_depth << "  " << tot << endl;
-		strftime(p_s_buff, 20, "%Y-%m-%d %H:%M:%S", &p_t_s[i]);
-		strftime(p_e_buff, 20, "%Y-%m-%d %H:%M:%S", &p_t_e[i]);
-		cout << " Prepare Finished " << _render[i]->m_tag << " " << p_s_buff << " : " << p_e_buff << endl;
-		g_file_clog << " Prepare Finished, " << _render[i]->m_tag << " " << p_s_buff << ", " << p_e_buff << endl;
+		for (int l = 0; l < render_saliency->render_depth; l++) {
+			Stroke_set_saliency[l] = render_saliency->render_Stroke_set[l];
+
+		}
+
+			stroke_dump(Stroke_set_sobel, m_tag + " : sobel depth, count = ", render_sobel->render_depth);
+
+	//	for (int l = 0; l < render_saliency->render_depth; l++)
+		stroke_dump(Stroke_set_saliency, m_tag + " : saliency depth, count  = ", render_saliency->render_depth);
+
+		int kk = 0;
+
+		for (int i = 0; i < render_sobel->render_depth; i++) {
+			//	r_cout << "astroke.size(_sobel)= " + m_tag << ", " << render_Stroke_set[i].size() << endl;
+			for (list<partition_Node*>::iterator partition_it = Stroke_set_sobel[i].stroke_list.begin(); partition_it != Stroke_set_sobel[i].stroke_list.end(); partition_it++) {
+			//	info = (*partition_it)->info;
+				k_depth = (*partition_it)->depth;
+				S = (*partition_it)->avgS;
+				me_node = new 
+					partition_Node((*partition_it)->srtPoint,(*partition_it)->endPoint, k_depth, S,g_no);
+				g_no++;
+				render_Stroke_set[i].push_back(me_node);
+				kk++;
+			}
+		}
+
+		r_cout << " sobel added " << kk << " strokes : to depth  " << k_depth << endl;
+		depth_sobel = k_depth;
+		//render_Stroke_set->sort();
+		stroke_dump(render_Stroke_set, m_tag, render_depth);
+		kk = 0;
+		k_depth = 0;
+		int s_depth = render_sobel->render_depth-1;
+		for (int i = s_depth; i < render_saliency->render_depth; i++) {
+			//r_cout << "astroke.size()= " + m_tag << ", " << render_Stroke_set[i].size() << endl;
+			int mod = 0;
+			for (list<partition_Node*>::iterator partition_it = Stroke_set_saliency[i].stroke_list.begin(); partition_it != Stroke_set_saliency[i].stroke_list.end(); partition_it++) {
+				mod++;
+				//if ((mod % 2) == 0) continue;
+				if (render_method == RENDER_TWOPASS_MERGE)
+					k_depth = (*partition_it)->depth;
+				else { //RENDER_TWOPASS_ENHANCE
+							k_depth = (*partition_it)->depth+1 ;
+				}
+
+			//	info = (*partition_it)->info;
+				S = (*partition_it)->avgS;
+				me_node = new partition_Node((*partition_it)->srtPoint,(*partition_it)->endPoint, k_depth, S,g_no);
+				g_no++;
+				render_Stroke_set[k_depth].push_back(me_node);
+				kk++;
+			}
+		}
+		r_cout << " saliency added " << kk << ": " << k_depth << endl;
+
+		//depth_saliency = render_saliency->render_depth;
+		//render_depth=depth_Enhance = k_depth+1;
+		render_depth = k_depth + 1;
+		for (int i = 0; i < render_depth; i++) {
+			r_cout << m_tag + "  _aStrokeset_size() : " <<i << ": " << render_Stroke_set[i].stroke_list.size() << endl;
+		}
 	}
 
-	cout << " ++++++++++++++++++++++++++++++++++++++++" << endl;
+	//m_aStroke_set->sort(Img_node::greater<Img_node*>());
+
+
+//	sort(m_aStroke_set->begin(), m_aStroke_set->end());
+	//m_aStroke_set->sort();
+	render_depth = draw_grid_depth(r_grid_map_1c, r_grid_map_1c_accu, render_Stroke_set, m_t,
+		grid_map_sum, QT_grid_count//, true, -1, 0
+	);
+	/*
+	k_depth = -1;
+	int astroke_depth;
+	int k = 0;
+	
+	for(int i=0;i<render_depth;i++){
+		if (render_Stroke_set[i].stroke_list.size() == 0) {
+			r_cout << m_tag + "Fail Sort check _aStrokeset_size() : " << k_depth << ": " << 
+				render_Stroke_set[i].stroke_list.size() << endl;
+		}
+		
+	for (list<partition_Node*>::iterator partition_it = render_Stroke_set[i].stroke_list.begin(); 
+		partition_it != render_Stroke_set[i].stroke_list.end(); partition_it++, k++)
+	{
+		astroke_depth = (*partition_it)->depth;
+		if (k_depth != -1) {
+			if (astroke_depth < k_depth ||
+				astroke_depth > k_depth + 1)
+			{
+				r_cout << "sort fail  " << k << "th : " << k_depth << " -> " << astroke_depth << endl;
+			}
+		}
+		k_depth = astroke_depth;
+	}
+	r_cout << m_tag + " Sort check _aStrokeset_size() : " << k_depth<<": "<<render_Stroke_set[i].stroke_list.size() << endl;
+	}
+	*/
+	/*for (int i = 0; i <= MAX_DEPTH; i++) {
+	
+
+		debug_image("ing/_or_grid_" + m_tag +
+			"_" +  "_", i, r_grid_map_1c[i]);
+
+	}
+	*/
+	
+	QT_depth = render_depth;
+	
+	//r_cout << "x depth " + m_tag + " = " << render_depth  << endl;
+	/*
+	for (int i = 0; i < render_depth ; i++)
+	{
+		r_cout << setw(15) << m_tag + ", " + to_string(i) <<", "<< QT_grid_count[i] << endl;
+	}
+	*/
+	for (int i = 0; i < render_depth; i++) {
+		list<partition_Node*>::iterator partition_it = render_Stroke_set[i].stroke_list.begin();
+		stroke_size[i] = (*partition_it)->stroke_size.width;
+	}
+	calc_render_brush_size(x_BrushMaxSize, x_BrushMinSize, render_depth,
+	render_brush_size, m_tag);
+
+	
+	brush_resize( g_brush_vector_set);
+	brush_pgm_resize(g__brush_pgm_list);
+	////for (int i = 0; i < render_depth; i++) {
+	//	r_cout << "Brush "<<i << ", " << render_brush_size[i] << endl;
+	//}
+//	for (int i = 0; i < render_depth; i++) {
+//		r_cout << "QT stroke count(" + m_tag + ") " << QT_depth << " " << render_depth << " : " << render_Stroke_set[i].size() << endl;
+	//	r_cout.flush();
+	//	if (render_Stroke_set[i].size() == 0) {
+	//		r_cout << "unexpected Stroke Tree" + m_tag + " = 0" << endl;
+	//		return -20000;
+	//	}
+	//}
+	//ret = draw_grid_2(x_srcImg_.clone(), m_aStroke_set, "src_0_" + m_tag, m_depth, -1, 0,m_tag);
+	r_cout << "------------------------------------------------------------------" << endl;
+	r_cout.flush();
 	return 0;
 }

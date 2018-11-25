@@ -39,7 +39,7 @@ using namespace cv;
 	}
 	*/
 //Img_node;
-//Stroke_Node a;
+//partition_Node a;
 
 	//static Img_node *copyImageTree(Imginfo info, int depth, int S);
 //	 int  TakeQuadTree_grid(cv::Mat &SaliencyMap, Stroke_set aStroke[],string tag);

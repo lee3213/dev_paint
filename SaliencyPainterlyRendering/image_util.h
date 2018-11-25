@@ -10,7 +10,7 @@ cv::Mat ColorReversal(cv::Mat &srcImg);
 
 void PaintBackGround(cv::Mat &rstImg, int r, int g, int b);
 void  PaintBackGround(unsigned char * rstData, int width, int height, int r, int g, int b);
-cv::Rect rounding_box(cv::Mat a_mat, int bsize_x, int bsize_y, int V_th);
+cv::Rect rounding_box(cv::Mat a_mat, int bsize_width, int bsize_height, int V_th);
 void overlap(Mat &a, Mat &b,int channel);
 void overlap_white(Mat &a, Mat &b);
 void overlap_blue(Mat &a, Mat &b);

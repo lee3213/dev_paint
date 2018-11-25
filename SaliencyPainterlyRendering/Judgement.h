@@ -17,7 +17,7 @@ using namespace std;
 using namespace cv;
 
 //int JudgementImage(unsigned char *srcData, unsigned char * changedData, unsigned char * beforeData,
-	//int bsize_x,int bsize_y, 
+	//int bsize_width,int bsize_height, 
 //	Point bSrtPoint,  int depth, int i_w, int i_h, int i_c);
 
 //int JudgementImage(cv::Mat rstImg, cv::Mat tempImg, int bsize, unsigned char* srcData, unsigned char* rstData, unsigned char* tempData, Point bSrtPoint,string,int depth);

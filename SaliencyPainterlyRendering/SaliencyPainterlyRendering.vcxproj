@@ -160,6 +160,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="brush.h" />
+    <ClInclude Include="brush_adjust.h" />
+    <ClInclude Include="brush_pgm.h" />
     <ClInclude Include="bsShowImage.h" />
     <ClInclude Include="cvQuiver.h" />
     <ClInclude Include="debug_define.h" />
@@ -207,6 +209,7 @@
   <ItemGroup>
     <ClCompile Include="brush.cpp" />
     <ClCompile Include="brush_adjust.cpp" />
+    <ClCompile Include="brush_pgm.cpp" />
     <ClCompile Include="brush_resize.cpp" />
     <ClCompile Include="bsShowImage.cpp" />
     <ClCompile Include="cvQuiver.cpp" />
@@ -228,11 +231,11 @@
     <ClCompile Include="pregraph\saliency_pregraph_main.cpp" />
     <ClCompile Include="pregraph\saliency_PreGraph.cpp" />
     <ClCompile Include="pregraph\SLIC.cpp" />
-    <ClCompile Include="render_prepare.cpp" />
+    <ClCompile Include="rendering_prepare.cpp" />
     <ClCompile Include="render_pixel.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="render_image.cpp" />
-    <ClCompile Include="render_.cpp" />
+    <ClCompile Include="render_prepare.cpp" />
     <ClCompile Include="render_etc.cpp" />
     <ClCompile Include="render_partition.cpp" />
     <ClCompile Include="rgb2hsv.cpp" />

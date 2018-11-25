@@ -176,7 +176,7 @@ cv::Mat get_canny_map(Mat & srcImg) {
 	//cv::convertScaleAbs(grad_x, abs_sobeld_x);
 	//debug_image("canny_2.jpg", abs_sobeld_x);
 	/// Gradient Y
-	//Scharr( src_gray, grad_y, ddepth, 0, 1, scale, delta, BORDER_DEFAULT );
+	//Scharr( src_8UC1, grad_y, ddepth, 0, 1, scale, delta, BORDER_DEFAULT );
 
 	/// Total Gradient (approximate)
 	//cv::addWeighted(abs_sobeld_x, 0.5, abs_sobeld_y, 0.5, 0, canny_map);

@@ -40,34 +40,34 @@ int do_rendering(){
 		p_render[RENDER_SOBEL]->join();
 		_render[RENDER_SOBEL]->post_process();
 
-#ifdef LATER
 		if (g_saliency_method != SALIENCY_STR_SOBEL) {
 			p_render[RENDER_SALIENCY] = new thread(run_render, _render[RENDER_SALIENCY]);
+			p_render[RENDER_SALIENCY]->join();
 			p_render[RENDER_UNION] = new thread(run_render, _render[RENDER_UNION]);
-			
+			p_render[RENDER_UNION]->join();
 			p_render[RENDER_TWOPASS_MERGE] = new thread(run_render, _render[RENDER_TWOPASS_MERGE]);
 		
-			
+			p_render[RENDER_TWOPASS_MERGE]->join();
 			
 			cout << "p_saliency t_id: " << p_render[RENDER_SALIENCY]->get_id() << endl;
 			cout << "p_union    t_id: " << p_render[RENDER_UNION]->get_id() << endl;
 			cout << "p_twopass MERGE t_id: " << p_render[RENDER_TWOPASS_MERGE]->get_id() << endl;
-			cout << "p_twopass  ENHANCE t_id: " << p_render[RENDER_TWOPASS_ENHANCE]->get_id() << endl;
+			
 			std::cout << "Number of threads Twopass = "
 				<< std::thread::hardware_concurrency() << std::endl;
 			
-			p_render[RENDER_SALIENCY]->join();
-			p_render[RENDER_UNION]->join();
-			p_render[RENDER_TWOPASS_ENHANCE] = new thread(run_render, _render[RENDER_TWOPASS_ENHANCE]);
-			p_render[RENDER_TWOPASS_MERGE]->join();
-			p_render[RENDER_TWOPASS_ENHANCE]->join();
 			
+			
+			p_render[RENDER_TWOPASS_ENHANCE] = new thread(run_render, _render[RENDER_TWOPASS_ENHANCE]);
+		
+			p_render[RENDER_TWOPASS_ENHANCE]->join();
+			cout << "p_twopass  ENHANCE t_id: " << p_render[RENDER_TWOPASS_ENHANCE]->get_id() << endl;
 			_render[RENDER_SALIENCY]->post_process();
 			_render[RENDER_UNION]->post_process();
 			_render[RENDER_TWOPASS_MERGE]->post_process();
 			_render[RENDER_TWOPASS_ENHANCE]->post_process();
 		}
-#endif
+
 #else
 
 		std::thread *p_render[RENDER_MAX];

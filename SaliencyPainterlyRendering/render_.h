@@ -8,8 +8,8 @@
 #include "brush.h"
 #include "QuadTree.h"
 #include "debug_image.h"
-
-class Stroke_Node
+#include "brush_pgm.h"
+class partition_Node
 {
 	//static int g_stroke_no;
 public:
@@ -19,8 +19,8 @@ public:
 	cv::Size stroke_size;
 	int avgS;
 	int no;
-	Stroke_Node() {};
-	Stroke_Node(cv::Point s, cv::Point e, int _depth, double S, int n) {
+	partition_Node() {};
+	partition_Node(cv::Point s, cv::Point e, int _depth, double S, int n) {
 		srtPoint = s;
 		endPoint = e;
 		stroke_size.width = e.x - s.x;
@@ -30,7 +30,7 @@ public:
 		depth = _depth;
 		avgS = (int)S;
 	};
-	~Stroke_Node() {};
+	~partition_Node() {};
 };
 using namespace std;
 using namespace cv;
@@ -38,8 +38,8 @@ using namespace cv;
 	//list<Img_node*> *aStroke_set, string tag, int  depth, int draw_depth, int c, string _tag);
 class Stroke_set {
 public:
-	//Stroke_Node *a;
-	list<Stroke_Node *> stroke_list;
+	//partition_Node *a;
+	list<partition_Node *> stroke_list;
 	//int stroke_cnt;
 	int depth;
 	//int size() {
@@ -54,7 +54,7 @@ public:
 	void set_depth(int _depth) {
 		depth = _depth;
 	};
-	int push_back(Stroke_Node * _p) {
+	int push_back(partition_Node * _p) {
 		stroke_list.push_back(_p);
 		return 0;//Good
 	};
@@ -67,12 +67,25 @@ public:
 	cv::Mat brush_8UC1;
 //	cv::Mat brush_mask;
 	cv::Mat brush_thumbnail;
-	cv::Mat brush_thumbnail_minimum;
+//	cv::Mat brush_thumbnail_minimum;
 //	cv::Mat bump;
 	int brush_no;
 	unsigned char * brush_8UC1_data;
 	unsigned char * brush_thumbnail_data;
-	unsigned char *brush_thumbnail_minimum_data;
+	//unsigned char *brush_thumbnail_minimum_data;
+};
+class render_Brush_pgm {
+public:
+	cv::Mat brush_8UC1;
+	Size pgm;
+	//	cv::Mat brush_mask;
+	cv::Mat brush_thumbnail;
+	//cv::Mat brush_thumbnail_minimum;
+	//	cv::Mat bump;
+	int brush_no;
+	unsigned char * brush_8UC1_data;
+	unsigned char * brush_thumbnail_data;
+	//unsigned char *brush_thumbnail_minimum_data;
 };
 
 class render_ {
@@ -98,13 +111,13 @@ public:
 	
 	//cv::Mat Quad_TreeMap;
 	cv::Mat result_image;
-
+	int  x_tbrush_cnt = 0;
 	Mat src_canvas;
 	cv::Mat accu_canvas[MAX_DEPTH];
 	cv::Mat ing_canvas[MAX_DEPTH];
 	unsigned char * accu_canvas_data[MAX_DEPTH];
 	unsigned char * ing_canvas_data[MAX_DEPTH];
-
+	int x_paint_area_brush_count;
 	int x_canvas_size_width;
 	int x_canvas_size_height;
 	int x_canvas_step1;
@@ -123,11 +136,12 @@ public:
 	int render_stroke_no;
 	int render_try;
 	int u_no=0;
-	int brush_minimum_size;
+	//int brush_minimum_size;
 
 	int depth_sobel, depth_saliency;//, depth_Enhance;
 
 	render_Brush* brush_resized_array[MAX_DEPTH][MAX_BRUSH];
+	render_Brush_pgm* brush_pgm_resized_array[MAX_DEPTH][MAX_BRUSH];
 	int QT_depth;
 
 	int render_brush_size[MAX_DEPTH];
@@ -212,17 +226,18 @@ public:
 		unsigned char * _ing_ptr
 		);
 
-
+	int render_::paint_a_stroke(partition_Node* strk_p,int layer_0);
 	double TakeAvgS(cv::Mat &srcImg, Point srtPoint, Point endPoint, int depth, string quad);
 	Point render_::get_midPoint(cv::Mat &srcImg, Point s, Point e, double *D, int d, int child_QT_depth);
 	int  TakeQuadTree(cv::Mat &SaliencyMap, Stroke_set aStroke[], string tag);
 
-	int DivideImage(cv::Mat &SaliencyMap, Stroke_Node* me_node, Stroke_set aStroke_set[],
+	int DivideImage(cv::Mat &SaliencyMap, partition_Node* me_node, Stroke_set aStroke_set[],
 		string  quad,
 		Mat & gradient_src,
 		Mat stageMap, int depth, string tag);
 	int  render_::TakeColorDistance_thumbnail(cv::Mat &testImg, int thumb_width, int thumb_height,int src_step1, string tag, int depth);
 	int  render_::JudgementBrush(cv::Mat &testImg, int depth, int width, int height,int src_step1, string tag);
+	int render_::JudgementBrush_pgm(cv::Mat &testImg_canvas, int depth, int t_image_width, int t_image_height, int _canvas_step1, string tag);
 	void brush_resize(
 		vector <Brush*> _brush_set);
 	
@@ -247,7 +262,7 @@ public:
 	}
 
 	int lbph();
-
+	void brush_pgm_resize(vector<Brush_pgm*> _brush_pgm_list);
 
 	double double_array_min_at(double a[], int n);
 	double double_array_min(double a[], int n);

@@ -10,7 +10,7 @@
 #include "define.h"
 #include "brush.h"
 #include "render_.h"
-
+#include "brush_pgm.h"
 using namespace std;
 using namespace cv;
 
@@ -86,7 +86,7 @@ extern int g_alpha_TH;
 extern int g_ET;//positive ET=-1 negative
 
 //extern Mat Sgrid_grid_map_1c[];
-extern Mat g_src_gray_Map;
+extern Mat g_src_8UC1_Map;
 
 extern Mat gradient_Map_C_8UC1;
 extern Mat gradient_Map_G_8UC1;
@@ -116,5 +116,6 @@ extern int g_rendering_method;
 
 extern render_ *_render[RENDER_MAX];
 extern int g_no;
-extern Mat enhance_brush[3];
-extern unsigned char * enhance_brush_ptr[3];
+extern Mat g_enhance_brush[3];
+extern unsigned char * g_enhance_brush_ptr[3];
+extern vector<Brush_pgm *> g__brush_pgm_list;

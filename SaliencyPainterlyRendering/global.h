@@ -8,6 +8,7 @@
 #include <ios>
 #include <iostream>
 #include <streambuf>
+#include "brush_pgm.h"
 //CWinApp theApp;
 //debug_image_single *g_debug_brush;
 //debug_image_single *g_debug_brush_thumbnail;
@@ -76,7 +77,7 @@ int g_BrushAttachSize;
 unsigned char *g_org_DensityMap_data;
 int g_INDEX_BRUSH_SIZE_WIDTH ;
 int g_INDEX_BRUSH_SIZE_HEIGHT;
-Mat g_src_gray_Map;
+Mat g_src_8UC1_Map;
 //Mat Sgrid_grid_map_1c[MAX_DEPTH];
 Mat gradient_Map_C_8UC1;
 Mat gradient_Map_G_8UC1;
@@ -135,5 +136,6 @@ render_ *_render[RENDER_MAX];
 Mat g_srcImg_RO;
 int g_rendering_method;
 int g_no;
-Mat enhance_brush[3];
-unsigned char * enhance_brush_ptr[3];
+Mat g_enhance_brush[3];
+unsigned char * g_enhance_brush_ptr[3];
+vector<Brush_pgm *> g__brush_pgm_list;

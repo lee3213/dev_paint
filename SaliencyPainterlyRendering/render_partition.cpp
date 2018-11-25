@@ -18,12 +18,12 @@ int  render_::TakeQuadTree(cv::Mat &SaliencyMap, Stroke_set aStroke_set[], strin
 
 	int width = SaliencyMap.size().width, height = SaliencyMap.size().height;
 	unsigned char* srcData = (unsigned char*)SaliencyMap.data;
-	Stroke_Node* root;
+	partition_Node* root;
 	// Imginfo root_Info;
 	string quad = "0_whole";
 
 	double avgS = TakeAvgS(SaliencyMap, Point(0, 0), Point(width - 1, height - 1), 0, quad);
-	root = new Stroke_Node(Point(0, 0), Point(width - 1, height - 1), 0, avgS,g_no);
+	root = new partition_Node(Point(0, 0), Point(width - 1, height - 1), 0, avgS,g_no);
 	g_no++;
 	/*	 root.srtPoint.x = 0;
 	root_Info.srtPoint.y = 0;
@@ -43,7 +43,7 @@ int  render_::TakeQuadTree(cv::Mat &SaliencyMap, Stroke_set aStroke_set[], strin
 	return last_depth;
 }
 
-int render_::DivideImage(cv::Mat &SaliencyMap, Stroke_Node* me_node, Stroke_set aStroke_set[],
+int render_::DivideImage(cv::Mat &SaliencyMap, partition_Node* me_node, Stroke_set aStroke_set[],
 	string  quad,
 	Mat & gradient_src,
 	Mat stageMap, int depth, string tag)
@@ -56,7 +56,7 @@ int render_::DivideImage(cv::Mat &SaliencyMap, Stroke_Node* me_node, Stroke_set 
 	double avgS[5];
 	//Point child_Info_s, child_Info_e;//,my_Info;
 	//Img_node* BL, *BR, *TL, *TR;
-	Stroke_Node *new_node[5];
+	partition_Node *new_node[5];
 
 	//	cout << "----" << quad << "  --------------------------------------------------------" << endl;
 	if (me_node == NULL)
@@ -137,7 +137,7 @@ int render_::DivideImage(cv::Mat &SaliencyMap, Stroke_Node* me_node, Stroke_set 
 			//	cout << "depth mismatch " << child_QT_depth << " " << quad << "["<<D[quadrant - 1] << "] != [" << avgS[quadrant] <<"]"<< endl;
 		//	}
 			if (avgS[quadrant] > g_QT_avgSThreshold) {
-				new_node[quadrant] = new Stroke_Node(c_srtPoint[quadrant], c_endPoint[quadrant], child_QT_depth, avgS[quadrant],g_no);
+				new_node[quadrant] = new partition_Node(c_srtPoint[quadrant], c_endPoint[quadrant], child_QT_depth, avgS[quadrant],g_no);
 				g_no++;
 
 				get_depth = DivideImage(SaliencyMap, new_node[quadrant], aStroke_set,
@@ -308,6 +308,7 @@ double render_::TakeAvgS(cv::Mat &srcImg, Point srtPoint, Point endPoint, int de
 		}
 	}
 	avgS = S / (g_qt_s_scale*(s_w + s_h));
+#ifdef TRACE_AVGS
 	if (depth >= g_trace_depth) {
 		if (quad != "KK") {
 			cout << "depth " << depth << " :" << quad << ": (x,y) " << setw(5) << srtPoint.x << " " << srtPoint.y <<
@@ -317,6 +318,7 @@ double render_::TakeAvgS(cv::Mat &srcImg, Point srtPoint, Point endPoint, int de
 				<< " S " << setw(15) << S << setw(15) << " avgS : " << avgS << endl;
 		}
 	}
+#endif
 	return avgS;
 }
 double  render_::double_array_min_at(double a[], int n) {

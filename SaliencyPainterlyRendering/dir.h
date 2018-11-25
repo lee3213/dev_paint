@@ -4,6 +4,7 @@
 
 #include <windows.h>
 #include <string>
+void check_and_create(string path, bool flag);
 bool dirExists(const std::string& dirName_in);
 bool fileExists(const std::string& dirName_in);
 void DeleteAllFiles(string folderPath);

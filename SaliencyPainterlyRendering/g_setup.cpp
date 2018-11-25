@@ -111,18 +111,17 @@ int  set_global(string src_name,string deploy_name) {
 
 	g_brush_choice = 1;// one of 5 random 
 
-	enhance_brush[0].create(2, 2, CV_8UC1);
-	enhance_brush[0].setTo(255);
-	enhance_brush_ptr[0] = enhance_brush[0].data;
-	enhance_brush[1].create(3, 3, CV_8UC1);
-	enhance_brush[1].setTo(255);
-	enhance_brush_ptr[1] = enhance_brush[1].data;
-	enhance_brush[2].create(4, 4, CV_8UC1);
-	enhance_brush[2].setTo(255);
-	enhance_brush_ptr[2] = enhance_brush[2].data;
+	g_enhance_brush[0].create(2, 2, CV_8UC1);
+	g_enhance_brush[0].setTo(255);
+	g_enhance_brush_ptr[0] = g_enhance_brush[0].data;
+	g_enhance_brush[1].create(3, 3, CV_8UC1);
+	g_enhance_brush[1].setTo(255);
+	g_enhance_brush_ptr[1] = g_enhance_brush[1].data;
+	g_enhance_brush[2].create(4, 4, CV_8UC1);
+	g_enhance_brush[2].setTo(255);
+	g_enhance_brush_ptr[2] = g_enhance_brush[2].data;
 	
-	unsigned char * enhance_brush_ptr[3];
-
+	
 	int ret=json_deployment(deploy_name);
 	if (ret < 0) return -1;
 	filename_without_ext( src_name,g_image_name);

@@ -133,7 +133,7 @@ void  PaintBackGround(cv::Mat &a_mat, int b0, int b1, int b2)
 
 }
 
-cv::Rect rounding_box(cv::Mat a_mat,int bsize_x,int bsize_y, int V_th){
+cv::Rect rounding_box(cv::Mat a_mat,int bsize_width,int bsize_height, int V_th){
 unsigned char *p = a_mat.data;
 
 Point crop_s, crop_e;
@@ -141,12 +141,12 @@ bool find_flag = false;
 //int V_th = 235;
 int x, y, v;
 
-for (y = 0; y < bsize_y; y++)
+for (y = 0; y < bsize_height; y++)
 {
 
-	for (x = 0; x < bsize_x; x++) {
+	for (x = 0; x < bsize_width; x++) {
 		int k;
-		k = x + y * bsize_x;
+		k = x + y * bsize_width;
 		v = (int)(*(p + k));
 		if (v <  V_th) {
 	//		cout << "T y : " << x << "," << y << " : " << v << endl;
@@ -169,12 +169,12 @@ else {
 //cout <<  crop_s.x << ", " << crop_s.y << ", " << crop_e.x << ", " << crop_e.y << endl;
 
 find_flag = false;
-for (x = 0; x < bsize_x; x++)
+for (x = 0; x < bsize_width; x++)
 {
 
-	for (y = 0; y < bsize_y; y++) {
+	for (y = 0; y < bsize_height; y++) {
 		int k;
-		k = x + y * bsize_x;
+		k = x + y * bsize_width;
 		v = (int)(*(p + k));
 		if (v <  V_th) {
 		//	cout << "L x : " << x << "," << y << " : " << v << endl;
@@ -200,14 +200,14 @@ else {
 
 find_flag = false;
 
-for (y = bsize_y-1; y >= 0; y--)
+for (y = bsize_height-1; y >= 0; y--)
 {
-	for (x = bsize_x-1; x >= 0; x--) {
+	for (x = bsize_width-1; x >= 0; x--) {
 		int k;
-		k = x + y * bsize_x;
+		k = x + y * bsize_width;
 		k = (int)(*(p + k));
 
-		//				k = (int)(temp_brush.at<unsigned char >(y, x));
+		//				k = (int)(mask_8UC1.at<unsigned char >(y, x));
 		if (k < V_th) {
 		//	cout << "B x : " << x << "," << y << " : " << v << endl;
 
@@ -230,14 +230,14 @@ else {
 
 find_flag = false;
 
-for (x = bsize_x-1; x >= 0; x--)
+for (x = bsize_width-1; x >= 0; x--)
 {
-	for (y = bsize_y-1; y >= 0; y--) {
+	for (y = bsize_height-1; y >= 0; y--) {
 		int k;
-		k = x + y * bsize_x;
+		k = x + y * bsize_width;
 		k = (int)(*(p + k));
 
-		//				k = (int)(temp_brush.at<unsigned char >(y, x));
+		//				k = (int)(mask_8UC1.at<unsigned char >(y, x));
 		if (k < V_th) {
 		//	cout << "B y : " << x << "," << y << " : " << v << endl;
 

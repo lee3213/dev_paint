@@ -50,14 +50,14 @@ int BrushInitialization(vector <Brush*> &_brush_set)
 			continue;
 		}
 		
-		unsigned char * temp_brush_mask_data = temp_mask.data;
+		unsigned char * mask_8UC1_mask_data = temp_mask.data;
 		bsize_w = temp_mask.size().width;
 		bsize_h = temp_mask.size().height;
 		s_step1 = b_step1 = (int)temp_mask.step1();
 		s_channels = b_channels = temp_mask.channels();
 	
 		 cv::cvtColor(temp_mask, mask_8UC1, COLOR_RGB2GRAY);
-		 unsigned char * bestBrush_data_gray_resized = mask_8UC1.data;
+		 unsigned char * bestBrush_data_8UC1_resized = mask_8UC1.data;
 	
 	
 	//	PaintBackGround(b160x160, 255, 255, 255);
@@ -65,7 +65,7 @@ int BrushInitialization(vector <Brush*> &_brush_set)
 	
 		//sz=Size (g_INDEX_BRUSH_SIZE_WIDTH, g_INDEX_BRUSH_SIZE_HEIGHT);
 		//	cout << s.height << "," << s.width << endl;
-		//cv::resize(temp_brush, temp_index_brush, sz);
+		//cv::resize(mask_8UC1, temp_index_brush, sz);
 	
 
 		//fname = cv::format("/rst/br/i_%d.ppm", nth + 1);
@@ -92,7 +92,7 @@ int BrushInitialization(vector <Brush*> &_brush_set)
 	
 		__brush = new Brush;
 		__brush->brush_thumbnail = temp_thumbnail.clone();
-		__brush->brush_gray = mask_8UC1.clone();
+		__brush->brush_8UC1 = mask_8UC1.clone();
 		__brush->brush_mask = temp_mask.clone();
 		__brush->brush_no = nth;
 
@@ -168,9 +168,9 @@ int BrushInitialization(vector <Brush*> &_brush_set)
 
 							//for tranparent effect 
 
-							//	if (bestBrush_data_gray[gray_bIndex] > g_brush_Ts) c_flag = true;
+							//	if (bestBrush_data_8UC1[gray_bIndex] > g_brush_Ts) c_flag = true;
 
-							if (bestBrush_data_gray_resized[gray_bIndex_1c] > g_brush_Ts) {
+							if (bestBrush_data_8UC1_resized[gray_bIndex_1c] > g_brush_Ts) {
 								c_flag = true;
 								alpha_channel_data[gray_bIndex_1c] = 150;
 								continue;
@@ -193,7 +193,7 @@ int BrushInitialization(vector <Brush*> &_brush_set)
 
 								//	Alpha = bestBrush_data_resized[bIndex];// T(x, y);
 								//		Alpha = (int)s_hsv.val[2];
-								Alpha = bestBrush_data_gray_resized[gray_bIndex_1c];
+								Alpha = bestBrush_data_8UC1_resized[gray_bIndex_1c];
 								if (Alpha < _TH) {
 
 									s_hsv.val[2] = s_hsv.val[2] + g_ET*(bestBrush_embossed_resized_data[gray_bIndex_1c] - 128);
@@ -252,8 +252,8 @@ int BrushInitialization(vector <Brush*> &_brush_set)
 		{
 			std::string fpath;
 
-			sz = temp_brush.size();
-			debug_image_mask = new debug_image_single(sz, g_BrushNumber, temp_brush.type());
+			sz = mask_8UC1.size();
+			debug_image_mask = new debug_image_single(sz, g_BrushNumber, mask_8UC1.type());
 
 			sz = temp_index_brush.size();
 			debug_image_index = new debug_image_single(sz,g_BrushNumber, temp_index_brush.type());
@@ -280,7 +280,7 @@ int BrushInitialization(vector <Brush*> &_brush_set)
 			a = debug_image_index->get_mat();
 			mat_print(a, "debug_image_index");
 		}
-		debug_image_mask->image_add(temp_brush);
+		debug_image_mask->image_add(mask_8UC1);
 		debug_image_index->image_add(temp_index_brush);
 		debug_image_thumbnail->image_add(temp_thumbnail);
 		debug_image_bump->image_add(temp_bump);
@@ -301,7 +301,7 @@ int BrushInitialization(vector <Brush*> &_brush_set)
 #endif
 	/*
 	for (nth=0; nth < g_BrushNumber; nth++) {
-		debug_image("br/brush_gray_", nth, g_brush_set.at(nth).brush_gray);
+		debug_image("br/brush_8UC1_", nth, g_brush_set.at(nth).brush_8UC1);
 		debug_image("br/brush_", nth, g_brush_set.at(nth).brush);
 		debug_image("br/thubmnail_", nth, g_brush_set.at(nth).brush_thumbnail);
 		debug_image("br/bump_", nth, g_brush_set.at(nth).bump);
