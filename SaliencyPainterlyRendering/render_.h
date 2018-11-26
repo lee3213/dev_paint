@@ -107,12 +107,13 @@ public:
 		unsigned char * paint_map_accu_canvas_8UC1_data[MAX_DEPTH + 1];
 	int success_or_fail;
 	int render_method;
-	//Mat render_::PainterlyRendering();
-	cv::Mat gradient_map[MAX_Gradient];
-	
+	//Mat render_::render_image();
+	cv::Mat gradient_map[MAX_Gradient+1];
+	Mat x_retry_map_1c;
 	//cv::Mat Quad_TreeMap;
 	cv::Mat result_image;
 	int  x_tbrush_cnt = 0;
+	int x_changed_depth;
 	Mat src_canvas;
 	cv::Mat accu_canvas[MAX_DEPTH];
 	cv::Mat ing_canvas[MAX_DEPTH];
@@ -133,6 +134,7 @@ public:
 	Mat r_grid_map_1c_accu;
 	Mat r_try_map_1c[MAX_DEPTH + 1];
 	unsigned char * r_try_map_1c_data[MAX_DEPTH];
+	unsigned char * x_retry_map_1c_data;
 	int render_depth;
 	int render_stroke_no;
 	int render_try;
@@ -140,7 +142,7 @@ public:
 	//int brush_minimum_size;
 
 	int depth_sobel, depth_saliency;//, depth_Enhance;
-
+	int  render_::JudgementBrush_pgm_bsize(cv::Mat &testImg_canvas_clone, int depth, int _t_image_width, int _t_image_height, int __canvas_step1, string tag);
 	render_Brush* brush_resized_array[MAX_DEPTH][MAX_BRUSH];
 	render_Brush_pgm* brush_pgm_resized_array[MAX_DEPTH][MAX_BRUSH];
 	int QT_depth;
@@ -167,7 +169,7 @@ public:
 	render_(int _render_method, Mat &_srcImg);
 	~render_();
 	void render_::func_();
-	int  PainterlyRendering();
+	int  render_image();
 
 	void func_p_map(Mat & a_map_8UC1, string tag,Rect);
 
@@ -236,7 +238,7 @@ public:
 		unsigned char * _ing_ptr
 		);
 
-	int render_::paint_a_stroke(partition_Node* strk_p,int layer_0);
+	int render_::paint_a_stroke(partition_Node* strk_p,int layer_more);
 	double TakeAvgS(cv::Mat &srcImg, Point srtPoint, Point endPoint, int depth, string quad);
 	Point render_::get_midPoint(cv::Mat &srcImg, Point s, Point e, double *D, int d, int child_QT_depth);
 	int  TakeQuadTree(cv::Mat &SaliencyMap, Stroke_set aStroke[], string tag);

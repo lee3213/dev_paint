@@ -23,7 +23,7 @@ int g_merge_method;
 //cv::Mat g_grid_map[MAX_DEPTH]; //
 //cv::Mat g_saliency_grid_map[MAX_DEPTH];
 //int g_saliency_Sgrid_painting_try[MAX_DEPTH];
-//int  m_render_brush_size[MAX_DEPTH]; // painting gris size for every depth //calculated in PainterlyRendering depends on depth and max/min brush size
+//int  m_render_brush_size[MAX_DEPTH]; // painting gris size for every depth //calculated in render_image depends on depth and max/min brush size
 //int  g_saliency_render_brush_size[MAX_DEPTH];
 //int g_brush_grid_size[MAX_DEPTH];// brush grid size for every depth
 //Size g_QT_grid_size[MAX_DEPTH]; //QuadTree grid size for every depth//calculated QT.cpp

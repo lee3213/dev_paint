@@ -158,9 +158,6 @@
     <ClCompile Include="QuadTree.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Judgement.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="util.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -282,6 +279,12 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="render_.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="render_stroke.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="render_Judgement.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

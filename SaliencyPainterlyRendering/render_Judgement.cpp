@@ -202,6 +202,100 @@ int  render_::JudgementBrush_pgm(cv::Mat &testImg_canvas_clone, int depth, int _
 }
 
 
+int  render_::JudgementBrush_pgm_bsize(cv::Mat &testImg_canvas_clone, int depth, int _t_image_width, int _t_image_height, int __canvas_step1, string tag)
+{
+	vector<DisData> colorDis;
+	colorDis.resize(g_BrushNumber);
+	DisData newDistance;
+	unsigned char* testData = (unsigned char*)testImg_canvas_clone.data;
+
+	int t_width = testImg_canvas_clone.size().width;
+	int t_height = testImg_canvas_clone.size().height;
+	int t_step1 = (int)testImg_canvas_clone.step1();
+	unsigned char* indexData;
+	int loop_w, loop_h;
+	//string f_path;
+	int brush_no;
+	static int called_cnt;
+	static int saved_depth = -1;
+	if (saved_depth != depth) {
+		saved_depth = depth;
+		called_cnt = 0;
+	}
+	//colorDis.reserve(g_BrushNumber);
+	int nth = 0;
+	//	bool flag=false;
+	//	unsigned char * ptr;
+	//if (t_width < g_brush_thumbnail_size) {
+	loop_w = t_width;
+	loop_h = t_height;
+
+
+	//	flag = true;
+	//}
+	//else {
+	//	loop_w = brush_minimum_size;
+	//	loop_h = brush_minimum_size;
+	//}
+	for (int i = 0; i<g_BrushNumber; i++)
+	{
+		render_Brush_pgm * b_ptr = brush_pgm_resized_array[depth][i];
+
+		//	if (flag == true) {
+		indexData = b_ptr->brush_8UC1_data;//b_ptr->brush_thumbnail_data;
+		//	}
+		//	else {
+		//	indexData = b_ptr->brush_thumbnail_minimum_data;
+		//	}
+		int pixel_cnt = 0;
+		double cDis = 0;
+
+		for (int y = 0; y < loop_h; y++)
+		{
+			for (int x = 0; x < loop_w; x++)
+			{
+				size_t index = y * t_step1 + x;
+				//	if (indexData[index] <= 240) {
+				if (indexData[index] < g_alpha_TH) {// test effective pixel 
+					cDis += abs(testData[index] - indexData[index]);
+					pixel_cnt++;
+				}//
+				 //}
+			}
+		}
+
+		//	cDis /= thumb_height*thumb_width;
+		cDis /= pixel_cnt;
+
+		vector<DisData>::iterator it2 = lower_bound(colorDis.begin(), colorDis.end(), (double)cDis, compareDistance);
+
+		newDistance.distance = cDis;
+		newDistance.nth = nth;
+		colorDis.insert(it2, newDistance);
+		//cout << " distance " << setw(10)<<cDis<< "b no "<<(*it).brush_no << " nth " << nth << endl;
+		nth++;
+	}
+#ifdef DEBUG_JUDGEMENT
+	if (called_cnt < 40) {
+		for (int i = 0; i < 5; i++)
+		{
+			string f_name = tag + "_" + to_string(i);
+			debug_image(f_name, _brush_set.at(i)->brush_thumbnail);
+		}
+	}
+#endif
+	called_cnt++;
+	if (g_brush_choice == 0) {
+		nth = rand() % 5;
+	}
+	else
+		nth = 0;
+	brush_no = colorDis.at(nth).nth;
+	//g_file_clog << __FILE__ << " , " << tag << " , " << depth << brush_no << endl;
+	return brush_no;
+}
+
+
 
 
 /*

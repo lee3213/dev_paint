@@ -224,7 +224,7 @@
     <ClCompile Include="jsoncpp.cpp" />
     <ClCompile Include="jsonwriter.cpp" />
     <ClCompile Include="json_read.cpp" />
-    <ClCompile Include="Judgement.cpp" />
+    <ClCompile Include="render_Judgement.cpp" />
     <ClCompile Include="LBPH.cpp" />
     <ClCompile Include="make_batch.cpp" />
     <ClCompile Include="permutohedral.cpp" />
@@ -239,6 +239,7 @@
     <ClCompile Include="render_prepare.cpp" />
     <ClCompile Include="render_etc.cpp" />
     <ClCompile Include="render_partition.cpp" />
+    <ClCompile Include="render_stroke.cpp" />
     <ClCompile Include="rgb2hsv.cpp" />
     <ClCompile Include="run_render.cpp" />
     <ClCompile Include="PainterlyRendering_main.cpp" />

@@ -1,8 +1,8 @@
-// SaliencyPainterlyRendering.cpp: 콘솔 응용 프로그램의 진입점을 정의합니다.
+// Saliencyrender_image.cpp: 콘솔 응용 프로그램의 진입점을 정의합니다.
 //
 #include "stdafx.h"
 #include "thread"
-//#include "SaliencyPainterlyRendering.h"
+//#include "Saliencyrender_image.h"
 #include "util.h"
 using namespace std;
 using namespace cv;
@@ -21,7 +21,7 @@ void run_render(render_ * _render) {
 		//	return ;
 	//	}
 
-	_render->success_or_fail = _render->PainterlyRendering();
+	_render->success_or_fail = _render->render_image();
 //	image_save(g_image_name + _render->m_tag_, _render->result_image, _render->grid_map_1c[MAX_DEPTH]);
 	}
 

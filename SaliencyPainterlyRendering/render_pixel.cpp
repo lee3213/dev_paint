@@ -95,13 +95,13 @@ int result = P_Rendering(
 	Mat a;
 	int s_w, s_h;
 	//if (canvas_ROI_width > g_brush_thumbnail_size)
-	//	s_w = canvas_ROI_width;
+		s_w = canvas_ROI_width;
 	//else
-	s_w = g_brush_thumbnail_size;
+	//s_w = g_brush_thumbnail_size;
 	//if (canvas_ROI_height > g_brush_thumbnail_size)
-		//s_h = canvas_ROI_height;
+		s_h = canvas_ROI_height;
 	//else
-	s_h = g_brush_thumbnail_size;
+	//s_h = g_brush_thumbnail_size;
 
 	resize(_src_canvas_ROI, a, cv::Size(s_w, s_h));
 	cv::cvtColor(a,src_ROI_canvas_clone_resized_8UC1, COLOR_RGB2GRAY);
@@ -120,7 +120,7 @@ int result = P_Rendering(
 
 	int brush_no;
 #ifdef _USE_PGM
-	 brush_no = JudgementBrush_pgm(src_ROI_canvas_clone_resized_8UC1, /*added by cwlee*/astroke_depth,
+	 brush_no = JudgementBrush_pgm_bsize(src_ROI_canvas_clone_resized_8UC1, /*added by cwlee*/astroke_depth,
 		s_w, s_h, src_resized_8UC1_step1, br_tag);
 	bestBrush_8UC1_resized = &(brush_resized_array[astroke_depth][brush_no]->brush_8UC1);
 #else

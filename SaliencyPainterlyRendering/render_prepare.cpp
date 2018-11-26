@@ -289,64 +289,6 @@ void  render_::post_process() {
 void  render_::add_gradient_map(int render_method, Mat a_map) {
 	gradient_map[render_method] = a_map;
 }
-render_::render_(int _render_method, cv::Mat &_srcImg) {
-	string r_cout_fname = g_root_path_win + string("\\cout\\") + g_para
-		+ "\\cout_" + g_para_method + "_" + g_image_name + _tag[_render_method] + string(".txt");
-	cout << " file name " << _tag[_render_method] <<" "<< r_cout_fname<< endl;
-	r_cout.open(r_cout_fname.c_str(), ios::out);
-	
-	render_method = _render_method;
-	m_tag = tag[_render_method];
-	m_tag_ = tag_[_render_method];
-	m__tag = _tag[_render_method];
-	m_t = _t[render_method];
-	m_t_ = _t_[render_method];
-	x_BrushMinSize = g_BrushMinSize;
-	x_srcImg_ = _srcImg.clone();
-
-	if (x_srcImg_.channels() == 1)
-	{
-		mat_print(x_srcImg_, "x_Src" + tag[_render_method]);
-	}
-	x_src_ptr = x_srcImg_.data;
-	QT_depth = g_depth_limit;
-
-	for (int i = 0; i <= MAX_DEPTH; i++) {
-		x_strk_times[i] = 0;
-		QT_grid_count[i] = 0;
-		grid_try_sum[i] = 0;
-		render_brush_size[i]=0;
-		r_s_changed_count[i]=0;
-		
-		r_grid_map_1c[i].create(g_src_image_height, g_src_image_width, CV_8UC1);
-		r_grid_map_1c[i].setTo(255);
-		r_try_map_1c[i].create(g_src_image_height, g_src_image_width, CV_8UC1);
-		r_try_map_1c[i].setTo(255);
-		
-		render_Stroke_set[i].set_depth(i);
-	}
-	
-
-	r_grid_map_1c_accu.create(g_src_image_height, g_src_image_width, CV_8UC1);
-};
-render_::~render_() {
-//	x_srcImg_.release();
-	//Quad_TreeMap.release();
-	//result_image.release();
-//	for (int i = 0; i < MAX_DEPTH; i++) {
-	//	r_grid_map_1c[i].release();
-		/*
-	for (list<Img_node*>::iterator partition_it = render_Stroke_set[i].stroke_list.begin(); 
-		partition_it != render_Stroke_set[i].stroke_list.end(); partition_it++) {
-		delete (*partition_it);
-	}*/
-	//}
-	
-//	brush_delete(brush_set);
-	//for(int i=0;i<MAX_DEPTH;i++)
-	//	brush_delete(brush_resized_set[i]);
-
-};
 
 int render_::prepare() {
 
