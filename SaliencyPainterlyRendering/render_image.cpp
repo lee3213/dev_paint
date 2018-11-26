@@ -11,35 +11,252 @@
 
 #include "time.h"
 #include "define_local.h"
+int render_::func_prepare(int x, int y, int astroke_depth) {
+	Point centered_SrtPoint, centered_EndPoint;
+	Point centered_SrtPoint_canvas, centered_EndPoint_canvas;
+	int brush_area_h_size_half;
+	int brush_area_w_size_half;
+	int adjusted_h_size;
+	int adjusted_w_size;
+	Point fetch_color_Point, fetch_color_canvas_point;
+	int color_BGR_B, color_BGR_G, color_BGR_R;
+	//	int times;
+	int brush_area_w_size, brush_area_h_size;
+	Size Brush_size;
+	Mat before_canvas_ROI;
+	Mat before_canvas_ROI_clone;
 
-void render_::func_p_map(Mat & a_map_canvas_8UC1,string tag,Rect x_src_canvas_Rect_full) {
-	double minval, maxval;
-	Point minloc, maxloc;
-	int i_minval, i_maxval;
+	Mat changed_canvas_ROI;
+	Mat changed_canvas_ROI_clone;
+
+	Mat ing_ROI_canvas;
+
+	cv::Mat src_canvas_ROI;
+	Mat mat_accu;
+
+	Mat mat_ing;
+	brush_area_h_size = render_brush_size[astroke_depth];// brush size(painting area) per each depth
+	brush_area_w_size = render_brush_size[astroke_depth];// brush size(painting area) per each depth
+	Brush_size = Size(brush_area_w_size, brush_area_h_size);
+
+	brush_area_h_size_half = brush_area_h_size / 2 + brush_area_h_size % 2;
+	brush_area_w_size_half = brush_area_w_size / 2 + brush_area_w_size % 2;
+
+	fetch_color_Point.x = x - x_canvas_bezel_size;
+	fetch_color_Point.y = y - x_canvas_bezel_size;
+	int fetch_Index = (fetch_color_Point.x + (fetch_color_Point.y*x_src_image_size.width))*(x_image_channels);
+	int fetch_Index_1c = (fetch_color_Point.x + fetch_color_Point.y*x_src_image_size.width);
+
+	int fetch_canvas_Index = ((fetch_color_Point.x + x_canvas_bezel_size)
+		+ (fetch_color_Point.y + x_canvas_bezel_size)*(x_canvas_size_width))*x_image_channels;
+
+	p_peek(x_src_ptr, fetch_Index, color_BGR_B, color_BGR_G, color_BGR_R);
+
+	p_poke(r_try_map_1c_data[astroke_depth], fetch_Index_1c, 0);
+	if (brush_area_w_size_half > x_canvas_bezel_size)
+		adjusted_w_size = x_canvas_bezel_size;
+	else
+		adjusted_w_size = brush_area_w_size_half;
+
+	if (brush_area_h_size_half > x_canvas_bezel_size)
+		adjusted_h_size = x_canvas_bezel_size;
+	else
+		adjusted_h_size = brush_area_w_size_half;
+
+	centered_SrtPoint.x = fetch_color_Point.x - adjusted_w_size;
+	centered_SrtPoint.y = fetch_color_Point.y - adjusted_h_size;
+
+	centered_EndPoint.x = fetch_color_Point.x + (adjusted_w_size);// to overcome odd brush size
+	centered_EndPoint.y = fetch_color_Point.y + (adjusted_h_size);// to overcome odd brush size
+
+	centered_SrtPoint_canvas.x = centered_SrtPoint.x + x_canvas_bezel_size;
+	centered_SrtPoint_canvas.y = centered_SrtPoint.y + x_canvas_bezel_size;
+	centered_EndPoint_canvas.x = centered_EndPoint.x + x_canvas_bezel_size;
+	centered_EndPoint_canvas.y = centered_EndPoint.y + x_canvas_bezel_size;
+
+	Rect centered_ROI_canvas_Rect = Rect(centered_SrtPoint_canvas, centered_EndPoint_canvas);
+	src_canvas_ROI = src_canvas(centered_ROI_canvas_Rect);
+	//	src_canvas_ROI_clone = src_canvas(centered_ROI_canvas_Rect).clone();
+
+	mat_accu = accu_canvas[astroke_depth];
+	mat_ing = ing_canvas[astroke_depth];
+	//before_canvas_ROI = mat_accu(centered_ROI_canvas_Rect);
+	before_canvas_ROI_clone.release();
+	before_canvas_ROI_clone = mat_accu(centered_ROI_canvas_Rect).clone();
+
+	changed_canvas_ROI = mat_accu(centered_ROI_canvas_Rect);
+	changed_canvas_ROI_clone.release();
+	changed_canvas_ROI_clone = mat_accu(centered_ROI_canvas_Rect).clone();
+
+	ing_ROI_canvas = mat_ing(centered_ROI_canvas_Rect);
+	int result = P_Rendering(
+		src_canvas_ROI,
+		before_canvas_ROI_clone,
+		changed_canvas_ROI_clone,
+		ing_ROI_canvas,
+		changed_canvas_ROI,
+		mat_accu,
+		centered_ROI_canvas_Rect,
+		fetch_color_Point,
+		centered_SrtPoint,
+		centered_SrtPoint_canvas,
+		centered_EndPoint_canvas,
+		adjusted_w_size, adjusted_h_size,
+
+		astroke_depth, render_try,
+		color_BGR_B, color_BGR_G, color_BGR_R,
+
+		x_image_step1,
+		x_canvas_step1,
+		x_src_ptr,
+		accu_canvas_data[astroke_depth],
+		ing_canvas_data[astroke_depth],
+		1,
+		0
+	);
+	if (result == CHANGED_BETTER)
+		r_s_changed_count[astroke_depth]++;
+
+	before_canvas_ROI.release();
+	before_canvas_ROI_clone.release();
+
+	changed_canvas_ROI.release();
+	changed_canvas_ROI_clone.release();
+
+	ing_ROI_canvas.release();
+
+	src_canvas_ROI.release();
+	return result;
+}
+				
+int  render_::pad_p_map(Mat & a_pmap_canvas_8UC1,string tag, Rect x_src_canvas_Rect_full,int _depth)
+{
+	//int times;
+	//partition_Node* strk_p;
+	int x, y, astroke_depth=_depth;
+	int _x_width;
+	int _y_height;
+	int sum_x;
+	int sum_y;
+	int c;
+	int ret;
+	_x_width = x_canvas_size_width / 10;
+	_y_height = x_canvas_size_height / 10;
+	int x_modulo = x_canvas_size_width - (_x_width * 10);
+	int y_modulo = x_canvas_size_height - (_y_height * 10);
+		Mat nonZeroCoordinates;
+		Mat nonzero_ROI;
+		Rect r_;
+		unsigned char * pp=paint_map_accu_canvas_8UC1[astroke_depth].data;
+		int tot_cnt = 0;
+		int effective = 0;
+		for( int _y=0;_y<10;_y++){
+			for (int _x = 0; _x < 10; _x++) {
+				if (_x == 9)
+					r_.width = _x_width + x_modulo;
+				else
+					r_.width = _x_width;
+				if (_y == 9)
+					r_.height = _y_height + y_modulo;
+				else
+					r_.height = _y_height;
+
+				r_.y = _y*_y_height;
+				r_.x = _x*_x_width;
+				nonzero_ROI = a_pmap_canvas_8UC1(r_);
+				//	debug_image("p" + to_string(_depth) + "/ROI_" + to_string(_y) + "_" + to_string(_x), nonzero_ROI);
+				findNonZero(nonzero_ROI, nonZeroCoordinates);
+				c = (int)nonZeroCoordinates.total();
+				tot_cnt += c;
+				sum_x = 0; sum_y = 0;
+
+				if (c > x_skip) {
+					do {
+
+						x = nonZeroCoordinates.at<Point>(0).x + r_.x;
+						y = nonZeroCoordinates.at<Point>(0).y + r_.y;
+						int index = x_canvas_size_width*y + x;
+						int val;
+						p_peek_1c(pp, index, val);
+						if (val != 0) {
+							ret = func_prepare(x, y, astroke_depth);
+							effective++;
+							p_peek_1c(pp, index, val);
+							if (val != 0) {
+								val = 0;
+								p_poke_1c(pp, index, val);
+
+							}
+						}
+						nonzero_ROI = a_pmap_canvas_8UC1(r_);
+						findNonZero(nonzero_ROI, nonZeroCoordinates);
+						c = (int)nonZeroCoordinates.total();
+					} while (c > x_skip);
+
+				}
+			}
+				debug_image("ing/__paint_map_a5_" + tag_[render_method] + to_string(_depth) + "_" + to_string(0) + "_" + to_string(_y), paint_map_accu_canvas_8UC1[_depth]);
+				debug_image("ing/_ac_" + to_string(_depth) + m_t + to_string(0) + "_" + to_string(_y), accu_canvas[_depth]);
+			}
+		r_cout << "tot_cnt "  <<tot_cnt <<"effective "<<effective << " "<<fixed<<setw(5)<<setprecision(1)<<
+			(float)(( (float)effective / ( float)tot_cnt )*(float)100.0)<< endl;
+	//times = paint_a_stroke(strk_p, 1, 1, Point(x, y), astroke_depth);
+		return tot_cnt;
+}
+
+int render_::func_p_map(Mat & a_map_canvas_8UC1,string tag,Rect x_src_canvas_Rect_full) {
+//	double minval, maxval;
+//	Point minloc, maxloc;
+	//int i_minval, i_maxval;
 	Mat ROI=a_map_canvas_8UC1(x_src_canvas_Rect_full);
-	cv::minMaxLoc(ROI, &minval, &maxval, &minloc, &maxloc);
-	i_minval = (int)minval;
-	i_maxval = (int)maxval;
 
+	//cv::minMaxLoc(ROI, &minval, &maxval, &minloc, &maxloc);
+	//i_minval = (int)minval;
+	//i_maxval = (int)maxval;
 
-	int diff = i_maxval - i_minval;
-	int step = (int)256 / diff;
-	Mat p_map;
-	a_map_canvas_8UC1.convertTo(p_map, -1, step);
-	debug_image("ing/" + tag, p_map);
+	
 
-	r_cout <<tag<< " minLoc " << minloc.x << ", " << minloc.y << " : " << (int)i_minval ;
-	r_cout << " maxLoc " << maxloc.x << ", " << maxloc.y << " : " << (int)i_maxval ;
-	r_cout << " diff = " << diff << ", step = " << step ;
+	//int diff = i_maxval - i_minval;
+	//if (diff == 0) diff = 1;
+	//int step = (int)256 / diff;
+//	Mat p_map;
+//	a_map_canvas_8UC1.convertTo(p_map, -1, step);
+//	debug_image("ing/" + tag, p_map);
+
+	//r_cout <<tag<< " minLoc " << minloc.x << ", " << minloc.y << " : " << (int)i_minval ;
+//	r_cout << " maxLoc " << maxloc.x << ", " << maxloc.y << " : " << (int)i_maxval ;
+	//r_cout << " diff = " << diff << ", step = " << step ;
 
 
 	//Mat paint_ROI = a_map_canvas_8UC1(x_src_canvas_Rect_full);
 	int zero_pixel_cnt = (x_src_image_size.height*x_src_image_size.width) - cv::countNonZero(ROI);
-	r_cout << " zero pixel = " << zero_pixel_cnt << " / " << (x_src_image_size.height*x_src_image_size.width) <<
-		" = " << std::fixed << setprecision(2) << ((float)zero_pixel_cnt / (float)(x_src_image_size.height*x_src_image_size.width))*100.0 << endl;
+	float ratio=(float)((float)zero_pixel_cnt / (float)(x_src_image_size.height*x_src_image_size.width))*(float)100.0;
+	r_cout <<tag<< " zero pixel = " << zero_pixel_cnt << " / " << (x_src_image_size.height*x_src_image_size.width) <<
+		" = " << std::fixed << setprecision(2) <<ratio << endl;
+	return (int)(ratio);
 }
-
-
+void render_::map_fill(int uu_depth, Mat a_map_canvas_8UC1, int color) {
+	Point Strk_srtPoint, Strk_endPoint;
+	Size Strk_size;
+	int Strk_w_size, Strk_h_size;
+	Point Strk_point_canvas;
+	for (list<partition_Node*>::iterator partition_it = render_Stroke_set[uu_depth].stroke_list.begin();
+		partition_it != render_Stroke_set[uu_depth].stroke_list.end(); partition_it++) {
+		partition_Node* strk_p = (*partition_it);
+		Strk_srtPoint = (strk_p)->srtPoint;
+		Strk_endPoint = (strk_p)->endPoint;
+		Strk_w_size = Strk_endPoint.x - Strk_srtPoint.x;
+		Strk_h_size = Strk_endPoint.y - Strk_srtPoint.y;
+		//	stroke_area[uu_depth] += Strk_w_size*Strk_h_size;
+		Strk_size = Size(Strk_w_size, Strk_h_size);
+		//astroke_depth = (strk_p)->depth;
+		Strk_point_canvas = Point(Strk_srtPoint.x + x_canvas_bezel_size, Strk_srtPoint.y + x_canvas_bezel_size);
+		Rect Strk_canvas_ROI_rect(Strk_point_canvas, Strk_size);
+		Mat a_map_canvas_8UC1_ROI = a_map_canvas_8UC1(Strk_canvas_ROI_rect);
+		//depth_map_canvas_8UC1_ROI.setTo(astroke_depth);//assign a value to Matrix
+		a_map_canvas_8UC1_ROI.setTo(color);
+	}
+}
 int   render_::render_image()
 
 {
@@ -63,7 +280,7 @@ int   render_::render_image()
 #endif
 	int times;
 	int times_0=0;
-	
+	partition_Node* strk_p;
 	src_canvas.create(x_canvas_size_height, x_canvas_size_width, CV_8UC3);
 	src_canvas.setTo(255);
 	
@@ -135,16 +352,10 @@ int   render_::render_image()
 	int stroke_area[MAX_DEPTH];
 	int stroke_area_ratio[MAX_DEPTH];
 
-	if (x_retry_map_1c.size().height == 0) {
-		r_cout << "v" << x_retry_map_1c.size().height << ", " << x_retry_map_1c.size().width << endl;
 
-	}
 	for (int uu_depth = 0; uu_depth < render_depth; uu_depth++) {
 
-		if (x_retry_map_1c.size().height == 0) {
-		//	r_cout << "x" << x_retry_map_1c.size().height << ", " << x_retry_map_1c.size().width << endl;
-
-		}
+		
 		stroke_area[uu_depth] = 0;
 		stroke_area_ratio[uu_depth] = 0;
 		for (list<partition_Node*>::iterator partition_it = render_Stroke_set[uu_depth].stroke_list.begin();
@@ -170,13 +381,19 @@ int   render_::render_image()
 	//		r_cout << "a" << x_retry_map_1c.size().height << ", " << x_retry_map_1c.size().width << endl;
 	}
 //	r_cout << "b" << x_retry_map_1c.size().height << ", " << x_retry_map_1c.size().width << endl;
-	x_changed_depth = 5;
+	x_changed_depth = -1;
+
+	
 	for (int uu_depth = 0; uu_depth < render_depth; uu_depth++) {
-		if (stroke_area_ratio[uu_depth] < 85)
+		map_fill(0, paint_map_canvas_8UC1[uu_depth], 255);
+		map_fill(0, paint_map_accu_canvas_8UC1[uu_depth], 255);
+
+		//debug_image("ing/__paint_map_1_" + tag_[render_method] + to_string(uu_depth), paint_map_canvas_8UC1[0]);
+		if (stroke_area_ratio[uu_depth] < 85 && x_changed_depth < 0)
 		{
 			x_changed_depth = uu_depth;
 			r_cout << "changed depth = " << x_changed_depth << endl;
-			break;
+				
 		}
 	}
 
@@ -188,7 +405,7 @@ int   render_::render_image()
 				it_partition_it != render_Stroke_set[uu_depth].stroke_list.end(); it_partition_it++)
 		{
 		//	r_cout << "e" << x_retry_map_1c.size().height << ", " << x_retry_map_1c.size().width << endl;
-			partition_Node* strk_p = (*it_partition_it);
+		 strk_p = (*it_partition_it);
 			Strk_srtPoint= (strk_p)->srtPoint;
 			Strk_endPoint = (strk_p)->endPoint;
 			Strk_w_size = Strk_endPoint.x - Strk_srtPoint.x;
@@ -226,11 +443,11 @@ int   render_::render_image()
 			}
 
 			
-			times=paint_a_stroke(strk_p,1);
+			times=paint_a_stroke(strk_p,1,0,Point(0,0),astroke_depth);
 			if (astroke_depth == (x_changed_depth-2)) {
-				times_0 += paint_a_stroke(strk_p,0);
-				times_0 += paint_a_stroke(strk_p, 0);
-				times_0 += paint_a_stroke(strk_p, 0);
+				times_0 += paint_a_stroke(strk_p,0,0, Point(0, 0), astroke_depth);
+				times_0 += paint_a_stroke(strk_p, 0,0, Point(0, 0), astroke_depth);
+				times_0 += paint_a_stroke(strk_p, 0,0, Point(0, 0), astroke_depth);
 			}
 			
 #ifdef _DEBUG_RENDER
@@ -239,8 +456,28 @@ int   render_::render_image()
 		
 		
 		}//end of it astroke
-		
-	
+		string tag = "p_map_" + m_tag_ + to_string(uu_depth);
+		func_p_map(paint_map_canvas_8UC1[uu_depth], tag, x_src_canvas_Rect_full);
+
+		debug_image("ing/__paint_map_a_" + tag_[render_method] + to_string(uu_depth), paint_map_accu_canvas_8UC1[uu_depth]);
+		debug_image("ing/__paint_map_i_" + tag_[render_method] + to_string(uu_depth), paint_map_canvas_8UC1[uu_depth]);
+				//paint_map_canvas_8UC1[uu_depth].copyTo(paint_map_accu_canvas_8UC1[uu_depth]);
+		int ret;
+		int tot_cnt;
+		if (uu_depth == (x_changed_depth-1)) {//apply paint map 
+			map_fill(x_changed_depth, paint_map_accu_canvas_8UC1[uu_depth], 0);
+			ret = func_p_map(paint_map_canvas_8UC1[uu_depth], tag, x_src_canvas_Rect_full);
+			debug_image("ing/__paint_map_a4_" + tag_[render_method] + to_string(uu_depth) + "_" + to_string(ret), paint_map_accu_canvas_8UC1[uu_depth]);
+			int how_many_loop = 0;
+		//	do {
+				tot_cnt=pad_p_map(paint_map_accu_canvas_8UC1[uu_depth], tag, x_src_canvas_Rect_full, uu_depth);
+				
+				ret = func_p_map(paint_map_canvas_8UC1[uu_depth], tag, x_src_canvas_Rect_full);
+			//	debug_image("ing/__paint_map_a5_" + tag_[render_method] + to_string(uu_depth)+"_"+to_string(ret), paint_map_accu_canvas_8UC1[uu_depth]);
+				how_many_loop++;
+			//} while (ret > 1);
+			cout << "how many loop " << how_many_loop << endl;
+		}
 		r_cout << "times_0 = " << times_0 << endl;
 		r_cout << setw(7) /*m_tag*/ << " :L " << "st size" << "times" << "times, pscale" << "st_size*strk_times*p_scale" << " , Br_size " << endl;
 		r_cout << setw(7) << m_tag <<setw(3) << uu_depth << " : "
@@ -274,8 +511,7 @@ int   render_::render_image()
 		debug_image("ing/try_" + to_string(uu_depth) + m_t , r_try_map_1c[uu_depth]);
 		//paint_map_accu_8UC1[uu_depth] += paint_map_canvas_8UC1[uu_depth];
 		//paint_map_accu_8UC1[uu_depth+1] = paint_map_accu_8UC1[uu_depth];
-		string tag = "p_map_" + m_tag+to_string(uu_depth);
-		func_p_map(paint_map_canvas_8UC1[uu_depth],tag,x_src_canvas_Rect_full);
+		
 		//tag = "p_map_a_" + m_tag + to_string(uu_depth);
 		//func_p_map(paint_map_accu_8UC1[uu_depth],tag);
 		

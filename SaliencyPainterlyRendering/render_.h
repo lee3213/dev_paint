@@ -91,14 +91,16 @@ public:
 
 class render_ {
 public:
+	int x_skip = 10;
 	cv::Mat x_srcImg_;
 	unsigned char * x_src_ptr;
 	Size x_src_image_size;
 	int x_src_step1;
+	int x_image_channels;
+	int x_image_step1;
 	Stroke_set render_Stroke_set[MAX_DEPTH];
 	int stroke_size[MAX_DEPTH];
-
-	
+int render_::pad_p_map(Mat & a_pmap_canvas_8UC1, string tag, Rect x_src_canvas_Rect_full, int _depth);
 	Mat depth_map_canvas_8UC1;
 	unsigned char * depth_map_canvas_8UC1_data;
 		Mat paint_map_canvas_8UC1[MAX_DEPTH+1];
@@ -170,8 +172,8 @@ public:
 	~render_();
 	void render_::func_();
 	int  render_image();
-
-	void func_p_map(Mat & a_map_8UC1, string tag,Rect);
+	void map_fill(int uu_depth, Mat a_map, int color);
+ int  func_p_map(Mat & a_map_8UC1, string tag,Rect);
 
 	int stroke_dump(Stroke_set _aStroke_set[], string tag, int  depth);
 	//int stroke_dump(Stroke_set _aStroke_set, string tag, int  depth);
@@ -218,7 +220,7 @@ public:
 		int c, string _tag);
 	int render_::calc_render_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth,
 		int _render_brush_size[], string tag);
-
+int render_::func_prepare(int x, int y, int astroke_depth);
 	int render_::P_Rendering(Mat & _src_ROI_clone, Mat & _before_ROI_clone,
 		cv::Mat & _changed_ROI_clone,
 		cv::Mat & ing_ROI_clone, Mat &changed_canvas_ROI,
@@ -235,10 +237,12 @@ public:
 		int x_canvas_step1,
 		unsigned char * _src_ptr,
 		unsigned char * _accu_ptr,
-		unsigned char * _ing_ptr
+		unsigned char * _ing_ptr,
+		int mode,
+		int _tbrush_reset
 		);
-
-	int render_::paint_a_stroke(partition_Node* strk_p,int layer_more);
+//int render_::func_p_map(Mat & a_pmap_canvas_8UC1, string tag, Rect x_src_canvas_Rect_full, int _depth);
+	int render_::paint_a_stroke(partition_Node* strk_p,int layer_more,int mode, Point p,int layer);
 	double TakeAvgS(cv::Mat &srcImg, Point srtPoint, Point endPoint, int depth, string quad);
 	Point render_::get_midPoint(cv::Mat &srcImg, Point s, Point e, double *D, int d, int child_QT_depth);
 	int  TakeQuadTree(cv::Mat &SaliencyMap, Stroke_set aStroke[], string tag);
@@ -247,7 +251,7 @@ public:
 		string  quad,
 		Mat & gradient_src,
 		Mat stageMap, int depth, string tag);
-	int  render_::TakeColorDistance_thumbnail(cv::Mat &testImg, int thumb_width, int thumb_height,int src_step1, string tag, int depth);
+//	int  render_::TakeColorDistance_thumbnail(cv::Mat &testImg, int thumb_width, int thumb_height,int src_step1, string tag, int depth);
 	int  render_::JudgementBrush(cv::Mat &testImg, int depth, int width, int height,int src_step1, string tag);
 	int render_::JudgementBrush_pgm(cv::Mat &testImg_canvas, int depth, int t_image_width, int t_image_height, int _canvas_step1, string tag);
 	void brush_resize(
@@ -271,6 +275,9 @@ public:
 	}
 	inline void p_peek_1c(unsigned char * p, int index, int &p_0) {
 		p_0 = p[index];
+	}
+	inline void p_poke_1c(unsigned char * p, int index, int &p_0) {
+		p[index]=p_0;
 	}
 
 	int lbph();

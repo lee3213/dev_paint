@@ -18,10 +18,9 @@ void  render_::p_peek_canvas_1c(unsigned char * p, int p_x, int p_y, int &p_0) {
 	p_0 = p[index];
 
 }
-int render_::paint_a_stroke(partition_Node* strk_p, int layer_more) {
+int render_::paint_a_stroke(partition_Node* strk_p, int layer_more, int _mode, Point _p, int _depth) {
 	//partition_Node* strk_p = (*it_partition_it);
-	int x_image_channels = g_src_image_channels;
-	int x_image_step1 = (int)g_src_image_step1;
+	
 	Point Strk_srtPoint, Strk_endPoint;
 	Point fetch_color_Point, fetch_color_canvas_point;
 
@@ -31,6 +30,10 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_more) {
 
 	int brush_area_w_size, brush_area_h_size;
 	int color_BGR_B, color_BGR_G, color_BGR_R;
+
+	int adjusted_h_size;
+	int adjusted_w_size;
+
 	Size Brush_size;
 	int size_mismatch = 0;
 	int saved_depth = -1;
@@ -49,10 +52,12 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_more) {
 	Mat changed_canvas_ROI_clone;
 
 	Mat ing_ROI_canvas;
+	Mat mat_accu;
 
+	Mat mat_ing;
 	cv::Mat src_canvas_ROI;
-	
-
+	int brush_area_h_size_half;
+		int brush_area_w_size_half;
 	static int layer_more_depth=-1; // check first time layer
 	static int check_depth = -1;//check last depth
 
@@ -96,8 +101,8 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_more) {
 	brush_area_w_size = render_brush_size[astroke_depth];// brush size(painting area) per each depth
 	Brush_size = Size(brush_area_w_size, brush_area_h_size);
 
-	int brush_area_h_size_half = brush_area_h_size / 2 + brush_area_h_size % 2;
-	int brush_area_w_size_half = brush_area_w_size / 2 + brush_area_w_size % 2;
+	 brush_area_h_size_half = brush_area_h_size / 2 + brush_area_h_size % 2;
+	 brush_area_w_size_half = brush_area_w_size / 2 + brush_area_w_size % 2;
 
 	times = ((Strk_w_size * Strk_h_size) /
 		(brush_area_h_size * brush_area_w_size));
@@ -116,8 +121,9 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_more) {
 	grid_try_sum[astroke_depth] += x_paint_area_brush_count;//
 	int extended_paint_area_brush_count = x_paint_area_brush_count;
 	int extend_retry = 0;
-	Mat mat_accu = accu_canvas[astroke_depth];
-	Mat mat_ing = ing_canvas[astroke_depth];
+	 mat_accu = accu_canvas[astroke_depth];
+	 mat_ing = ing_canvas[astroke_depth];
+
 	int extended_paint_area_brush_count_limit = extended_paint_area_brush_count * 3;
 	
 	for (render_try = 0; render_try < extended_paint_area_brush_count; render_try++)
@@ -128,8 +134,7 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_more) {
 		
 		bool modified = true;
 		//	int retry_cnt = 1;
-		int adjusted_h_size;
-		int adjusted_w_size;
+
 		random_x = diStrk_x(rand_x[astroke_depth]);
 		random_y = diStrk_y(rand_y[astroke_depth]);
 		fetch_color_Point.x = Strk_srtPoint.x + random_x;
@@ -228,7 +233,9 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_more) {
 			x_canvas_step1,
 			x_src_ptr,
 			accu_canvas_data[astroke_depth],
-			ing_canvas_data[astroke_depth]
+			ing_canvas_data[astroke_depth],
+			0,
+			0
 		);
 		//r_cout << "i" << x_retry_map_1c.size().height << ", " << x_retry_map_1c.size().width << " " << render_try << endl;
 		//	current_fetched_map_data,fetched_color_data,r,g,b);

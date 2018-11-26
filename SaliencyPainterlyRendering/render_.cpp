@@ -27,6 +27,10 @@ render_::render_(int _render_method, cv::Mat &_srcImg) {
 	x_srcImg_ = _srcImg.clone();
 	x_src_image_size.width = (g_src_image_width);
 	x_src_image_size.height = g_src_image_height;
+	x_image_channels = g_src_image_channels;
+	x_image_step1 = (int)g_src_image_step1;
+
+
 	x_retry_map_1c.create(x_src_image_size.height, x_src_image_size.width, CV_8UC1);
 	x_retry_map_1c.setTo(255);
 
