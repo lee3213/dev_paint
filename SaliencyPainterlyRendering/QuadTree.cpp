@@ -79,7 +79,7 @@ void DrawEdgeLine(cv::Mat &srcImg, Imginfo info)
 					}
 					if (avgS > g_QT_avgSThreshold) {
 						TR = QuadTree::newImageTree(child_Info, child_QT_depth, avgS);
-						DivideImage(SaliencyMap, TR, aStroke_set,
+						DivideImage(SaliencyMap, TR, aRegion_set,
 							string("TR") + to_string(child_QT_depth), stageMap, gradient_src, child_QT_depth,tag);
 						if (get_depth > depth)
 							get_depth = depth;
@@ -105,7 +105,7 @@ void DrawEdgeLine(cv::Mat &srcImg, Imginfo info)
 					}
 					if (avgS > g_QT_avgSThreshold) {
 						BL = QuadTree::newImageTree(child_Info, child_QT_depth, avgS);
-						DivideImage(SaliencyMap, BL, aStroke_set,
+						DivideImage(SaliencyMap, BL, aRegion_set,
 							string("BL") + to_string(child_QT_depth), stageMap, gradient_src, child_QT_depth,tag);
 						if (get_depth > depth)
 							get_depth = depth;
@@ -131,7 +131,7 @@ void DrawEdgeLine(cv::Mat &srcImg, Imginfo info)
 					}
 					if (avgS > g_QT_avgSThreshold) {
 						BR = QuadTree::newImageTree(child_Info, child_QT_depth, avgS);
-						DivideImage(SaliencyMap, BR, aStroke_set,
+						DivideImage(SaliencyMap, BR, aRegion_set,
 						string("BR") + to_string(child_QT_depth), stageMap, gradient_src, child_QT_depth,tag);
 						if (get_depth > depth)
 							get_depth = depth;
@@ -150,7 +150,7 @@ void DrawEdgeLine(cv::Mat &srcImg, Imginfo info)
 
 
 /*
-	int  QuadTree::TakeQuadTree_grid(cv::Mat &SaliencyMap, list<Img_node*> aStroke_set[], string tag)
+	int  QuadTree::TakeQuadTree_grid(cv::Mat &SaliencyMap, list<Img_node*> aRegion_set[], string tag)
 	{
 		//cv::Mat Quad_treeMap;
 		Mat Quad_treeMap = SaliencyMap.clone();
@@ -183,7 +183,7 @@ void DrawEdgeLine(cv::Mat &srcImg, Imginfo info)
 				double avgS = TakeAvgS(SaliencyMap, block_x.srtPoint, block_x.endPoint, 0,quad);
 				if (avgS > 250) {
 					root = newImageTree(block_x, 0, avgS);
-					aStroke_set[root->depth].push_back(root);
+					aRegion_set[root->depth].push_back(root);
 
 				}
 			}
@@ -192,7 +192,7 @@ void DrawEdgeLine(cv::Mat &srcImg, Imginfo info)
 		//double avgS = TakeAvgS(SaliencyMap, root_Info.srtPoint, root_Info.endPoint, 0);
 	//	root = newImageTree(root_Info, 0, avgS);
 
-		//last_depth = DivideImage(SaliencyMap, root, aStroke_set, string("root") + to_string(0), 
+		//last_depth = DivideImage(SaliencyMap, root, aRegion_set, string("root") + to_string(0), 
 			//Quad_treeMap, stageMap, 0, tag);
 		//	cout		<< "after  aStroke size" << aStroke.size() << endl;
 

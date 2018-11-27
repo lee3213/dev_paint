@@ -416,8 +416,8 @@ int   prepare_Rendering(char * src_name, char * deploy_name)
 		int tot = 0;
 		for (int j = 0; j < _render[i]->render_depth; j++) {
 			cout << _render[i]->m_tag << " : "
-				<< _render[i]->render_Stroke_set[j].stroke_list.size() << endl;
-			tot += (int)_render[i]->render_Stroke_set[j].stroke_list.size();
+				<< _render[i]->render_region_set[j].Region_list.size() << endl;
+			tot += (int)_render[i]->render_region_set[j].Region_list.size();
 		}
 		cout << _render[i]->render_depth << "  " << tot << endl;
 		strftime(p_s_buff, 20, "%Y-%m-%d %H:%M:%S", &p_t_s[i]);

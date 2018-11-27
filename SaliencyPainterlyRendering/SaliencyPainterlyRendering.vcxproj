@@ -224,6 +224,8 @@
     <ClCompile Include="jsoncpp.cpp" />
     <ClCompile Include="jsonwriter.cpp" />
     <ClCompile Include="json_read.cpp" />
+    <ClCompile Include="json_ts.cpp" />
+    <ClCompile Include="pmap.cpp" />
     <ClCompile Include="render_Judgement.cpp" />
     <ClCompile Include="LBPH.cpp" />
     <ClCompile Include="make_batch.cpp" />
@@ -257,6 +259,7 @@
     </ClCompile>
     <ClCompile Include="superpixel.cpp" />
     <ClCompile Include="time_stamp.cpp" />
+    <ClCompile Include="try_scale_json.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -16,7 +16,7 @@ using namespace cv;
 
 void run_render(render_ * _render) {
 	//for (int j = 0; j < _render->render_depth; j++)
-		//if (_render->render_Stroke_set[j].stroke_list.size() == 0) {
+		//if (_render->render_region_set[j].Region_list.size() == 0) {
 			//cout << _render->m_tag << " stroke_size==0" << endl;
 		//	return ;
 	//	}

@@ -287,6 +287,15 @@
     <ClCompile Include="render_Judgement.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="pmap.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="try_scale_json.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="json_ts.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SaliencyPainterlyRendering.rc">

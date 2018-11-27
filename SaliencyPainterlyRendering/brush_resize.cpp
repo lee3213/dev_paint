@@ -132,11 +132,11 @@ void render_::brush_resize(	vector <Brush*> _brush_set)
 				cv::threshold(brush_resized->brush_8UC1,th,(double)g_alpha_TH,g_alpha_TH,1);
 				int cnz=countNonZero(th);
 				if (j == 0) {
-					r_cout << i << ", " << j << " = " << setw(7) << cnz << " : " << setw(7) << render_brush_size[i] * render_brush_size[i] <<
-						std::fixed << setw(15) <<
-						setprecision(2) << (float)((float(cnz) / float(render_brush_size[i] * render_brush_size[i]) )*100.0) << endl;
-						debug_image("br2/th_" + to_string(i) + "_" + to_string(j), brush_resized->brush_thumbnail);
-						debug_image("br2/inv_th_" + to_string(i) + "_" + to_string(j), th);
+					r_cout << "org "<<i << ", " << j << " = " << setw(7) << render_brush_size[i] << setw(7) << cnz << " / " << setw(7) << render_brush_size[i] * render_brush_size[i] <<
+						std::fixed << setw(7) <<
+						setprecision(1) << (float)((float(cnz) / float(render_brush_size[i] * render_brush_size[i]) )*100.0) << endl;
+					//	debug_image("br2/th_" + to_string(i) + "_" + to_string(j), brush_resized->brush_thumbnail);
+					//	debug_image("br2/inv_th_" + to_string(i) + "_" + to_string(j), th);
 				}
 #ifdef  DEBUG_BR2
 				string x = "br2/_";
@@ -159,11 +159,11 @@ void render_::brush_resize(	vector <Brush*> _brush_set)
 				render_Brush *p_brush;
 				p_brush = brush_resized_array[i][j];
 				if ( j == 0 )
-					debug_image("br2/br" + to_string(j) + "_"+to_string(i), p_brush->brush_8UC1);
+					debug_image("br2/org_" + to_string(j) + "_"+to_string(i), p_brush->brush_8UC1);
 				Mat roi=brush_set_image(r);
 				p_brush->brush_8UC1.copyTo(roi);
 			}
-			debug_image("br2/" + to_string(j) + "_", brush_set_image);
+			debug_image("br2/org_" + to_string(j) + "_", brush_set_image);
 		}
 }
 
@@ -200,11 +200,11 @@ void render_::brush_pgm_resize(vector <Brush_pgm*> _brush_pgm_list)
 			cv::threshold(brush_pgm_resized->brush_8UC1, th, (double)g_alpha_TH, g_alpha_TH, 1);
 			int cnz = countNonZero(th);
 			if (j == 0) {
-				r_cout << i << ", " << j << " = " << setw(7) << cnz << " : " << setw(7) << render_brush_size[i] * render_brush_size[i] <<
-					std::fixed << setw(15) <<
-					setprecision(2) << (float)((float(cnz) / float(render_brush_size[i] * render_brush_size[i]))*100.0) << endl;
+				r_cout << "pgm "<<i << ", " << j << " = " << setw(7) << render_brush_size[i]<<setw(7) << cnz << " / " << setw(7) << render_brush_size[i] * render_brush_size[i] <<
+					std::fixed << setw(7) <<
+					setprecision(1) << (float)((float(cnz) / float(render_brush_size[i] * render_brush_size[i]))*100.0) << endl;
 
-				debug_image("br2/pgm_th_" + to_string(i) + "_" + to_string(j), th);
+			//	debug_image("br2/pgm_th_" + to_string(i) + "_" + to_string(j), th);
 			}
 #ifdef  DEBUG_BR2
 			string x = "br2/pgm_";
@@ -214,6 +214,7 @@ void render_::brush_pgm_resize(vector <Brush_pgm*> _brush_pgm_list)
 #endif
 		}
 	}
+
 	int b_max = render_brush_size[0];
 	Mat brush_set_image;
 	brush_set_image.create(b_max, b_max*render_depth, CV_8UC1);
@@ -232,4 +233,5 @@ void render_::brush_pgm_resize(vector <Brush_pgm*> _brush_pgm_list)
 		}
 		debug_image("br2/pgm_" + to_string(j) + "_", brush_set_image);
 	}
-}
+
+	}

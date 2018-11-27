@@ -57,7 +57,7 @@ bool fileExists(const std::string& dirName_in)
 		cout << "FILE_ATTRIBUTE_READONLY" << endl;//0x01
 
 	if (ftyp & FILE_ATTRIBUTE_ARCHIVE) {
-		cout << " FILE_ATTRIBUTE_ARCHIVE" << endl;//0x20
+	//	cout << " FILE_ATTRIBUTE_ARCHIVE" << endl;//0x20
 		return true;
 	}
 		if (ftyp & FILE_ATTRIBUTE_DEVICE)
@@ -305,7 +305,7 @@ void DeleteAllFiles(string folderPath)
 }
 
 void check_and_create(string path, bool flag) {
-	cout << "check_and_create  :: " << flag << " :: " << path << endl;
+//	cout << "check_and_create  :: " << flag << " :: " << path << endl;
 	if (dirExists(path)) {
 		//cout << "dir  " << path << " Exists" << endl;
 		if (flag)

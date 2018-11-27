@@ -39,7 +39,7 @@ cout_func(string src_name, string deploy_name){
 
 
 void set_result_path(std::string para_path, string method_path, int depth) {
-	string dirs[] = { "ing","sobel","saliency" ,"br","grid","br2","grad_ori" };
+	string dirs[] = { "ing","sobel","saliency" ,"br","grid","br2","grad_ori","pmap" };
 	string sub_dirs;
 	string dir;
 
@@ -79,6 +79,15 @@ void set_result_path(std::string para_path, string method_path, int depth) {
 		cout << i << " : " << sub_dirs << endl;
 		check_and_create(sub_dirs, true);
 	}
+	for (int i = 0; i < RENDER_MAX; i++) {
+		sub_dirs = dir;
+
+		sub_dirs.append("\\pmap\\r");
+		sub_dirs.append(to_string(i));
+		cout << i << " : " << sub_dirs << endl;
+		check_and_create(sub_dirs, true);
+	}
+
 }
 
 void filename_without_ext(string src_name, string &g_image_name) {

@@ -35,27 +35,27 @@ public:
 using namespace std;
 using namespace cv;
 //int draw_grid_2(Mat _Quad_TreeMap,
-	//list<Img_node*> *aStroke_set, string tag, int  depth, int draw_depth, int c, string _tag);
-class Stroke_set {
+	//list<Img_node*> *aRegion_set, string tag, int  depth, int draw_depth, int c, string _tag);
+class Region_set {
 public:
 	//partition_Node *a;
-	list<partition_Node *> stroke_list;
+	list<partition_Node *> Region_list;
 	//int stroke_cnt;
 	int depth;
 	//int size() {
-	//		return (int)(stroke_list.size());
+	//		return (int)(Region_list.size());
 	//}
-	Stroke_set() {
+	Region_set() {
 
 	};
-	~Stroke_set() {
+	~Region_set() {
 
 	};
 	void set_depth(int _depth) {
 		depth = _depth;
 	};
 	int push_back(partition_Node * _p) {
-		stroke_list.push_back(_p);
+		Region_list.push_back(_p);
 		return 0;//Good
 	};
 
@@ -96,11 +96,16 @@ public:
 	unsigned char * x_src_ptr;
 	Size x_src_image_size;
 	int x_src_step1;
-	int x_image_channels;
-	int x_image_step1;
-	Stroke_set render_Stroke_set[MAX_DEPTH];
+	int x_src_channels;
+	//int x_src_step1;
+	Region_set render_region_set[MAX_DEPTH];
+	Region_set render_dropped_set[MAX_DEPTH];
+
+	Mat overlay_grid_map[MAX_DEPTH];
+	Mat overlay_dropped_map[MAX_DEPTH];
+	int dropped_no;
 	int stroke_size[MAX_DEPTH];
-int render_::pad_p_map(Mat & a_pmap_canvas_8UC1, string tag, Rect x_src_canvas_Rect_full, int _depth);
+int render_::pad_p_map(Mat & a_pmap_canvas_8UC1, Rect r_,string tag, int _depth);
 	Mat depth_map_canvas_8UC1;
 	unsigned char * depth_map_canvas_8UC1_data;
 		Mat paint_map_canvas_8UC1[MAX_DEPTH+1];
@@ -111,12 +116,13 @@ int render_::pad_p_map(Mat & a_pmap_canvas_8UC1, string tag, Rect x_src_canvas_R
 	int render_method;
 	//Mat render_::render_image();
 	cv::Mat gradient_map[MAX_Gradient+1];
+	Mat gradient_inverse;
 	Mat x_retry_map_1c;
 	//cv::Mat Quad_TreeMap;
 	cv::Mat result_image;
 	int  x_tbrush_cnt = 0;
 	int x_changed_depth;
-	Mat src_canvas;
+	Mat x_src_canvas;
 	cv::Mat accu_canvas[MAX_DEPTH];
 	cv::Mat ing_canvas[MAX_DEPTH];
 	unsigned char * accu_canvas_data[MAX_DEPTH];
@@ -157,7 +163,7 @@ int render_::pad_p_map(Mat & a_pmap_canvas_8UC1, string tag, Rect x_src_canvas_R
 
 	render_ * render_sobel;
 	render_ * render_saliency;
-
+	Rect x_src_canvas_Rect_full;
 	std::string m_tag;
 	std::string m__tag;
 	std::string m_tag_;
@@ -172,19 +178,19 @@ int render_::pad_p_map(Mat & a_pmap_canvas_8UC1, string tag, Rect x_src_canvas_R
 	~render_();
 	void render_::func_();
 	int  render_image();
-	void map_fill(int uu_depth, Mat a_map, int color);
- int  func_p_map(Mat & a_map_8UC1, string tag,Rect);
-
-	int stroke_dump(Stroke_set _aStroke_set[], string tag, int  depth);
-	//int stroke_dump(Stroke_set _aStroke_set, string tag, int  depth);
+	void pmap_overlay_fill(int uu_depth, Mat a_map, int color);
+ int  pmap_count_zero(Mat & a_map_8UC1, string tag,Rect);
+ void render_::canvas_rect(partition_Node* region_p, Rect &Strk_canvas_ROI_rect);
+	int stroke_dump(Region_set _aRegion_set[], string tag, int  depth);
+	//int stroke_dump(Region_set _aRegion_set, string tag, int  depth);
 	int draw_grid_depth(Mat  _grid_map_1c[], Mat _grid_map_1c_accu,
-		Stroke_set  aStroke_set[], string tag, int & grid_map_sum,
+		Region_set  aRegion_set[], string tag, int & grid_map_sum,
 		int _QT_grid_count[]//, bool do_grid_cnt//, int draw_depth, int c
 	);
 	void proof_box(Point &s, int i_width, int i_height, char * p);
 	void proof_box(Point &s, int i_width, int i_height);
-	//	list<Img_node*> *get_Stroke_set_ptr(int i) {
-		//	return &render_Stroke_set[i];
+	//	list<Img_node*> *get_Region_set_ptr(int i) {
+		//	return &render_region_set[i];
 	//	}
 	void add_gradient_map(int i, Mat a_map);
 	int render_::prepare();
@@ -216,11 +222,11 @@ int render_::pad_p_map(Mat & a_pmap_canvas_8UC1, string tag, Rect x_src_canvas_R
 	};
 	//void  render_::p_peek_canvas(unsigned char * p, int p_x, int p_y, int &p_0, int &p_1, int &p_2);
 	int draw_grid_2(Mat _Quad_TreeMap,
-		Stroke_set aStroke_set[], string ftag, int  depth,// int draw_depth, 
+		Region_set aRegion_set[], string ftag, int  depth,// int draw_depth, 
 		int c, string _tag);
 	int render_::calc_render_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth,
 		int _render_brush_size[], string tag);
-int render_::func_prepare(int x, int y, int astroke_depth);
+int render_::func_render_a_pixel(int x, int y, int astroke_depth);
 	int render_::P_Rendering(Mat & _src_ROI_clone, Mat & _before_ROI_clone,
 		cv::Mat & _changed_ROI_clone,
 		cv::Mat & ing_ROI_clone, Mat &changed_canvas_ROI,
@@ -233,7 +239,7 @@ int render_::func_prepare(int x, int y, int astroke_depth);
 		int astroke_depth, int painting_try, 
 		int color_BGR_B, int color_BGR_G, int color_BGR_R,
 	
-		int x_image_step1,
+		int x_src_step1,
 		int x_canvas_step1,
 		unsigned char * _src_ptr,
 		unsigned char * _accu_ptr,
@@ -241,13 +247,13 @@ int render_::func_prepare(int x, int y, int astroke_depth);
 		int mode,
 		int _tbrush_reset
 		);
-//int render_::func_p_map(Mat & a_pmap_canvas_8UC1, string tag, Rect x_src_canvas_Rect_full, int _depth);
-	int render_::paint_a_stroke(partition_Node* strk_p,int layer_more,int mode, Point p,int layer);
+//int render_::pmap_count_zero(Mat & a_pmap_canvas_8UC1, string tag, Rect x_src_canvas_Rect_full, int _depth);
+	int render_::paint_a_stroke(partition_Node* region_p,int layer_more,int mode, Point p,int layer);
 	double TakeAvgS(cv::Mat &srcImg, Point srtPoint, Point endPoint, int depth, string quad);
 	Point render_::get_midPoint(cv::Mat &srcImg, Point s, Point e, double *D, int d, int child_QT_depth);
-	int  TakeQuadTree(cv::Mat &SaliencyMap, Stroke_set aStroke[], string tag);
+	int  TakeQuadTree(cv::Mat &SaliencyMap, Region_set aStroke[], string tag);
 
-	int DivideImage(cv::Mat &SaliencyMap, partition_Node* me_node, Stroke_set aStroke_set[],
+	int DivideImage(cv::Mat &SaliencyMap, partition_Node* me_node, Region_set aRegion_set[],
 		string  quad,
 		Mat & gradient_src,
 		Mat stageMap, int depth, string tag);
@@ -276,7 +282,7 @@ int render_::func_prepare(int x, int y, int astroke_depth);
 	inline void p_peek_1c(unsigned char * p, int index, int &p_0) {
 		p_0 = p[index];
 	}
-	inline void p_poke_1c(unsigned char * p, int index, int &p_0) {
+	inline void p_poke_1c(unsigned char * p, int index, int p_0) {
 		p[index]=p_0;
 	}
 

@@ -9,7 +9,7 @@
 #include "debug_image.h"
 
 #include "render_.h"
-int  render_::TakeQuadTree(cv::Mat &SaliencyMap, Stroke_set aStroke_set[], string tag)
+int  render_::TakeQuadTree(cv::Mat &SaliencyMap, Region_set aRegion_set[], string tag)
 {
 	//cv::Mat Quad_treeMap;
 	Mat Quad_treeMap = SaliencyMap.clone();
@@ -34,7 +34,7 @@ int  render_::TakeQuadTree(cv::Mat &SaliencyMap, Stroke_set aStroke_set[], strin
 	root = newImageTree(root_Info, 0,avgS);
 
 	*/
-	last_depth = DivideImage(SaliencyMap, root, aStroke_set, string("root"), Quad_treeMap, stageMap, 0, tag);
+	last_depth = DivideImage(SaliencyMap, root, aRegion_set, string("root"), Quad_treeMap, stageMap, 0, tag);
 	//	cout		<< "after  aStroke size" << aStroke.size() << endl;
 	
 	//cv::String f_path = cv::format("%s/org_quad_tree.ppm", g_para_method_path.c_str());//1ch
@@ -43,7 +43,7 @@ int  render_::TakeQuadTree(cv::Mat &SaliencyMap, Stroke_set aStroke_set[], strin
 	return last_depth;
 }
 
-int render_::DivideImage(cv::Mat &SaliencyMap, partition_Node* me_node, Stroke_set aStroke_set[],
+int render_::DivideImage(cv::Mat &SaliencyMap, partition_Node* me_node, Region_set aRegion_set[],
 	string  quad,
 	Mat & gradient_src,
 	Mat stageMap, int depth, string tag)
@@ -57,7 +57,7 @@ int render_::DivideImage(cv::Mat &SaliencyMap, partition_Node* me_node, Stroke_s
 	//Point child_Info_s, child_Info_e;//,my_Info;
 	//Img_node* BL, *BR, *TL, *TR;
 	partition_Node *new_node[5];
-
+	partition_Node *new_dropped_node;
 	//	cout << "----" << quad << "  --------------------------------------------------------" << endl;
 	if (me_node == NULL)
 	{
@@ -77,7 +77,7 @@ int render_::DivideImage(cv::Mat &SaliencyMap, partition_Node* me_node, Stroke_s
 	}
 	called++;
 
-	int ret = aStroke_set[me_node->depth].push_back(me_node);
+	int ret = aRegion_set[me_node->depth].push_back(me_node);
 	if (ret < 0)
 	{
 		cout << "ERROR stroke_Set FULL " << me_node->depth << endl;
@@ -140,10 +140,22 @@ int render_::DivideImage(cv::Mat &SaliencyMap, partition_Node* me_node, Stroke_s
 				new_node[quadrant] = new partition_Node(c_srtPoint[quadrant], c_endPoint[quadrant], child_QT_depth, avgS[quadrant],g_no);
 				g_no++;
 
-				get_depth = DivideImage(SaliencyMap, new_node[quadrant], aStroke_set,
+				get_depth = DivideImage(SaliencyMap, new_node[quadrant], aRegion_set,
 					quad + to_string(child_QT_depth), stageMap, gradient_src, child_QT_depth, tag);
 
+			}
+			else
+			{
+				new_dropped_node = new partition_Node(c_srtPoint[quadrant], c_endPoint[quadrant], child_QT_depth, avgS[quadrant], dropped_no);
+				dropped_no++;
+				int ret = render_dropped_set[new_dropped_node->depth].push_back(new_dropped_node);
+				if (ret < 0)
+				{
+					cout << "ERROR dropped_stroke_Set push_back Error " << new_dropped_node << endl;
+					return -1;
+				}
 			}//if avgS
+
 
 
 		}//if mion_grid_Size

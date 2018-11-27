@@ -10,7 +10,25 @@
 #include "debug_image.h"
 #include "brush_pgm.h"
 #include "render_.h"
+void render_::canvas_rect(partition_Node* region_p, Rect &Strk_canvas_ROI_rect) {
+	Point Strk_srtPoint, Strk_endPoint;
+	//Point Strk_point_canvas;
+	//Size Strk_size;
+	//int Strk_w_size, Strk_h_size;
+	//int astroke_depth = -1;
+	Strk_srtPoint = (region_p)->srtPoint;
+	Strk_endPoint = (region_p)->endPoint;
+	//	Strk_w_size = Strk_endPoint.x - Strk_srtPoint.x;
+	//	Strk_h_size = Strk_endPoint.y - Strk_srtPoint.y;
 
+	Strk_canvas_ROI_rect.width = Strk_endPoint.x - Strk_srtPoint.x;
+	Strk_canvas_ROI_rect.height = Strk_endPoint.y - Strk_srtPoint.y;
+
+	//astroke_depth = (region_p)->depth;
+	Strk_canvas_ROI_rect.x = Strk_srtPoint.x + x_canvas_bezel_size;
+	Strk_canvas_ROI_rect.y = Strk_srtPoint.y + x_canvas_bezel_size;
+
+}
 render_::render_(int _render_method, cv::Mat &_srcImg) {
 	string r_cout_fname = g_root_path_win + string("\\cout\\") + g_para
 		+ "\\cout_" + g_para_method + "_" + g_image_name + _tag[_render_method] + string(".txt");
@@ -27,8 +45,8 @@ render_::render_(int _render_method, cv::Mat &_srcImg) {
 	x_srcImg_ = _srcImg.clone();
 	x_src_image_size.width = (g_src_image_width);
 	x_src_image_size.height = g_src_image_height;
-	x_image_channels = g_src_image_channels;
-	x_image_step1 = (int)g_src_image_step1;
+	x_src_channels = g_src_image_channels;
+	x_src_step1 = (int)g_src_image_step1;
 
 
 	x_retry_map_1c.create(x_src_image_size.height, x_src_image_size.width, CV_8UC1);
@@ -54,10 +72,11 @@ render_::render_(int _render_method, cv::Mat &_srcImg) {
 		r_try_map_1c[i].create(g_src_image_height, g_src_image_width, CV_8UC1);
 		r_try_map_1c[i].setTo(255);
 
-		render_Stroke_set[i].set_depth(i);
+		render_region_set[i].set_depth(i);
+		render_dropped_set[i].set_depth(i);
 	}
 
-
+	dropped_no = 0;
 	r_grid_map_1c_accu.create(g_src_image_height, g_src_image_width, CV_8UC1);
 };
 render_::~render_() {
@@ -67,8 +86,8 @@ render_::~render_() {
 	//	for (int i = 0; i < MAX_DEPTH; i++) {
 	//	r_grid_map_1c[i].release();
 	/*
-	for (list<Img_node*>::iterator partition_it = render_Stroke_set[i].stroke_list.begin();
-	partition_it != render_Stroke_set[i].stroke_list.end(); partition_it++) {
+	for (list<Img_node*>::iterator partition_it = render_region_set[i].Region_list.begin();
+	partition_it != render_region_set[i].Region_list.end(); partition_it++) {
 	delete (*partition_it);
 	}*/
 	//}

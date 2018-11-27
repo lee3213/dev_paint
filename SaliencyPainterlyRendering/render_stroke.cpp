@@ -18,8 +18,8 @@ void  render_::p_peek_canvas_1c(unsigned char * p, int p_x, int p_y, int &p_0) {
 	p_0 = p[index];
 
 }
-int render_::paint_a_stroke(partition_Node* strk_p, int layer_more, int _mode, Point _p, int _depth) {
-	//partition_Node* strk_p = (*it_partition_it);
+int render_::paint_a_stroke(partition_Node* region_p, int layer_more, int _mode, Point _p, int _depth) {
+	//partition_Node* region_p = (*region_iter);
 	
 	Point Strk_srtPoint, Strk_endPoint;
 	Point fetch_color_Point, fetch_color_canvas_point;
@@ -55,7 +55,7 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_more, int _mode, P
 	Mat mat_accu;
 
 	Mat mat_ing;
-	cv::Mat src_canvas_ROI;
+	cv::Mat centered_src_canvas_ROI;
 	int brush_area_h_size_half;
 		int brush_area_w_size_half;
 	static int layer_more_depth=-1; // check first time layer
@@ -63,8 +63,8 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_more, int _mode, P
 
 	random_device rand_x[MAX_DEPTH];
 	random_device rand_y[MAX_DEPTH];
-	astroke_depth = strk_p->depth;
-	render_stroke_no = (strk_p)->no;
+	astroke_depth = region_p->depth;
+	render_stroke_no = (region_p)->no;
 	if (layer_more == 0) {
 		
 		if (layer_more_depth == -1) {//first time
@@ -80,17 +80,17 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_more, int _mode, P
 		if (layer_more_depth != astroke_depth)
 			layer_more_depth = 1000 + astroke_depth;
 	}
-	Strk_srtPoint = (strk_p)->srtPoint;
-	Strk_endPoint = (strk_p)->endPoint;
+	Strk_srtPoint = (region_p)->srtPoint;
+	Strk_endPoint = (region_p)->endPoint;
 	Strk_w_size = Strk_endPoint.x - Strk_srtPoint.x;
 	Strk_h_size = Strk_endPoint.y - Strk_srtPoint.y;
 
 	Strk_size = Size(Strk_w_size, Strk_h_size);
 
-	render_stroke_no = (strk_p)->no;
+	render_stroke_no = (region_p)->no;
 
-	Strk_srtPoint = (strk_p)->srtPoint;
-	Strk_endPoint = (strk_p)->endPoint;
+	Strk_srtPoint = (region_p)->srtPoint;
+	Strk_endPoint = (region_p)->endPoint;
 	Strk_w_size = Strk_endPoint.x - Strk_srtPoint.x;
 	Strk_h_size = Strk_endPoint.y - Strk_srtPoint.y;
 
@@ -123,6 +123,8 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_more, int _mode, P
 	int extend_retry = 0;
 	 mat_accu = accu_canvas[astroke_depth];
 	 mat_ing = ing_canvas[astroke_depth];
+	 string f_name_btdt = "p" + to_string(astroke_depth) + "/" + m_t_ + to_string(astroke_depth) + "_t_" + to_string(0);
+	 debug_image(f_name_btdt + "__ACC_ACC_" + to_string(layer_more) + "_", accu_canvas[astroke_depth]);
 
 	int extended_paint_area_brush_count_limit = extended_paint_area_brush_count * 3;
 	
@@ -157,11 +159,11 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_more, int _mode, P
 			}
 		}
 
-		int fetch_Index = (fetch_color_Point.x + (fetch_color_Point.y*x_src_image_size.width))*(x_image_channels);
+		int fetch_Index = (fetch_color_Point.x + (fetch_color_Point.y*x_src_image_size.width))*(x_src_channels);
 		int fetch_Index_1c = (fetch_color_Point.x + fetch_color_Point.y*x_src_image_size.width);
 
 		int fetch_canvas_Index = ((fetch_color_Point.x + x_canvas_bezel_size)
-			+ (fetch_color_Point.y + x_canvas_bezel_size)*(x_canvas_size_width) )*x_image_channels;
+			+ (fetch_color_Point.y + x_canvas_bezel_size)*(x_canvas_size_width) )*x_src_channels;
 
 		p_peek(x_src_ptr, fetch_Index, color_BGR_B, color_BGR_G, color_BGR_R);
 		if (layer_more == 0 || check_depth == astroke_depth) {
@@ -195,7 +197,7 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_more, int _mode, P
 #ifdef _DEBUG_RENDER
 		rectangle(painting_area_canvas[astroke_depth], centered_ROI_canvas_Rect, Scalar(0, 0, 0));//BLACK
 #endif
-		src_canvas_ROI = src_canvas(centered_ROI_canvas_Rect);
+		centered_src_canvas_ROI = x_src_canvas(centered_ROI_canvas_Rect);
 		//	src_canvas_ROI_clone = src_canvas(centered_ROI_canvas_Rect).clone();
 
 
@@ -213,7 +215,7 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_more, int _mode, P
 
 
 		int result = P_Rendering(
-			src_canvas_ROI,
+			centered_src_canvas_ROI,
 			before_canvas_ROI_clone,
 			changed_canvas_ROI_clone,
 			ing_ROI_canvas,
@@ -229,12 +231,12 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_more, int _mode, P
 			astroke_depth, render_try,
 			color_BGR_B, color_BGR_G, color_BGR_R,
 
-			x_image_step1,
+			x_src_step1,
 			x_canvas_step1,
 			x_src_ptr,
 			accu_canvas_data[astroke_depth],
 			ing_canvas_data[astroke_depth],
-			0,
+			1,//debug_image on
 			0
 		);
 		//r_cout << "i" << x_retry_map_1c.size().height << ", " << x_retry_map_1c.size().width << " " << render_try << endl;
@@ -282,7 +284,7 @@ int render_::paint_a_stroke(partition_Node* strk_p, int layer_more, int _mode, P
 
 	ing_ROI_canvas.release();
 
-	src_canvas_ROI.release();
+	centered_src_canvas_ROI.release();
 
 	return times;
 }

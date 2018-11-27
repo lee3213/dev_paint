@@ -42,9 +42,9 @@ using namespace cv;
 //partition_Node a;
 
 	//static Img_node *copyImageTree(Imginfo info, int depth, int S);
-//	 int  TakeQuadTree_grid(cv::Mat &SaliencyMap, Stroke_set aStroke[],string tag);
+//	 int  TakeQuadTree_grid(cv::Mat &SaliencyMap, Region_set aStroke[],string tag);
 	
-	// cv::Mat TakeDensity(cv::Mat &srcImg, Stroke_set *aStroke);
+	// cv::Mat TakeDensity(cv::Mat &srcImg, Region_set *aStroke);
 	//static Img_node *newImageTree(cv::Point s, cv::Point e, int depth, double S);
 	//static Img_node *copyImageTree(Img_node deno, int depth, int avgS);
 	

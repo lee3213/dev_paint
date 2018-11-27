@@ -46,11 +46,11 @@ void render_::brush_delete(render_Brush* r_brush_array[]) {
 
 }
 */
-int render_ ::stroke_dump(Stroke_set _aStroke_set[], string tag__, int  depth) {
+int render_ ::stroke_dump(Region_set _aRegion_set[], string tag__, int  depth) {
 	r_cout << tag__ << " " << depth << endl;
 	for (int i = 0; i < depth; i++) {
 		
-			r_cout << tag__ << " " << i << " : " << _aStroke_set[i].stroke_list.size() << endl;
+			r_cout << tag__ << " " << i << " : " << _aRegion_set[i].Region_list.size() << endl;
 		
 	}
 /*	int __saved_depth = -1;
@@ -62,7 +62,7 @@ int render_ ::stroke_dump(Stroke_set _aStroke_set[], string tag__, int  depth) {
 	}
 
 	for (int i = 0; i < depth; i++) {
-		for (list<Img_node*>::iterator partition_it = _aStroke_set[i]->begin(); partition_it != _aStroke_set[i]->end(); partition_it++)
+		for (list<Img_node*>::iterator partition_it = _aRegion_set[i]->begin(); partition_it != _aRegion_set[i]->end(); partition_it++)
 		{
 
 			_grid[(*partition_it)->depth]++;
@@ -77,14 +77,14 @@ int render_ ::stroke_dump(Stroke_set _aStroke_set[], string tag__, int  depth) {
 }
 
 int render_::draw_grid_2(Mat _Quad_TreeMap,
-	Stroke_set aStroke_set[], string ftag, int  depth, 
+	Region_set aRegion_set[], string ftag, int  depth, 
 	//int draw_depth, 
 	int c,string _tag) {
 	int __saved_depth = -1;
 	Mat overlay_grid_map[MAX_DEPTH];
 	
 	static int called_cnt = 0;
-	if (aStroke_set->stroke_list.size() == 0) {
+	if (aRegion_set->Region_list.size() == 0) {
 		r_cout << "aStroke_Set size() = 0 " + _tag << +": " << ftag << " : "// << to_string(draw_depth) 
 			<< endl;
 		return depth;
@@ -95,7 +95,7 @@ int render_::draw_grid_2(Mat _Quad_TreeMap,
 	}
 	for (int i = 0; i < depth; i++) {
 
-		for (list<partition_Node *>::iterator partition_it = render_Stroke_set[i].stroke_list.begin(); partition_it != render_Stroke_set[i].stroke_list.end(); partition_it++)
+		for (list<partition_Node *>::iterator partition_it = render_region_set[i].Region_list.begin(); partition_it != render_region_set[i].Region_list.end(); partition_it++)
 		{
 		//	if (draw_depth != -1 && __saved_depth != draw_depth) {
 		//		continue;
@@ -121,34 +121,35 @@ int render_::draw_grid_2(Mat _Quad_TreeMap,
 	return depth;
 }
 int render_::draw_grid_depth(Mat  _grid_map_1c[], Mat _grid_map_1c_accu,
-	Stroke_set aStroke_set[], string tag, int & grid_map_sum,
+	Region_set aRegion_set[], string tag, int & grid_map_sum,
 	 int _QT_grid_count[]//, bool do_grid_cnt//, int draw_depth, int c
 	) {
 	int __saved_depth = -1;
-	Mat overlay_grid_map[MAX_DEPTH];
+	
 	static int called_cnt = 0;
-	list<partition_Node*>::iterator outbox = aStroke_set[0].stroke_list.begin();
+	list<partition_Node*>::iterator outbox = aRegion_set[0].Region_list.begin();
 	//Point p;
 //	p.x=(*outbox)->info.endPoint.x - 1;
 	//p.y=(*outbox)->info.endPoint.y - 1;
 	for (int i = 0; i < MAX_DEPTH; i++) {
-		overlay_grid_map[i] = _grid_map_1c[MAX_DEPTH].clone();
+		overlay_grid_map[i] = gradient_inverse.clone();
 		cv::rectangle(_grid_map_1c[i], cv::Rect((*outbox)->srtPoint,
 			(*outbox)->endPoint)
-			, RGB(0, 0,0));
+			, RGB(0, 0,0));//outer box
+		overlay_dropped_map[i] = gradient_inverse.clone();
 		//	debug_image("ing/_ok_grid_" + tag +
 			//	"_" + to_string(called_cnt) + "_", i, overlay_grid_map[i]);
 		_QT_grid_count[i] = 0;
 	}
-	
+
 	for (int i = 0; i < MAX_DEPTH; i++) {
-		int ssize=(int) aStroke_set[i].stroke_list.size();
-		//r_cout << "z : stroke " << i<<" : "<<__saved_depth <<" , "<<aStroke_set[i].size() << endl;
+		int ssize=(int) aRegion_set[i].Region_list.size();
+		//r_cout << "z : stroke " << i<<" : "<<__saved_depth <<" , "<<aRegion_set[i].size() << endl;
 		if (ssize == 0) 
 			break;
 		
-		for (list<partition_Node*>::iterator partition_it = aStroke_set[i].stroke_list.begin(); 
-			partition_it != aStroke_set[i].stroke_list.end(); partition_it++)
+		for (list<partition_Node*>::iterator partition_it = aRegion_set[i].Region_list.begin(); 
+			partition_it != aRegion_set[i].Region_list.end(); partition_it++)
 		{
 			__saved_depth = (*partition_it)->depth;
 
@@ -157,17 +158,35 @@ int render_::draw_grid_depth(Mat  _grid_map_1c[], Mat _grid_map_1c_accu,
 			cv::rectangle(_grid_map_1c[__saved_depth], Rect((*partition_it)->srtPoint,
 				(*partition_it)->endPoint), RGB(0,0, 0));
 			cv::rectangle(overlay_grid_map[__saved_depth], Rect((*partition_it)->srtPoint,
-				(*partition_it)->endPoint), RGB(255, 255, 255));
+				(*partition_it)->endPoint), RGB(0, 0, 0));
 
 				_QT_grid_count[__saved_depth]++;
 		}//end of for list
 	}//end of for i
+
+
+	for (int i = 0; i < MAX_DEPTH; i++) {
+		int ssize = (int)render_dropped_set[i].Region_list.size();
+		//r_cout << "z : stroke " << i<<" : "<<__saved_depth <<" , "<<aRegion_set[i].size() << endl;
+		if (ssize == 0)
+			continue;
+
+		for (list<partition_Node*>::iterator partition_it = render_dropped_set[i].Region_list.begin();
+			partition_it != render_dropped_set[i].Region_list.end(); partition_it++)
+		{
+			__saved_depth = (*partition_it)->depth;
+			cv::rectangle(overlay_dropped_map[__saved_depth], Rect((*partition_it)->srtPoint,
+				(*partition_it)->endPoint), RGB(0, 0, 0));
+		}//end of for list
+		debug_image("pmap/r" + to_string(render_method) + "/_od" + m_t, i, overlay_dropped_map[i]);
+	}//end of for i
+
 	for (int i = 0; i <= __saved_depth; i++) {
 		
 			debug_image("ing/_og" +m_t, i, overlay_grid_map[i]);
 			debug_image("_g" + m_t, i, _grid_map_1c[i]);
 			debug_image("ing/_g" + m_t, i, _grid_map_1c[i]);
-
+			
 			r_cout << tag<<" "<<setw(6) << i << " : " << setw(10)<<_QT_grid_count[i] << endl;
 				
 			grid_map_sum += _QT_grid_count[i];
@@ -279,7 +298,7 @@ void  render_::post_process() {
 		image_save(m_t+g_image_name, result_image, r_grid_map_1c_accu);
 
 		
-			ret = draw_grid_2(result_image.clone(), render_Stroke_set, "p" + m_t, render_depth, //-1, 
+			ret = draw_grid_2(result_image.clone(), render_region_set, "p" + m_t, render_depth, //-1, 
 				255, m_t);
 
 		func_();
@@ -303,10 +322,22 @@ int render_::prepare() {
 
 	x_canvas_bezel_size = x_BrushMaxSize*g_brush_scale[0];
 
-	//Rendering
+	x_src_canvas_Rect_full.width = x_src_image_size.width;
+	x_src_canvas_Rect_full.height = x_src_image_size.height;
+	x_src_canvas_Rect_full.x = x_canvas_bezel_size;//bezel size decided at prepare()
+	x_src_canvas_Rect_full.y = x_canvas_bezel_size;
 	x_canvas_size_width = g_src_image_width + x_canvas_bezel_size * 2;
 	x_canvas_size_height = g_src_image_height + x_canvas_bezel_size * 2;
-	x_canvas_step1 = x_canvas_size_width * 3;
+	x_canvas_step1 = x_canvas_size_width * x_src_channels;
+		;
+	x_src_canvas.create(x_canvas_size_height, x_canvas_size_width, CV_8UC3);
+	x_src_canvas.setTo(255);
+
+
+	Mat src_ROI_full = x_src_canvas(x_src_canvas_Rect_full);
+	x_srcImg_.copyTo(src_ROI_full);
+	//Rendering
+	
 
 	//paint_map = new Mat(canvas_size_height, canvas_size_width, CV_8UC3);
 	//	paint_map_data = paint_map->data;
@@ -316,68 +347,70 @@ int render_::prepare() {
 	
 	r_grid_map_1c_accu = gradient_map[render_method].clone();
 	r_grid_map_1c[MAX_DEPTH] = gradient_map[render_method].clone();
-
-	//m_aStroke_set = new list<Img_node*>();
+	gradient_inverse = 255-(r_grid_map_1c[MAX_DEPTH]);
+	//	 cv::threshold((r_grid_map_1c[MAX_DEPTH]),gradient_inverse, (double)30, 30, 1); ;
+	 debug_image("gradient_inverse", gradient_inverse);
+	//m_aRegion_set = new list<Img_node*>();
 	//for (int i = 0; i < MAX_DEPTH; i++)
-	//	r_cout << "aStroke_set[" << setw(2) << to_string(i) + "]->size().initialize = " + m_tag << ", " << render_Stroke_set[i].size() << endl;
+	//	r_cout << "aRegion_set[" << setw(2) << to_string(i) + "]->size().initialize = " + m_tag << ", " << render_region_set[i].size() << endl;
 
 	if (render_method != RENDER_TWOPASS_ENHANCE && render_method != RENDER_TWOPASS_MERGE) {
 		//if (render_method != RENDER_SOBEL) {
-		//	ret = QuadTree::TakeQuadTree_grid(gradient_map[render_method], render_Stroke_set, m_tag);
+		//	ret = QuadTree::TakeQuadTree_grid(gradient_map[render_method], render_region_set, m_tag);
 		//}
 		//else
-		ret = TakeQuadTree(gradient_map[render_method], render_Stroke_set, m_tag);
+		ret = TakeQuadTree(gradient_map[render_method], render_region_set, m_tag);
 	}
 	else {
 		int saved_depth = -1;
 		partition_Node *me_node;
 	//	Imginfo info;
 		int  S;
-		Stroke_set Stroke_set_sobel[MAX_DEPTH];
-		Stroke_set Stroke_set_saliency[MAX_DEPTH];
+		Region_set Region_set_sobel[MAX_DEPTH];
+		Region_set Region_set_saliency[MAX_DEPTH];
 		
 	
 		for (int l = 0; l < render_sobel->render_depth; l++) {
-			Stroke_set_sobel[l] = render_sobel->render_Stroke_set[l];
+			Region_set_sobel[l] = render_sobel->render_region_set[l];
 
 		}
 		for (int l = 0; l < render_saliency->render_depth; l++) {
-			Stroke_set_saliency[l] = render_saliency->render_Stroke_set[l];
+			Region_set_saliency[l] = render_saliency->render_region_set[l];
 
 		}
 
-			stroke_dump(Stroke_set_sobel, m_tag + " : sobel depth, count = ", render_sobel->render_depth);
+			stroke_dump(Region_set_sobel, m_tag + " : sobel depth, count = ", render_sobel->render_depth);
 
 	//	for (int l = 0; l < render_saliency->render_depth; l++)
-		stroke_dump(Stroke_set_saliency, m_tag + " : saliency depth, count  = ", render_saliency->render_depth);
+		stroke_dump(Region_set_saliency, m_tag + " : saliency depth, count  = ", render_saliency->render_depth);
 
 		int kk = 0;
 
 		for (int i = 0; i < render_sobel->render_depth; i++) {
-			//	r_cout << "astroke.size(_sobel)= " + m_tag << ", " << render_Stroke_set[i].size() << endl;
-			for (list<partition_Node*>::iterator partition_it = Stroke_set_sobel[i].stroke_list.begin(); partition_it != Stroke_set_sobel[i].stroke_list.end(); partition_it++) {
+			//	r_cout << "astroke.size(_sobel)= " + m_tag << ", " << render_region_set[i].size() << endl;
+			for (list<partition_Node*>::iterator partition_it = Region_set_sobel[i].Region_list.begin(); partition_it != Region_set_sobel[i].Region_list.end(); partition_it++) {
 			//	info = (*partition_it)->info;
 				k_depth = (*partition_it)->depth;
 				S = (*partition_it)->avgS;
 				me_node = new 
 					partition_Node((*partition_it)->srtPoint,(*partition_it)->endPoint, k_depth, S,g_no);
 				g_no++;
-				render_Stroke_set[i].push_back(me_node);
+				render_region_set[i].push_back(me_node);
 				kk++;
 			}
 		}
 
 		r_cout << " sobel added " << kk << " strokes : to depth  " << k_depth << endl;
 		depth_sobel = k_depth;
-		//render_Stroke_set->sort();
-		stroke_dump(render_Stroke_set, m_tag, render_depth);
+		//render_region_set->sort();
+		stroke_dump(render_region_set, m_tag, render_depth);
 		kk = 0;
 		k_depth = 0;
 		int s_depth = render_sobel->render_depth-1;
 		for (int i = s_depth; i < render_saliency->render_depth; i++) {
-			//r_cout << "astroke.size()= " + m_tag << ", " << render_Stroke_set[i].size() << endl;
+			//r_cout << "astroke.size()= " + m_tag << ", " << render_region_set[i].size() << endl;
 			int mod = 0;
-			for (list<partition_Node*>::iterator partition_it = Stroke_set_saliency[i].stroke_list.begin(); partition_it != Stroke_set_saliency[i].stroke_list.end(); partition_it++) {
+			for (list<partition_Node*>::iterator partition_it = Region_set_saliency[i].Region_list.begin(); partition_it != Region_set_saliency[i].Region_list.end(); partition_it++) {
 				mod++;
 				//if ((mod % 2) == 0) continue;
 				if (render_method == RENDER_TWOPASS_MERGE)
@@ -390,7 +423,7 @@ int render_::prepare() {
 				S = (*partition_it)->avgS;
 				me_node = new partition_Node((*partition_it)->srtPoint,(*partition_it)->endPoint, k_depth, S,g_no);
 				g_no++;
-				render_Stroke_set[k_depth].push_back(me_node);
+				render_region_set[k_depth].push_back(me_node);
 				kk++;
 			}
 		}
@@ -400,16 +433,16 @@ int render_::prepare() {
 		//render_depth=depth_Enhance = k_depth+1;
 		render_depth = k_depth + 1;
 		for (int i = 0; i < render_depth; i++) {
-			r_cout << m_tag + "  _aStrokeset_size() : " <<i << ": " << render_Stroke_set[i].stroke_list.size() << endl;
+			r_cout << m_tag + "  _aStrokeset_size() : " <<i << ": " << render_region_set[i].Region_list.size() << endl;
 		}
 	}
 
-	//m_aStroke_set->sort(Img_node::greater<Img_node*>());
+	//m_aRegion_set->sort(Img_node::greater<Img_node*>());
 
 
-//	sort(m_aStroke_set->begin(), m_aStroke_set->end());
-	//m_aStroke_set->sort();
-	render_depth = draw_grid_depth(r_grid_map_1c, r_grid_map_1c_accu, render_Stroke_set, m_t,
+//	sort(m_aRegion_set->begin(), m_aRegion_set->end());
+	//m_aRegion_set->sort();
+	render_depth = draw_grid_depth(r_grid_map_1c, r_grid_map_1c_accu, render_region_set, m_t,
 		grid_map_sum, QT_grid_count//, true, -1, 0
 	);
 	/*
@@ -418,13 +451,13 @@ int render_::prepare() {
 	int k = 0;
 	
 	for(int i=0;i<render_depth;i++){
-		if (render_Stroke_set[i].stroke_list.size() == 0) {
+		if (render_region_set[i].Region_list.size() == 0) {
 			r_cout << m_tag + "Fail Sort check _aStrokeset_size() : " << k_depth << ": " << 
-				render_Stroke_set[i].stroke_list.size() << endl;
+				render_region_set[i].Region_list.size() << endl;
 		}
 		
-	for (list<partition_Node*>::iterator partition_it = render_Stroke_set[i].stroke_list.begin(); 
-		partition_it != render_Stroke_set[i].stroke_list.end(); partition_it++, k++)
+	for (list<partition_Node*>::iterator partition_it = render_region_set[i].Region_list.begin(); 
+		partition_it != render_region_set[i].Region_list.end(); partition_it++, k++)
 	{
 		astroke_depth = (*partition_it)->depth;
 		if (k_depth != -1) {
@@ -436,7 +469,7 @@ int render_::prepare() {
 		}
 		k_depth = astroke_depth;
 	}
-	r_cout << m_tag + " Sort check _aStrokeset_size() : " << k_depth<<": "<<render_Stroke_set[i].stroke_list.size() << endl;
+	r_cout << m_tag + " Sort check _aStrokeset_size() : " << k_depth<<": "<<render_region_set[i].Region_list.size() << endl;
 	}
 	*/
 	/*for (int i = 0; i <= MAX_DEPTH; i++) {
@@ -458,7 +491,7 @@ int render_::prepare() {
 	}
 	*/
 	for (int i = 0; i < render_depth; i++) {
-		list<partition_Node*>::iterator partition_it = render_Stroke_set[i].stroke_list.begin();
+		list<partition_Node*>::iterator partition_it = render_region_set[i].Region_list.begin();
 		stroke_size[i] = (*partition_it)->stroke_size.width;
 	}
 	calc_render_brush_size(x_BrushMaxSize, x_BrushMinSize, render_depth,
@@ -471,14 +504,14 @@ int render_::prepare() {
 	//	r_cout << "Brush "<<i << ", " << render_brush_size[i] << endl;
 	//}
 //	for (int i = 0; i < render_depth; i++) {
-//		r_cout << "QT stroke count(" + m_tag + ") " << QT_depth << " " << render_depth << " : " << render_Stroke_set[i].size() << endl;
+//		r_cout << "QT stroke count(" + m_tag + ") " << QT_depth << " " << render_depth << " : " << render_region_set[i].size() << endl;
 	//	r_cout.flush();
-	//	if (render_Stroke_set[i].size() == 0) {
+	//	if (render_region_set[i].size() == 0) {
 	//		r_cout << "unexpected Stroke Tree" + m_tag + " = 0" << endl;
 	//		return -20000;
 	//	}
 	//}
-	//ret = draw_grid_2(x_srcImg_.clone(), m_aStroke_set, "src_0_" + m_tag, m_depth, -1, 0,m_tag);
+	//ret = draw_grid_2(x_srcImg_.clone(), m_aRegion_set, "src_0_" + m_tag, m_depth, -1, 0,m_tag);
 	r_cout << "------------------------------------------------------------------" << endl;
 	r_cout.flush();
 	return 0;

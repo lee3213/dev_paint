@@ -26,7 +26,7 @@ int result = P_Rendering(
 	astroke_depth, render_try,
 	color_BGR_B, color_BGR_G, color_BGR_R,
 
-	x_image_step1,
+	x_src_step1,
 	x_canvas_step1,
 	x_src_ptr,
 	accu_canvas_data[astroke_depth],
@@ -49,7 +49,7 @@ int render_::P_Rendering(Mat & _src_canvas_ROI,
 	int _adjusted_w_size, int _adjusted_h_size,
 	int astroke_depth, int _try_,
 	int color_BGR_B, int color_BGR_G, int color_BGR_R,
-	int _x_image_step1,
+	int _x_src_step1,
 	int _x_canvas_step1,
 
 	unsigned char * _src_ptr,
@@ -123,24 +123,33 @@ int render_::P_Rendering(Mat & _src_canvas_ROI,
 
 	}
 	int brush_no;
+	unsigned char * bestBrush_8UC1_resized_data;
+	render_Brush_pgm *bestBrush_pgm_resized;
 #ifdef _USE_PGM
 	brush_no = JudgementBrush_pgm_bsize(src_ROI_canvas_clone_resized_8UC1, /*added by cwlee*/astroke_depth,
 		s_w, s_h, src_resized_8UC1_step1, br_tag);
-	bestBrush_8UC1_resized = &(brush_resized_array[astroke_depth][brush_no]->brush_8UC1);
+	bestBrush_pgm_resized = brush_pgm_resized_array[astroke_depth][brush_no];
+	bestBrush_8UC1_resized_data = bestBrush_pgm_resized->brush_8UC1_data;
+		int b_width = bestBrush_pgm_resized->brush_size;
+	int b_height = bestBrush_pgm_resized->brush_size; 
+	int b_step1 = (int)(bestBrush_pgm_resized->brush_8UC1.step1() );
+	int b_channels = bestBrush_pgm_resized->brush_8UC1.channels();
 #else
 	brush_no = JudgementBrush(src_ROI_canvas_resized_8UC1, /*added by cwlee*/astroke_depth,
 		s_w, s_h, src_resized_8UC1_step1, br_tag);
-	bestBrush_8UC1_resized = brush_resized_array[astroke_depth][brush_no]->brush_8UC1;
-#endif
-
-	//	bestBrush_embossed_resized = brush_resized_array[astroke_depth][brush_no]->bump;
-	unsigned char * bestBrush_data_8UC1_resized = (unsigned char *)bestBrush_8UC1_resized->data;
-	//unsigned char * bestBrush_embossed_resized_data = bestBrush_embossed_resized.data;
-
+	render_Brush *brush_pgm_resized = brush_pgm_resized_array[astroke_depth][brush_no];
+	bestBrush_8UC1_resized_data = brush_pgm_resized->brush_8UC1_data;
 	int b_width = bestBrush_8UC1_resized->size().width;
 	int b_height = bestBrush_8UC1_resized->size().height;
 	int b_step1 = (int)bestBrush_8UC1_resized->step1();
 	int b_channels = bestBrush_8UC1_resized->channels();
+#endif
+
+	//	bestBrush_embossed_resized = brush_resized_array[astroke_depth][brush_no]->bump;
+	//unsigned char * bestBrush_data_8UC1_resized = (unsigned char *)bestBrush_8UC1_resized->data;
+	//unsigned char * bestBrush_embossed_resized_data = bestBrush_embossed_resized.data;
+
+	
 
 
 	for (int bx = 0; bx < b_width; bx++)
@@ -152,7 +161,7 @@ int render_::P_Rendering(Mat & _src_canvas_ROI,
 			//	int canvas_ROI_Index_3c = by *canvas_clone_ROI_step1 + bx * canvas_clone_ROI_channels;
 			int canvas_clone_ROI_Index_3c = by *canvas_clone_ROI_step1 + bx * canvas_clone_ROI_channels;
 			int gray_bIndex_1c = by*b_step1 + bx*b_channels;
-			p_peek_1c(bestBrush_data_8UC1_resized, gray_bIndex_1c, Alpha);
+			p_peek_1c(bestBrush_8UC1_resized_data, gray_bIndex_1c, Alpha);
 			if (Alpha < g_alpha_TH) {
 				p_poke(changed_canvas_ROI_clone_data, canvas_clone_ROI_Index_3c, color_BGR_B, color_BGR_G, color_BGR_R);
 			}
@@ -204,7 +213,7 @@ int render_::P_Rendering(Mat & _src_canvas_ROI,
 				int gray_bIndex_1c = by*b_width + bx;
 			//	int bIndex_1c = by *b_step1 + bx * b_channels;
 
-					Alpha = bestBrush_data_8UC1_resized[gray_bIndex_1c];
+					Alpha = bestBrush_8UC1_resized_data[gray_bIndex_1c];
 					if (Alpha < g_alpha_TH) {
 						
 						p_poke(_ing_canvas_ptr, canvas_Index_3c, color_BGR_B, color_BGR_G, color_BGR_R);
