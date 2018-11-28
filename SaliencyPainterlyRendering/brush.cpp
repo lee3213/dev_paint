@@ -20,7 +20,7 @@ int BrushInitialization(vector <Brush*> &_brush_set)
 
 	int nth;
 	static bool run_once = false;
-	cv::Mat brush_cr, brush_th;
+	cv::Mat brush_outlined, brush_th;
 	string f_name;
 	
 	int bsize_w, bsize_h;

@@ -5,7 +5,7 @@
 using namespace std;
 #include "extern.h"
 
-int  json_deployment(string path_fname) {
+int  read_try_scale_json_content(string path_fname) {
 	//	Json::Value root;
 	cout << "path" << path_fname << " : " << path_fname.c_str() << endl;
 	std::ifstream config_doc(path_fname.c_str());
@@ -47,9 +47,9 @@ int  json_deployment(string path_fname) {
 	g_ts_count_x = root.get("count_x", MAX_DEPTH).asInt();
 	for (int ts_y = 0; ts_y < g_ts_count_y; ts_y++) {
 		for (int ts_x = 0; ts_x < g_ts_count_x; ts_x++) {
-		a = "a" + to_string(ts_x);
-		ts[ts_x][ts_y] = root.get(a, 1).asInt();
+			a = "a" + to_string(ts_x);
+			ts[ts_y][ts_x] = root.get(a, 1).asInt();
+		}
 	}
-
 	return 0;
 }

@@ -305,8 +305,8 @@ void  render_::post_process() {
 	}
 	//m_depth, changed_count, QT_grid_count, grid_painting_try, render_brush_size, painting_area);
 }
-void  render_::add_gradient_map(int render_method, Mat a_map) {
-	gradient_map[render_method] = a_map;
+void  render_::add_gradient_map(int gradient_type, Mat a_map) {
+	gradient_map[gradient_type] = a_map;
 }
 
 int render_::prepare() {
@@ -353,13 +353,31 @@ int render_::prepare() {
 	//m_aRegion_set = new list<Img_node*>();
 	//for (int i = 0; i < MAX_DEPTH; i++)
 	//	r_cout << "aRegion_set[" << setw(2) << to_string(i) + "]->size().initialize = " + m_tag << ", " << render_region_set[i].size() << endl;
-
+	 int gradient_type;
 	if (render_method != RENDER_TWOPASS_ENHANCE && render_method != RENDER_TWOPASS_MERGE) {
 		//if (render_method != RENDER_SOBEL) {
 		//	ret = QuadTree::TakeQuadTree_grid(gradient_map[render_method], render_region_set, m_tag);
 		//}
 		//else
-		ret = TakeQuadTree(gradient_map[render_method], render_region_set, m_tag);
+		switch (render_method) {
+		case RENDER_SOBEL:
+			gradient_type = Gradient_Sobel;
+			break;
+		case RENDER_SALIENCY:
+			gradient_type = Gradient_Saliency_C;
+			break;
+		case RENDER_UNION:
+			gradient_type = Gradient_Union;
+		case RENDER_TWOPASS_MERGE:
+			gradient_type = Gradient_Union;
+		case RENDER_TWOPASS_ENHANCE:
+			gradient_type = Gradient_Union;
+			break;
+		default:
+			r_cout << "render_method error in setting gradient image " << render_method<<endl;
+			gradient_type = Gradient_Sobel;
+		}
+		ret = TakeQuadTree(gradient_map[gradient_type], render_region_set, m_tag);
 	}
 	else {
 		int saved_depth = -1;

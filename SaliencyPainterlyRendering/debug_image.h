@@ -19,3 +19,4 @@ void debug_image(string str, Mat *a, int ftype = 0);
 void debug_image(char * p, int d, vector<Mat> a, int ftype =0);
 void debug_image(char * p, int d, Mat &a, int ftype =0);
 void debug_image(string p, int d, Mat &a, int ftype =0);
+void debug_image(char * p, int d, Mat *a, int ftype=0);

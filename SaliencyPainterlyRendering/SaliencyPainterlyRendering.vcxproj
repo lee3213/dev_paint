@@ -119,6 +119,12 @@
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
     </ProjectReference>
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" c:\render\bin</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>copy exe to bin</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -259,7 +265,7 @@
     </ClCompile>
     <ClCompile Include="superpixel.cpp" />
     <ClCompile Include="time_stamp.cpp" />
-    <ClCompile Include="try_scale_json.cpp" />
+    <ClCompile Include="write_try_scale_json.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -290,10 +290,10 @@
     <ClCompile Include="pmap.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="try_scale_json.cpp">
+    <ClCompile Include="json_ts.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="json_ts.cpp">
+    <ClCompile Include="write_try_scale_json.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

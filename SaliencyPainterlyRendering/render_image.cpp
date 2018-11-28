@@ -111,7 +111,7 @@ int   render_::render_image()
 	//		r_cout << "a" << x_retry_map_1c.size().height << ", " << x_retry_map_1c.size().width << endl;
 	}
 //	r_cout << "b" << x_retry_map_1c.size().height << ", " << x_retry_map_1c.size().width << endl;
-	x_changed_depth = -1;
+	x_changed_depth = render_depth-1;
 
 	
 	for (int uu_depth = 0; uu_depth < render_depth; uu_depth++) {
@@ -119,7 +119,7 @@ int   render_::render_image()
 		pmap_overlay_fill(from_layer_0, paint_map_accu_canvas_8UC1[uu_depth], 255); //paint_map_accu_canvas_8UC1[uu_depth].ROI(src image).setTo(255)
 
 		//debug_image("ing/__paint_map_1_" + tag_[render_method] + to_string(uu_depth), paint_map_canvas_8UC1[0]);
-		if (stroke_area_ratio[uu_depth] < 45 && x_changed_depth < 0)
+		if (stroke_area_ratio[uu_depth] < 45)
 		{
 			x_changed_depth = uu_depth;
 			r_cout << "changed depth = " << x_changed_depth << endl;
@@ -128,8 +128,8 @@ int   render_::render_image()
 	}
 
 //	r_cout << "c" << x_retry_map_1c.size().height << ", " << x_retry_map_1c.size().width << endl;
-	r_cout << setw(7) /*m_tag*/ << " :L " << "st size" << "times" << "times, pscale" << "st_size*strk_times*p_scale" << " , Br_size " ;
-	r_cout << "try cnt " << setw(7) << "<ex_try" << setw(7) << "  ratio" << "ch count  % ";
+	r_cout << setw(10) /*m_tag*/ << " :L " << "Rsize," << "times, pscale," << "    try" << " , Br_size " ;
+	r_cout << setw(7) << "ex_try" << setw(7) << " ratio, " << "ch_count  % ";
 	Rect r_;
 	for (int uu_depth = 0; uu_depth < render_depth; uu_depth++) {
 		
@@ -199,16 +199,16 @@ int   render_::render_image()
 
 		//r_cout << "times_0 = " << times_0 << endl;
 	
-		r_cout << setw(7) << m_tag << setw(3) << uu_depth << " : "
+		r_cout << setw(7) << m_tag << setw(3) << uu_depth <<", "
 			<< setw(5) << render_region_set[uu_depth].Region_list.size() << ", " <<
-			setw(5) << x_strk_times[uu_depth] << ", "
-			<< setw(5) << times << ", " << setw(6) << g_paint_try_scale[uu_depth] << " :  " << setw(7) <<
+			 setw(5) << x_strk_times[uu_depth] << ", "<<
+			 setw(6) << g_paint_try_scale[uu_depth] << " :  " << setw(7) <<
 			render_region_set[uu_depth].Region_list.size()*x_strk_times[uu_depth] * g_paint_try_scale[uu_depth] <<
 			" , " <<
-			setw(5) << render_region_set[uu_depth].Region_list.size() <<
-			",  " << setw(4) << x_paint_area_brush_count;
-		r_cout <<  grid_try_sum[uu_depth]<< ","<<setw(6)<<extended_try[uu_depth]<<","<<
-			std::fixed << setw(7) << std::setprecision(2) << (float((float)extended_try[uu_depth]/(float)grid_try_sum[uu_depth])*100.0)<<
+			
+			 setw(5) << x_paint_area_brush_count<<",  ";
+		r_cout <<  grid_try_sum[uu_depth]<< ","<<setw(7)<<extended_try[uu_depth]<<","<<
+			std::fixed << setw(9) << std::setprecision(2) << (float((float)extended_try[uu_depth]/(float)grid_try_sum[uu_depth])*100.0)<<
 			"," << r_s_changed_count[uu_depth];
 		r_cout << "," << std::fixed << setw(7)<<std::setprecision(2)<<
 			((float)r_s_changed_count[uu_depth] / (float)grid_try_sum[uu_depth])*100.0 << endl;

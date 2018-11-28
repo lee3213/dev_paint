@@ -211,6 +211,26 @@ void debug_image(char * p, int d, vector<Mat> a, int ftype )
 		imwrite(path.c_str(), b);
 	}
 }
+void debug_image(char * p, int d, Mat *a, int ftype)
+{
+	string path;
+
+
+	Mat b;
+	if ((a->type() & CV_MAT_DEPTH_MASK) == CV_32F) {
+		//cout <<p<<" "<< type2str(a.type())<<endl;
+		a->convertTo(b, CV_8UC3, 255.);
+	}
+	else b = *a;
+	char ext[10];
+	get_ext(ext, b.channels(), ftype);
+	path = format("%s/%s_%d.%s", g_para_method_image_path.c_str(), p, d, ext);
+	//#ifdef _DEBUG_IMAGE 
+	//	cout << str.c_str() << endl;
+	//#endif
+	imwrite(path.c_str(), 
+		b);
+}
 void debug_image(char * p, int d, Mat &a, int ftype)
 {
 	string path;

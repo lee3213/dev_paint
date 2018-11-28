@@ -15,6 +15,7 @@
 //debug_image_single *g_debug_brush_resized;
 //int g_brush_called_cnt = 0;
 int g_image_divider;// BrushMaxSize = g_src_image_height / g_image_divider;
+int g_render_method;
 bool g_fitime = true;
 //FILE *g_log;
 //vector <Brush*> g_brush_set;//Brush set

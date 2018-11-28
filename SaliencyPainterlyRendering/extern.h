@@ -17,7 +17,7 @@ using namespace cv;
 extern string g_debug_file;
 
 extern int g_merge_method;
-
+extern int g_render_method;
 extern int g_QT_avgSThreshold;
 //extern int g_grid_threshold;
 extern int g_depth_limit;
