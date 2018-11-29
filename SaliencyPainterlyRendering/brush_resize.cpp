@@ -13,6 +13,102 @@ int render_::calc_render_brush_size(int _BrushMaxSize, int _BrushMinSize, int  &
 	int _render_brush_size[], string tag)
 {
 	int brush_step;
+	//int k_depth;
+	int last_depth;
+	//int _brush_step;
+	//basic depth 
+	if (render_method == RENDER_ENHANCE)
+	last_depth = enhance_mode_base_depth ;
+	else last_depth = render_depth-1;
+	brush_step = (int)((_BrushMaxSize - _BrushMinSize) / (last_depth));
+
+	for (int i = (last_depth); i >= 0; i--)
+	{
+		_render_brush_size[i] = (int)(_BrushMinSize + (last_depth - i)* brush_step)*g_brush_scale[i];
+		x_render_brush_count[i] = g_BrushNumber;
+		if (_render_brush_size[i] >x_canvas_bezel_size)
+			_render_brush_size[i] = x_canvas_bezel_size;
+	
+
+		if (_render_brush_size[i] > region_size[i]) {
+			_render_brush_size[i] = region_size[i] - 1;
+		}
+		cout << tag + " , " << ", " << "render_brush_size : " + to_string(i) + " , " <<
+			_render_brush_size[i] << endl;
+		g_file_cstat << g_para_method + "," << g_image_name << ", " << "render_brush_size" + to_string(i) + "," <<
+			_render_brush_size[i] << endl;
+	}
+
+
+
+	if (render_method == RENDER_ENHANCE) {
+
+
+		for (int i = enhance_mode_base_depth+1; i < render_depth; i++) {
+			int k ;
+			////k=enhance_brush_size[i] = i;
+			//if (i > 2) k=enhance_brush_size[i] = 2;
+			k = i - (enhance_mode_base_depth +1);
+			if (k > 2) k = 2;
+			brush_pgm_resized_array[i][0] = new (render_Brush_pgm);
+			brush_pgm_resized_array[i][0]->brush_8UC1 = x_spot_brush[k];
+			brush_pgm_resized_array[i][0]->brush_8UC1_data = x_spot_brush_ptr[k];
+			brush_pgm_resized_array[i][0]->brush_no = g_no++;
+			brush_pgm_resized_array[i][0]->brush_size =k+2;
+			brush_pgm_resized_array[i][0]->pgm_size.width = x_spot_brush[k].size().width;
+			brush_pgm_resized_array[i][0]->pgm_size.height = x_spot_brush[k].size().height;
+			render_brush_size[i] = k + 2;
+			x_render_brush_count[i] = 1;
+		}
+	}
+
+
+
+	//	r_cout << "_brush_step " << _brush_step << endl;
+
+	//g_paint_try_scale[last_depth-1] *= 2;
+	//_brush_step = 3;
+	//for (int i = (render_depth - 1); i >= 1; i--)
+	//	{
+	//		_render_brush_size[i ] = x_BrushMinSize + (render_depth- i-1)*_brush_step;
+	//	}
+	//	_render_brush_size[0] = x_BrushMaxSize ;
+
+	r_cout << tag + " image depth  " << _depth << ", image size: " << g_src_image_width << ",  " << g_src_image_height << endl;
+	r_cout << "  _BrushMaxSize " << _BrushMaxSize << ", " << x_canvas_bezel_size << " ";
+	r_cout << "  _BrushMinSize " << _BrushMinSize << ", at size " << g_BrushAttachSize;
+	r_cout << "  _BrushAttachSize " << g_BrushAttachSize;
+	r_cout << "  _depth  " << _depth;
+	r_cout << "enhance_mode_base_depth" << enhance_mode_base_depth;
+	r_cout << "  x_enhance_depth  " << x_enhance_depth;
+	r_cout << "  brush_step " << brush_step <<
+		endl;
+	for (int i = 0; i < _depth; i++) {
+		r_cout <<  setw(5) << i <<" : ";
+
+	
+				r_cout << setw(5) << g_brush_scale[i] << setw(10) << _render_brush_size[i] << " ";
+	
+		
+		
+		r_cout<<
+
+			setw(5) << region_size[i] <<
+			setw(6) << QT_grid_count[i] << " * " << setw(5) << x_strk_times[i] << setw(5) << g_paint_try_scale[i] << " = " <<
+			setw(6) << g_paint_try_scale[i] * QT_grid_count[i] << endl;
+	}
+	
+		//brush_minimum_size = _render_brush_size[x_enhance_depth - 1];
+
+
+	return _depth;
+}
+
+/*
+int calc_render_brush_size_org(int _BrushMaxSize, int _BrushMinSize, int  & _depth,
+	int _render_brush_size[], string tag)
+{
+	int brush_step;
 	int k_depth;
 	//int last_depth;
 	int _brush_step;
@@ -33,8 +129,8 @@ int render_::calc_render_brush_size(int _BrushMaxSize, int _BrushMinSize, int  &
 			_render_brush_size[i] =x_canvas_bezel_size;
 		if (_render_brush_size[i] < _BrushMinSize || (render_depth - 1) == i)
 			_render_brush_size[i] = _BrushMinSize;
-		if (_render_brush_size[i] > stroke_size[i]) {
-			_render_brush_size[i] = stroke_size[i] - 1;
+		if (_render_brush_size[i] > region_size[i]) {
+			_render_brush_size[i] = region_size[i] - 1;
 		}
 		cout << tag + " , " << ", " << "render_brush_size : " + to_string(i) + " , " <<
 			_render_brush_size[i] << endl;
@@ -42,15 +138,15 @@ int render_::calc_render_brush_size(int _BrushMaxSize, int _BrushMinSize, int  &
 			_render_brush_size[i] << endl;
 	}
 
-	x_last_depth = k_depth;
+	//x_enhance_depth = k_depth;
 
-	if (render_method == RENDER_TWOPASS_ENHANCE) {
+	if (render_method == RENDER_ENHANCE) {
 
 		/*if (k_depth == 1)
 			brush_step = (int)((_BrushMaxSize - _BrushMinSize));
 		else
 			brush_step = (int)((_BrushMaxSize - _BrushMinSize) / (k_depth - 1));
-*/
+* /
 
 	int  _B = _render_brush_size[k_depth - 1];
 	if (_B > g_BrushAttachSize) {
@@ -68,7 +164,7 @@ int render_::calc_render_brush_size(int _BrushMaxSize, int _BrushMinSize, int  &
 	}
 	}
 	_render_brush_size[0] *= 2;
-		x_last_depth = render_depth;
+	//	x_enhance_depth = render_depth;
 		//	r_cout << "_brush_step " << _brush_step << endl;
 	
 		//g_paint_try_scale[last_depth-1] *= 2;
@@ -84,30 +180,35 @@ int render_::calc_render_brush_size(int _BrushMaxSize, int _BrushMinSize, int  &
 	r_cout << "  _BrushMinSize " << _BrushMinSize << ", at size " << g_BrushAttachSize;
 	r_cout << "  _BrushAttachSize " << g_BrushAttachSize;
 	r_cout << "  _depth  " << _depth;
-	r_cout << "  last_depth  " << x_last_depth;
+	r_cout << "  last_depth  " << x_enhance_depth;
 	r_cout << "  brush_step " << brush_step <<
 		endl;
 	for (int i = 0; i < _depth; i++) {
 		r_cout << tag << " : Br size : " << setw(5) << i <<
 			setw(5) << g_brush_scale[i] << setw(10) << _render_brush_size[i] << " " <<
-			setw(5)<<stroke_size[i]<<
+			setw(5)<<region_size[i]<<
 			setw(6) << QT_grid_count[i] << " * " << setw(5)<< x_strk_times[i]<<setw(5) << g_paint_try_scale[i] << " = " <<
 			setw(6) << g_paint_try_scale[i] * QT_grid_count[i] << endl;
 	}
-	//brush_minimum_size = _render_brush_size[x_last_depth - 1];
+	//brush_minimum_size = _render_brush_size[x_enhance_depth - 1];
 	
 	
 	return _depth;
 }
 
-
+*/
 
 void render_::brush_resize(	vector <Brush*> _brush_set)
 {
 	render_Brush *brush_resized;
-	
+	render_Brush *brush_it;
 		int no = 0;
 		vector <Brush*>::iterator it = _brush_set.begin();
+		int brush_render_depth;
+		if (render_method == RENDER_ENHANCE)
+			brush_render_depth= enhance_mode_base_depth;
+		else 
+			brush_render_depth=render_depth;
 
 		for (int j=0; it != _brush_set.end(); it++,j++) {
 			for (int i = 0; i < render_depth; i++) {
@@ -152,7 +253,7 @@ void render_::brush_resize(	vector <Brush*> _brush_set)
 		brush_set_image.setTo(255);
 		
 			for (int j = 0; j < g_BrushNumber; j++) {
-				for (int i = 0; i < render_depth; i++) {
+				for (int i = 0; i < brush_render_depth; i++) {
 				int x = i*b_max;
 				Rect r(Point(x, 0), Point(x +render_brush_size[i], render_brush_size[i]));
 				cv::rectangle(brush_set_image, r,Scalar(0,0,0));
@@ -174,8 +275,13 @@ void render_::brush_pgm_resize(vector <Brush_pgm*> _brush_pgm_list)
 	int no = 0;
 	vector <Brush_pgm*>::iterator it = _brush_pgm_list.begin();
 	Size sz_pgm;
+	int brush_render_depth;
+	if (render_method == RENDER_ENHANCE)
+		brush_render_depth = enhance_mode_base_depth+1;
+	else
+		brush_render_depth = render_depth;
 	for (int j = 0; it != _brush_pgm_list.end(); it++, j++) {
-		for (int i = 0; i < render_depth; i++) {
+		for (int i = 0; i < brush_render_depth; i++) {
 			if (render_brush_size[i] == 0) continue;
 			brush_pgm_resized = new (render_Brush_pgm);
 			sz_pgm.height = render_brush_size[i];
@@ -221,7 +327,7 @@ void render_::brush_pgm_resize(vector <Brush_pgm*> _brush_pgm_list)
 	brush_set_image.setTo(255);
 
 	for (int j = 0; j < g_BrushNumber; j++) {
-		for (int i = 0; i < render_depth; i++) {
+		for (int i = 0; i < brush_render_depth; i++) {
 			int x = i*b_max;
 			Rect r(Point(x, 0), Point(x + render_brush_size[i], render_brush_size[i]));
 			render_Brush_pgm *p_pgm_brush;

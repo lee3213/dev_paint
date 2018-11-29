@@ -227,9 +227,8 @@ int  render_::JudgementBrush_pgm_bsize(cv::Mat &testImg_canvas_clone, int depth,
 	//	bool flag=false;
 	//	unsigned char * ptr;
 	//if (t_width < g_brush_thumbnail_size) {
-	loop_w = t_width;
-	loop_h = t_height;
-
+	loop_w = render_brush_size[depth];
+		loop_h = render_brush_size[depth];
 
 	//	flag = true;
 	//}
@@ -237,10 +236,11 @@ int  render_::JudgementBrush_pgm_bsize(cv::Mat &testImg_canvas_clone, int depth,
 	//	loop_w = brush_minimum_size;
 	//	loop_h = brush_minimum_size;
 	//}
-	for (int i = 0; i<g_BrushNumber; i++)
+	for (int i = 0; i<x_render_brush_count[depth]; i++)
 	{
+		
 		render_Brush_pgm * b_ptr = brush_pgm_resized_array[depth][i];
-
+		
 		//	if (flag == true) {
 		indexData = b_ptr->brush_8UC1_data;//b_ptr->brush_thumbnail_data;
 		//	}

@@ -45,10 +45,10 @@ int brush_pgm() {
 		cv::threshold(_b->brush_8UC1, th, (double)g_alpha_TH, g_alpha_TH, 1);
 		int cnz = countNonZero(th);
 		
-			cout << ncnt << ", "  " = " << setw(7) << cnz << " : " << setw(7) << _b->brush_8UC1_Size.height * _b->brush_8UC1_Size.width <<
+			cout <<"pgm brush "<< ncnt << ", "  " = " << setw(7) << cnz << " : " << setw(7) << _b->brush_8UC1_Size.height * _b->brush_8UC1_Size.width <<
 				std::fixed << setw(15) <<
 				setprecision(2) << (float)(float(cnz) / (float(_b->brush_8UC1_Size.width)*(float)(_b->brush_8UC1_Size.height))*100.0) << endl;
-
+			ncnt++;
 	}
 	cout << "pgm brush count = "<<ncnt<<endl;
 	return ncnt;

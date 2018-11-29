@@ -349,8 +349,8 @@ int render_::pmap_count_zero(Mat & a_map_canvas_8UC1, string tag, Rect x_src_can
 }
 void render_::pmap_overlay_fill(int from_uu_depth, Mat a_map_canvas_8UC1, int color) {
 	Point Strk_srtPoint, Strk_endPoint;
-	Size Strk_size;
-	int Strk_w_size, Strk_h_size;
+	Size Region_size;
+	int Region_w_size, Region_h_size;
 	Point Strk_point_canvas;
 	partition_Node* region_p;
 	for (list<partition_Node*>::iterator partition_it = render_region_set[from_uu_depth].Region_list.begin();
@@ -360,13 +360,13 @@ void render_::pmap_overlay_fill(int from_uu_depth, Mat a_map_canvas_8UC1, int co
 
 		Strk_srtPoint = (region_p)->srtPoint;
 		Strk_endPoint = (region_p)->endPoint;
-		Strk_w_size = Strk_endPoint.x - Strk_srtPoint.x;
-		Strk_h_size = Strk_endPoint.y - Strk_srtPoint.y;
+		Region_w_size = Strk_endPoint.x - Strk_srtPoint.x;
+		Region_h_size = Strk_endPoint.y - Strk_srtPoint.y;
 
-		Strk_size = Size(Strk_w_size, Strk_h_size);
+		Region_size = Size(Region_w_size, Region_h_size);
 
 		Strk_point_canvas = Point(Strk_srtPoint.x + x_canvas_bezel_size, Strk_srtPoint.y + x_canvas_bezel_size);
-		Rect Strk_canvas_ROI_rect(Strk_point_canvas, Strk_size);
+		Rect Strk_canvas_ROI_rect(Strk_point_canvas, Region_size);
 		Mat a_map_canvas_8UC1_ROI = a_map_canvas_8UC1(Strk_canvas_ROI_rect);
 
 		a_map_canvas_8UC1_ROI.setTo(color);

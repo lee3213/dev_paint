@@ -16,8 +16,8 @@ int   render_::render_image()
 
 {
 //	Point Strk_srtPoint, Strk_endPoint;
-//	Size Strk_size;
-//	int Strk_w_size, Strk_h_size;
+//	Size Region_size;
+//	int Region_w_size, Region_h_size;
 	int saved_depth = -1;
 //	Point Strk_point_canvas;
 	//int x_src_width = g_src_image_width;
@@ -163,9 +163,9 @@ int   render_::render_image()
 #ifdef _DEBUG_RENDER
 			//	Strk_srtPoint= (region_p)->srtPoint;
 			//	Strk_endPoint = (region_p)->endPoint;
-			//	Strk_w_size = Strk_endPoint.x - Strk_srtPoint.x;
-			//	Strk_h_size = Strk_endPoint.y - Strk_srtPoint.y;
-			//	Strk_size=Size(Strk_w_size, Strk_h_size);
+			//	Region_w_size = Strk_endPoint.x - Strk_srtPoint.x;
+			//	Region_h_size = Strk_endPoint.y - Strk_srtPoint.y;
+			//	Region_size=Size(Region_w_size, Region_h_size);
 
 			rectangle_canvas(painting_area_canvas[astroke_depth], Rect(Strk_srtPoint, Strk_endPoint), Scalar(0, 0, 255));//RED QT outline
 #endif
@@ -186,8 +186,9 @@ int   render_::render_image()
 			//ret = pmap_count_zero(paint_map_canvas_8UC1[uu_depth], pmap_path, x_src_canvas_Rect_full);
 		
 			debug_image(pmap_path+ "_" + to_string(uu_depth), paint_map_accu_canvas_8UC1[uu_depth]);
-			
-			tot_cnt=pad_p_map(paint_map_accu_canvas_8UC1[uu_depth], r_,pmap_path, uu_depth);
+		
+			if ( g_pmap_do == 1)
+				tot_cnt=pad_p_map(paint_map_accu_canvas_8UC1[uu_depth], r_,pmap_path, uu_depth);
 				
 			//ret = pmap_count_zero(paint_map_canvas_8UC1[uu_depth], pmap_path, x_src_canvas_Rect_full);
 			

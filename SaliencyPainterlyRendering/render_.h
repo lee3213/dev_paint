@@ -16,15 +16,15 @@ public:
 	int depth;
 	cv::Point srtPoint;
 	cv::Point endPoint;
-	cv::Size stroke_size;
+	cv::Size region_size;
 	int avgS;
 	int no;
 	partition_Node() {};
 	partition_Node(cv::Point s, cv::Point e, int _depth, double S, int n) {
 		srtPoint = s;
 		endPoint = e;
-		stroke_size.width = e.x - s.x;
-		stroke_size.height = e.y - s.y;
+		region_size.width = e.x - s.x;
+		region_size.height = e.y - s.y;
 		no = n;
 
 		depth = _depth;
@@ -91,6 +91,7 @@ public:
 
 class render_ {
 public:
+	int enhance_mode_base_depth;
 	int x_skip = 10;
 	cv::Mat x_srcImg_;
 	unsigned char * x_src_ptr;
@@ -100,11 +101,11 @@ public:
 	//int x_src_step1;
 	Region_set render_region_set[MAX_DEPTH];
 	Region_set render_dropped_set[MAX_DEPTH];
-
+	int enhance_brush_size[MAX_DEPTH];
 	Mat overlay_grid_map[MAX_DEPTH];
 	Mat overlay_dropped_map[MAX_DEPTH];
 	int dropped_no;
-	int stroke_size[MAX_DEPTH];
+	int region_size[MAX_DEPTH];
 int render_::pad_p_map(Mat & a_pmap_canvas_8UC1, Rect r_,string tag, int _depth);
 	Mat depth_map_canvas_8UC1;
 	unsigned char * depth_map_canvas_8UC1_data;
@@ -149,18 +150,21 @@ int render_::pad_p_map(Mat & a_pmap_canvas_8UC1, Rect r_,string tag, int _depth)
 	int u_no=0;
 	//int brush_minimum_size;
 
-	int depth_sobel, depth_saliency;//, depth_Enhance;
+	//int depth_sobel, depth_saliency;//, depth_Enhance;
 	int  render_::JudgementBrush_pgm_bsize(cv::Mat &testImg_canvas_clone, int depth, int _t_image_width, int _t_image_height, int __canvas_step1, string tag);
 	render_Brush* brush_resized_array[MAX_DEPTH][MAX_BRUSH];
 	render_Brush_pgm* brush_pgm_resized_array[MAX_DEPTH][MAX_BRUSH];
-	int QT_depth;
-
+	//render_Brush_pgm* brush_spot_resized_array[MAX_DEPTH];
+	//int QT_depth;
+	Mat x_spot_brush[3];
+	unsigned char * x_spot_brush_ptr[3];
 	int render_brush_size[MAX_DEPTH];
+	int x_render_brush_count[MAX_DEPTH];
 	int QT_grid_count[MAX_DEPTH];
 	int r_s_changed_count[MAX_DEPTH];
 	int grid_try_sum[MAX_DEPTH];
 //	long int r_s_painting_area[MAX_DEPTH];
-
+	int layer_more_1 = 1;
 	render_ * render_sobel;
 	render_ * render_saliency;
 	Rect x_src_canvas_Rect_full;
@@ -172,7 +176,7 @@ int render_::pad_p_map(Mat & a_pmap_canvas_8UC1, Rect r_,string tag, int _depth)
 	int random_x;
 	int random_y;
 	int extended_try[MAX_DEPTH];
-	int x_last_depth;
+	int x_enhance_depth;
 	//int get_depth;
 	render_(int _render_method, Mat &_srcImg);
 	~render_();
@@ -181,8 +185,8 @@ int render_::pad_p_map(Mat & a_pmap_canvas_8UC1, Rect r_,string tag, int _depth)
 	void pmap_overlay_fill(int uu_depth, Mat a_map, int color);
  int  pmap_count_zero(Mat & a_map_8UC1, string tag,Rect);
  void render_::canvas_rect(partition_Node* region_p, Rect &Strk_canvas_ROI_rect);
-	int stroke_dump(Region_set _aRegion_set[], string tag, int  depth);
-	//int stroke_dump(Region_set _aRegion_set, string tag, int  depth);
+	int region_dump(Region_set _aRegion_set[], string tag, int  depth);
+	//int region_dump(Region_set _aRegion_set, string tag, int  depth);
 	int draw_grid_depth(Mat  _grid_map_1c[], Mat _grid_map_1c_accu,
 		Region_set  aRegion_set[], string tag, int & grid_map_sum,
 		int _QT_grid_count[]//, bool do_grid_cnt//, int draw_depth, int c

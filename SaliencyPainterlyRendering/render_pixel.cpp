@@ -64,7 +64,7 @@ int render_::P_Rendering(Mat & _src_canvas_ROI,
 	if (saved_depth != astroke_depth)
 	{
 		saved_depth = astroke_depth;
-		
+
 	}
 
 	cv::Mat *bestBrush_8UC1_resized;
@@ -115,25 +115,39 @@ int render_::P_Rendering(Mat & _src_canvas_ROI,
 
 	if (_mode == 1) {
 		if (tbrush_cnt < DEBUG_BRUSH_CNT) {
-			debug_image(f_name + "_0src_ROI_ ", _src_canvas_ROI);
-			debug_image(f_name + "_1RsizROI_ ", src_ROI_canvas_clone_resized_8UC1);
-			debug_image(f_name + "_2bef_ROI_ ", _before_ROI_canvas_clone);
-			debug_image(f_name + "_3chg_ROI_", _changed_canvas_ROI_clone);
+		///	debug_image(f_name + "_0src_ROI_ ", _src_canvas_ROI);
+		//	debug_image(f_name + "_1RsizROI_ ", src_ROI_canvas_clone_resized_8UC1);
+		//	debug_image(f_name + "_2bef_ROI_ ", _before_ROI_canvas_clone);
+		//	debug_image(f_name + "_3chg_ROI_", _changed_canvas_ROI_clone);
 		}
 
 	}
 	int brush_no;
 	unsigned char * bestBrush_8UC1_resized_data;
 	render_Brush_pgm *bestBrush_pgm_resized;
+	int brush_render_depth;
+
+//	if (render_method == RENDER_ENHANCE)
+//		brush_render_depth = enhance_mode_base_depth+astroke_depth;
+//	else
+//		brush_render_depth = render_depth;
+
+	int b_width;
+	
+		int b_height;
+		int b_step1;
+		int b_channels;
 #ifdef _USE_PGM
-	brush_no = JudgementBrush_pgm_bsize(src_ROI_canvas_clone_resized_8UC1, /*added by cwlee*/astroke_depth,
-		s_w, s_h, src_resized_8UC1_step1, br_tag);
-	bestBrush_pgm_resized = brush_pgm_resized_array[astroke_depth][brush_no];
-	bestBrush_8UC1_resized_data = bestBrush_pgm_resized->brush_8UC1_data;
-		int b_width = bestBrush_pgm_resized->brush_size;
-	int b_height = bestBrush_pgm_resized->brush_size; 
-	int b_step1 = (int)(bestBrush_pgm_resized->brush_8UC1.step1() );
-	int b_channels = bestBrush_pgm_resized->brush_8UC1.channels();
+		brush_no = JudgementBrush_pgm_bsize(src_ROI_canvas_clone_resized_8UC1, /*added by cwlee*/astroke_depth,
+			s_w, s_h, src_resized_8UC1_step1, br_tag);
+		bestBrush_pgm_resized = brush_pgm_resized_array[astroke_depth][brush_no];
+		bestBrush_8UC1_resized_data = bestBrush_pgm_resized->brush_8UC1_data;
+		b_width = bestBrush_pgm_resized->brush_size;
+		b_height = bestBrush_pgm_resized->brush_size;
+		b_step1 = (int)(bestBrush_pgm_resized->brush_8UC1.step1());
+		b_channels = bestBrush_pgm_resized->brush_8UC1.channels();
+
+	
 #else
 	brush_no = JudgementBrush(src_ROI_canvas_resized_8UC1, /*added by cwlee*/astroke_depth,
 		s_w, s_h, src_resized_8UC1_step1, br_tag);
@@ -176,7 +190,7 @@ int render_::P_Rendering(Mat & _src_canvas_ROI,
 		if (tbrush_cnt < DEBUG_BRUSH_CNT) {
 
 			//	debug_image("br/" + f_name + "_brN_" + to_string(brush_no), bestBrush_8UC1_resized);
-			debug_image(f_name + "_6acc_ROI_", _changed_canvas_ROI_clone);
+	//		debug_image(f_name + "_6acc_ROI_", _changed_canvas_ROI_clone);
 			tbrush_cnt++;
 		}
 	}
@@ -229,15 +243,15 @@ int render_::P_Rendering(Mat & _src_canvas_ROI,
 			if (tbrush_cnt < DEBUG_BRUSH_CNT) {
 
 				//debug_image(f_name + "_6ing_ROI_", _changed_ROI_clone);
-				debug_image(f_name + "_6acc_ing_", _accu_canvas);
-				debug_image(f_name + "_6ing_ing_", _ing_canvas_ROI);
-				debug_image(f_name + "_6ing_ROI_", _changed_canvas_ROI);
+		//		debug_image(f_name + "_6acc_ing_", _accu_canvas);
+		//		debug_image(f_name + "_6ing_ing_", _ing_canvas_ROI);
+		//		debug_image(f_name + "_6ing_ROI_", _changed_canvas_ROI);
 			}
 		}
 	} // if changed better
 	if (_mode == 1) {
 		if (tbrush_cnt < DEBUG_BRUSH_CNT) {
-			debug_image(f_name + "paint_" + m_t_ + to_string(astroke_depth), paint_map_canvas_8UC1[astroke_depth]);
+		//	debug_image(f_name + "paint_" + m_t_ + to_string(astroke_depth), paint_map_canvas_8UC1[astroke_depth]);
 
 		}
 	}

@@ -12,8 +12,8 @@
 #define RENDER_SOBEL 0
 #define RENDER_SALIENCY 1
 #define RENDER_UNION 2
-#define RENDER_TWOPASS_MERGE 3
-#define RENDER_TWOPASS_ENHANCE 4
+#define RENDER_MERGE 3
+#define RENDER_ENHANCE 4
 
 
 #define MAX_Gradient 5

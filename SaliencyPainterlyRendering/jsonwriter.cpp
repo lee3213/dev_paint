@@ -19,21 +19,21 @@ using namespace std;
 //	root["indent"]["length"] = getCurrentIndentLength();
 //	root["indent"]["use_space"] = getCurrentIndentUseSpace();
 int sthresh[] = {110,120,130 };
-int _grid[] = { 5,7,10,15 };
+int _grid[] = { 5,10 };
 int depth[] = { 10 };
-int _br[] = { 5,7,10,15 }; //g_BrushMinSize
-int _at[] = { 5 }; //Enhance brush size
+int _br[] = { 5,10,15 }; //g_BrushMinSize
+int _pmap[] = { 0,1 }; //Enhance brush size
 
 int QT_N[] = {1};
 string paint_method_str = BRUSH_STENCIL_STR;
 
 
 //int _bts[] = {250 };//brush transparecy threshold
-int br, th, de, gr, sm, qt, re, mm, gth, ps;// , bts;
+int br, th, de, gr, sm, qt, re, mm, gth, ps,pm;// , bts;
 
 void get_json_name(string & file_name) {
 	 file_name = "M" + g_saliency_method_str[sm]+"_s" + to_string(sthresh[th]) + "_d" + to_string(depth[de]) +
-		"_g" + to_string(_grid[gr]) + "_b" + to_string(_br[br]) + "_N" + to_string(QT_N[qt])
+		"_g" + to_string(_grid[gr]) + "_b" + to_string(_br[br]) + "_p" + to_string(_pmap[pm])
 		//+ "_ps" + to_string(_ps[ps])
 		//	 + "_ts" + to_string(_bts[bts])
 		 + "_"+paint_method_str+".json";
@@ -53,8 +53,8 @@ int write_json_content(string from_jsonfolderPath) {
 	root["root_path"] = "/rst";
 	root["root_path_win"] = "\\rst";
 	root["g_paint_mode_str"] = paint_method_str;//Stencil alpha
-	root["g_BrushMinSize"] = _br[0]; //15
-	root["g_BrushAttachSize"] = _at[0];//5
+	root["g_BrushMinSize"] = _br[br]; //15
+	//root["g_BrushAttachSize"] = _at[0];//5
 									   //		root["g_brush_Ts"] = _bts[bts];//brush tranparency threshold brush
 	root["end"] = "end";
 	//root["g_paint_try_scale"] = _ps[ps];//
@@ -65,7 +65,7 @@ int write_json_content(string from_jsonfolderPath) {
 	root["g_gridsize"] = _grid[gr];	//5,10 used in divide
 
 	root["g_saliency_method"] = g_saliency_method_str[sm];//wo saliency pregraph 
-
+	root["g_pmap_do"] = _pmap[pm];
 	root["g_QT_method_N"] = QT_N[qt]; //1,2,3,4...6
 	std::string outputConfig = Json::writeString(wbuilder, root);
 	f_path_name = from_jsonfolderPath + "\\" + json_file_name;
@@ -95,9 +95,9 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 	int n_qt = sizeof(QT_N) / sizeof(int);
 	//int n_re = _re_cnt;
 //	int n_mm = 1;//_str_mm_cnt;
-	//int n_ps = sizeof(_ps) / sizeof(int);
+	int n_pm = sizeof(pm) / sizeof(int);
 
-	howmany = MAX_SALIENCY* n_sth * n_de * n_gr*n_qt*n_bth;
+	howmany = MAX_SALIENCY* n_sth * n_de * n_gr*n_qt*n_bth*n_pm;
 	int Max_PARA = n_sth*n_gr;
 	if (Max_PARA > MAX_PARA) {
 		cout << "Max Para " << Max_PARA << "Exceeded " << MAX_PARA << endl;
@@ -148,12 +148,12 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 	string f_name_para_method_cfg[MAX_PARA];
 
 	int f_max = n_sth*n_gr;//
-
+	for (pm = 0; pm < n_pm; pm++) //ps //scale
 	for (th = 0; th < n_sth; th++) //avg S thresh
 		for (gr = 0; gr < n_gr; gr++) {
 			f_loc = th*n_gr + gr;
 			f_name_para_cfg[f_loc] ="s_" + to_string(sthresh[th]) +
-				"_g" + to_string(_grid[gr]) + ".cfg";
+				"_g" + to_string(_grid[gr]) + "_p" + to_string(_pmap[pm]) + ".cfg";
 			file_para_cfg[f_loc].open(liStrk_cfg_path +"\\"+ f_name_para_cfg[f_loc]);
 			cout << setw(5)<<f_loc<<" : "<<liStrk_cfg_path + "\\" + f_name_para_cfg[f_loc] << endl;
 			if (!file_para_cfg[f_loc].is_open())  // operator! is used here
@@ -167,7 +167,7 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 			for (sm = 0; sm < MAX_SALIENCY; sm++) {
 				int mf_loc = th*n_gr*MAX_SALIENCY + gr*MAX_SALIENCY+sm;
 				f_name_para_method_cfg[mf_loc] = "M"+g_saliency_method_str[sm]+"_s_" + to_string(sthresh[th]) +
-					"_g" + to_string(_grid[gr]) + ".cfg";
+					"_g" + to_string(_grid[gr]) + "_p" + to_string(_pmap[pm]) + ".cfg";
 				file_para_method_cfg[mf_loc].open(liStrk_cfg_path + "\\" + f_name_para_method_cfg[mf_loc]);
 				cout << setw(5) << mf_loc << " : " << liStrk_cfg_path + "\\" + f_name_para_method_cfg[mf_loc] << endl;
 				if (!file_para_method_cfg[mf_loc].is_open())  // operator! is used here
@@ -176,14 +176,7 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 					return -1;
 				}
 				else file_para_method_meta_cfg << f_name_para_method_cfg[mf_loc] << endl;
-
-
 			}
-
-
-
-
-
 	}
 
 	for (th = 0; th < n_sth; th++) //avg S thresh
@@ -193,7 +186,7 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 			for (de = 0; de < n_de; de++) //depth
 				for (br = 0; br < n_bth; br++)//brush min size
 					for (qt = 0; qt < n_qt; qt++) //N QTn{
-						//for (ps = 0; ps < n_ps; ps++) {//ps //scale
+						for (pm = 0; pm < n_pm; pm++) //ps //scale
 							for (sm = 0; sm < MAX_SALIENCY; sm++) { //saliency method
 								get_json_name(json_file_name);
 								int mf_loc = th*n_gr*MAX_SALIENCY + gr*MAX_SALIENCY + sm;
@@ -218,6 +211,7 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 						
 
 		}
+			for (pm = 0; pm < n_pm; pm++)
 	for (th = 0; th < n_sth; th++) //avg S thresh
 		for (gr = 0; gr < n_gr; gr++) {
 			f_loc = th*n_gr + gr;
@@ -238,11 +232,10 @@ int  json_write_method(string from_jsonfolderPath,//render/deployument
 		file_method_meta_cfg << g_saliency_method_str[sm] +".cfg"<< endl;//MAY BE REMOED
 		for (th = 0; th < n_sth; th++) //avg S thresh
 			for (gr = 0; gr < n_gr; gr++) { 
-			
 				for (de = 0; de < n_de; de++) //depth
 						for (br = 0; br < n_bth; br++)//brush min size
 						for (qt = 0; qt < n_qt; qt++) //N QTn{
-						//	for (ps = 0; ps < n_ps; ps++) {//ps //scale
+							for (pm = 0; pm < n_pm; pm++) //ps //scale
 						{
 								get_json_name(json_file_name);
 							

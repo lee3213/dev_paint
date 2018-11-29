@@ -38,7 +38,7 @@ int render_::paint_a_stroke(partition_Node* region_p, int layer_more, int _mode,
 	int size_mismatch = 0;
 	int saved_depth = -1;
 	
-	Size Region_size;
+	Size Strk_size;
 	int Region_w_size, Region_h_size;
 
 	int astroke_depth;
@@ -65,7 +65,7 @@ int render_::paint_a_stroke(partition_Node* region_p, int layer_more, int _mode,
 	random_device rand_y[MAX_DEPTH];
 	astroke_depth = region_p->depth;
 	render_stroke_no = (region_p)->no;
-	if (layer_more == 1) {
+	if (layer_more == 0) {
 		
 		if (layer_more_depth == -1) {//first time
 			layer_more_depth = astroke_depth;
@@ -84,12 +84,8 @@ int render_::paint_a_stroke(partition_Node* region_p, int layer_more, int _mode,
 	Strk_endPoint = (region_p)->endPoint;
 	Region_w_size = Strk_endPoint.x - Strk_srtPoint.x;
 	Region_h_size = Strk_endPoint.y - Strk_srtPoint.y;
-	
-	//if (render_method == RENDER_ENHANCE) {
-		//Region_h_size += 8;
-	//	Region_w_size += 8;
-//	}
-	Region_size = Size(Region_w_size, Region_h_size);
+
+	Strk_size = Size(Region_w_size, Region_h_size);
 
 	render_stroke_no = (region_p)->no;
 
@@ -98,11 +94,12 @@ int render_::paint_a_stroke(partition_Node* region_p, int layer_more, int _mode,
 	brush_area_h_size = render_brush_size[astroke_depth];// brush size(painting area) per each depth
 	brush_area_w_size = render_brush_size[astroke_depth];// brush size(painting area) per each depth
 
+	
+
 	Brush_size = Size(brush_area_w_size, brush_area_h_size);
 
 	 brush_area_h_size_half = brush_area_h_size / 2;
 	 brush_area_w_size_half = brush_area_w_size / 2 ;
-
 
 	 if (brush_area_w_size_half > x_canvas_bezel_size)
 		 adjusted_w_size = x_canvas_bezel_size;
@@ -126,8 +123,8 @@ int render_::paint_a_stroke(partition_Node* region_p, int layer_more, int _mode,
 	//else
 	x_paint_area_brush_count = times*g_paint_try_scale[astroke_depth];
 	
-	uniform_int_distribution<int> diStrk_x(0,Region_w_size);
-	uniform_int_distribution<int> diStrk_y(0, Region_h_size);
+	uniform_int_distribution<int> diStrk_x(0, render_brush_size[astroke_depth]);
+	uniform_int_distribution<int> diStrk_y(0, render_brush_size[astroke_depth]);
 
 
 	grid_try_sum[astroke_depth] += x_paint_area_brush_count;//
@@ -137,7 +134,7 @@ int render_::paint_a_stroke(partition_Node* region_p, int layer_more, int _mode,
 	 mat_ing = ing_canvas[astroke_depth];
 
 	 string f_name_btdt = "p" + to_string(astroke_depth) + "/" + m_t_ + to_string(astroke_depth) + "_t_" + to_string(0);
-	// debug_image(f_name_btdt + "__ACC_ACC_" + to_string(layer_more) + "_", accu_canvas[astroke_depth]);
+	 debug_image(f_name_btdt + "__ACC_ACC_" + to_string(layer_more) + "_", accu_canvas[astroke_depth]);
 
 	int extended_paint_area_brush_count_limit = extended_paint_area_brush_count * 3;
 	
@@ -155,7 +152,7 @@ int render_::paint_a_stroke(partition_Node* region_p, int layer_more, int _mode,
 		fetch_color_Point.x = Strk_srtPoint.x + random_x;
 		fetch_color_Point.y = Strk_srtPoint.y + random_y;
 
-		if (layer_more == layer_more_1) {
+		if (layer_more == 0) {
 
 			int depth_value;
 			render_::p_peek_canvas_1c(depth_map_canvas_8UC1_data, fetch_color_Point.x, fetch_color_Point.y, depth_value);
@@ -166,7 +163,7 @@ int render_::paint_a_stroke(partition_Node* region_p, int layer_more, int _mode,
 				if (extended_paint_area_brush_count < extended_paint_area_brush_count_limit )
 					continue;
 				else {
-					layer_more = 0;
+					layer_more = 1;
 					check_depth = 1000;
 				}
 			}
@@ -179,7 +176,7 @@ int render_::paint_a_stroke(partition_Node* region_p, int layer_more, int _mode,
 			+ (fetch_color_Point.y + x_canvas_bezel_size)*(x_canvas_size_width) )*x_src_channels;
 
 		p_peek(x_src_ptr, fetch_Index, color_BGR_B, color_BGR_G, color_BGR_R);
-		if (layer_more == layer_more_1 || check_depth == astroke_depth) {
+		if (layer_more == 0 || check_depth == astroke_depth) {
 				p_poke(x_retry_map_1c_data, fetch_Index_1c, 0);
 		}
 		p_poke(r_try_map_1c_data[astroke_depth], fetch_Index_1c, 0);
@@ -266,9 +263,8 @@ int render_::paint_a_stroke(partition_Node* region_p, int layer_more, int _mode,
 		}
 		if (x_tbrush_cnt < DEBUG_BRUSH_CNT) {
 			string f_name_tdt = "p" + to_string(astroke_depth) + "/" + m_t_ + to_string(astroke_depth) + "_t_" + to_string(render_try);
-		//	debug_image(f_name_tdt + "_4ING_ING_" + to_string(layer_more) + "_", ing_canvas[astroke_depth]);
-			//
-			//debug_image(f_name_tdt + "_5ACC_ACC_" + to_string(layer_more) + "_", accu_canvas[astroke_depth]);
+			debug_image(f_name_tdt + "_4ING_ING_" + to_string(layer_more) + "_", ing_canvas[astroke_depth]);
+			debug_image(f_name_tdt + "_5ACC_ACC_" + to_string(layer_more) + "_", accu_canvas[astroke_depth]);
 		}
 		x_tbrush_cnt++;
 	}

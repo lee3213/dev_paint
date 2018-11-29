@@ -137,6 +137,5 @@ render_ *_render[RENDER_MAX];
 Mat g_srcImg_RO;
 int g_rendering_method;
 int g_no;
-Mat g_enhance_brush[3];
-unsigned char * g_enhance_brush_ptr[3];
+int g_pmap_do;
 vector<Brush_pgm *> g__brush_pgm_list;

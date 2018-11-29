@@ -13,7 +13,7 @@
 #include "brush_pgm.h"
 using namespace std;
 using namespace cv;
-
+extern int g_pmap_do;
 extern string g_debug_file;
 
 extern int g_merge_method;
@@ -116,6 +116,6 @@ extern int g_rendering_method;
 
 extern render_ *_render[RENDER_MAX];
 extern int g_no;
-extern Mat g_enhance_brush[3];
-extern unsigned char * g_enhance_brush_ptr[3];
+extern Mat x_spot_brush[3];
+extern unsigned char * x_spot_brush_ptr[3];
 extern vector<Brush_pgm *> g__brush_pgm_list;

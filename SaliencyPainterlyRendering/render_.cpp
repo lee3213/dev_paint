@@ -13,13 +13,13 @@
 void render_::canvas_rect(partition_Node* region_p, Rect &Strk_canvas_ROI_rect) {
 	Point Strk_srtPoint, Strk_endPoint;
 	//Point Strk_point_canvas;
-	//Size Strk_size;
-	//int Strk_w_size, Strk_h_size;
+	//Size Region_size;
+	//int Region_w_size, Region_h_size;
 	//int astroke_depth = -1;
 	Strk_srtPoint = (region_p)->srtPoint;
 	Strk_endPoint = (region_p)->endPoint;
-	//	Strk_w_size = Strk_endPoint.x - Strk_srtPoint.x;
-	//	Strk_h_size = Strk_endPoint.y - Strk_srtPoint.y;
+	//	Region_w_size = Strk_endPoint.x - Strk_srtPoint.x;
+	//	Region_h_size = Strk_endPoint.y - Strk_srtPoint.y;
 
 	Strk_canvas_ROI_rect.width = Strk_endPoint.x - Strk_srtPoint.x;
 	Strk_canvas_ROI_rect.height = Strk_endPoint.y - Strk_srtPoint.y;
@@ -58,7 +58,7 @@ render_::render_(int _render_method, cv::Mat &_srcImg) {
 		mat_print(x_srcImg_, "x_Src" + tag[_render_method]);
 	}
 	x_src_ptr = x_srcImg_.data;
-	QT_depth = g_depth_limit;
+//	QT_depth = g_depth_limit;
 
 	for (int i = 0; i <= MAX_DEPTH; i++) {
 		x_strk_times[i] = 0;
@@ -78,6 +78,13 @@ render_::render_(int _render_method, cv::Mat &_srcImg) {
 
 	dropped_no = 0;
 	r_grid_map_1c_accu.create(g_src_image_height, g_src_image_width, CV_8UC1);
+
+	for (int i = 0; i < 3; i++) {
+		x_spot_brush[i].create(4-i, 4-i, CV_8UC1);
+		x_spot_brush[i].setTo(0);
+		x_spot_brush_ptr[i] = x_spot_brush[0].data;
+	}
+	
 };
 render_::~render_() {
 	//	x_srcImg_.release();

@@ -93,8 +93,8 @@ cv::Mat get_sobel_map(Mat & srcImg) {
 //	cv::Sobel(bilaterial_Map, grad_bi_y, ddepth, 0, 1, 3, scale, delta);
 //	cv::convertScaleAbs(grad_bi_y, abs_sobeld_bi_y);
 
-	mat_print(grad_x, "grad_x");
-	mat_print(abs_sobeld_y, "abs_sobeld_y");
+	//mat_print(grad_x, "grad_x");
+	//mat_print(abs_sobeld_y, "abs_sobeld_y");
 	
 	cv::addWeighted(abs_sobeld_x, 0.5, abs_sobeld_y, 0.5, 0, sobel_map);
 	//cv::addWeighted(abs_sobeld_bi_x, 0.5, abs_sobeld_bi_y, 0.5, 0, sobel_bi_map);
@@ -395,8 +395,8 @@ int   prepare_Rendering(char * src_name, char * deploy_name)
 	else {
 		how_many_render = RENDER_MAX;
 		_render[RENDER_UNION]->add_render(_render[0], _render[2]);
-		_render[RENDER_TWOPASS_ENHANCE]->add_render(_render[0], _render[2]);//render_sobel, render_union
-		_render[RENDER_TWOPASS_MERGE]->add_render(_render[0], _render[2]);
+		_render[RENDER_ENHANCE]->add_render(_render[0], _render[2]);//render_sobel, render_union
+		_render[RENDER_MERGE]->add_render(_render[0], _render[2]);
 	}
 	time_t p_s_time[RENDER_MAX], p_e_time[RENDER_MAX];
 	tm p_t_s[RENDER_MAX], p_t_e[RENDER_MAX];
