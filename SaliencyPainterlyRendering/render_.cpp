@@ -11,22 +11,22 @@
 #include "brush_pgm.h"
 #include "render_.h"
 void render_::canvas_rect(partition_Node* region_p, Rect &Strk_canvas_ROI_rect) {
-	Point Strk_srtPoint, Strk_endPoint;
+	Point Region_srtPoint, Region_endPoint;
 	//Point Strk_point_canvas;
 	//Size Region_size;
 	//int Region_w_size, Region_h_size;
 	//int astroke_depth = -1;
-	Strk_srtPoint = (region_p)->srtPoint;
-	Strk_endPoint = (region_p)->endPoint;
-	//	Region_w_size = Strk_endPoint.x - Strk_srtPoint.x;
-	//	Region_h_size = Strk_endPoint.y - Strk_srtPoint.y;
+	Region_srtPoint = (region_p)->srtPoint;
+	Region_endPoint = (region_p)->endPoint;
+	//	Region_w_size = Region_endPoint.x - Region_srtPoint.x;
+	//	Region_h_size = Region_endPoint.y - Region_srtPoint.y;
 
-	Strk_canvas_ROI_rect.width = Strk_endPoint.x - Strk_srtPoint.x;
-	Strk_canvas_ROI_rect.height = Strk_endPoint.y - Strk_srtPoint.y;
+	Strk_canvas_ROI_rect.width = Region_endPoint.x - Region_srtPoint.x;
+	Strk_canvas_ROI_rect.height = Region_endPoint.y - Region_srtPoint.y;
 
 	//astroke_depth = (region_p)->depth;
-	Strk_canvas_ROI_rect.x = Strk_srtPoint.x + x_canvas_bezel_size;
-	Strk_canvas_ROI_rect.y = Strk_srtPoint.y + x_canvas_bezel_size;
+	Strk_canvas_ROI_rect.x = Region_srtPoint.x + x_canvas_bezel_size;
+	Strk_canvas_ROI_rect.y = Region_srtPoint.y + x_canvas_bezel_size;
 
 }
 render_::render_(int _render_method, cv::Mat &_srcImg) {

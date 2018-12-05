@@ -15,7 +15,7 @@
 int   render_::render_image()
 
 {
-//	Point Strk_srtPoint, Strk_endPoint;
+//	Point Region_srtPoint, Region_endPoint;
 //	Size Region_size;
 //	int Region_w_size, Region_h_size;
 	int saved_depth = -1;
@@ -76,7 +76,7 @@ int   render_::render_image()
 
 		painting_area_canvas[i].create(canvas_size_height, canvas_size_width, CV_8UC3);
 		painting_area_canvas[i].setTo(255);
-		rectangle_canvas(painting_area_canvas[i], Rect(Strk_srtPoint, Strk_endPoint), Scalar(0, 0, 255));//RED QT outline
+		rectangle_canvas(painting_area_canvas[i], Rect(Region_srtPoint, Region_endPoint), Scalar(0, 0, 255));//RED QT outline
 #endif
 	}
 
@@ -161,13 +161,13 @@ int   render_::render_image()
 			}
 			*/
 #ifdef _DEBUG_RENDER
-			//	Strk_srtPoint= (region_p)->srtPoint;
-			//	Strk_endPoint = (region_p)->endPoint;
-			//	Region_w_size = Strk_endPoint.x - Strk_srtPoint.x;
-			//	Region_h_size = Strk_endPoint.y - Strk_srtPoint.y;
+			//	Region_srtPoint= (region_p)->srtPoint;
+			//	Region_endPoint = (region_p)->endPoint;
+			//	Region_w_size = Region_endPoint.x - Region_srtPoint.x;
+			//	Region_h_size = Region_endPoint.y - Region_srtPoint.y;
 			//	Region_size=Size(Region_w_size, Region_h_size);
 
-			rectangle_canvas(painting_area_canvas[astroke_depth], Rect(Strk_srtPoint, Strk_endPoint), Scalar(0, 0, 255));//RED QT outline
+			rectangle_canvas(painting_area_canvas[astroke_depth], Rect(Region_srtPoint, Region_endPoint), Scalar(0, 0, 255));//RED QT outline
 #endif
 		
 		

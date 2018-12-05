@@ -120,8 +120,7 @@
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
     </ProjectReference>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>copy "$(TargetPath)" c:\render\bin</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>copy exe to bin</Message>

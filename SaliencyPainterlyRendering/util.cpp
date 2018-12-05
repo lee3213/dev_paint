@@ -119,8 +119,8 @@ void p_poke(unsigned char * p, int index, int p_0) {
  }
  */
  /*
- fetch_color_Point.x = Strk_srtPoint.x + random_x;
- fetch_color_Point.y = Strk_srtPoint.y + random_y;*/
+ fetch_color_Point.x = Region_srtPoint.x + random_x;
+ fetch_color_Point.y = Region_srtPoint.y + random_y;*/
  /*
  bool FixToInside(Point &b_SrtPoint, Point &b_EndPoint, Point &tryPoint, int image_width, int image_height,int bsize)
  {

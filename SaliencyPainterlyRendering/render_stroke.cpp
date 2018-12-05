@@ -21,7 +21,7 @@ void  render_::p_peek_canvas_1c(unsigned char * p, int p_x, int p_y, int &p_0) {
 int render_::paint_a_stroke(partition_Node* region_p, int layer_more, int _mode, Point _p, int _depth) {
 	//partition_Node* region_p = (*region_iter);
 	
-	Point Strk_srtPoint, Strk_endPoint;
+	Point Region_srtPoint, Region_endPoint;
 	Point fetch_color_Point, fetch_color_canvas_point;
 
 	Point centered_SrtPoint, centered_EndPoint;
@@ -80,10 +80,10 @@ int render_::paint_a_stroke(partition_Node* region_p, int layer_more, int _mode,
 		if (layer_more_depth != astroke_depth)
 			layer_more_depth = 1000 + astroke_depth;
 	}
-	Strk_srtPoint = (region_p)->srtPoint;
-	Strk_endPoint = (region_p)->endPoint;
-	Region_w_size = Strk_endPoint.x - Strk_srtPoint.x;
-	Region_h_size = Strk_endPoint.y - Strk_srtPoint.y;
+	Region_srtPoint = (region_p)->srtPoint;
+	Region_endPoint = (region_p)->endPoint;
+	Region_w_size = Region_endPoint.x - Region_srtPoint.x;
+	Region_h_size = Region_endPoint.y - Region_srtPoint.y;
 	
 	//if (render_method == RENDER_ENHANCE) {
 		//Region_h_size += 8;
@@ -152,8 +152,8 @@ int render_::paint_a_stroke(partition_Node* region_p, int layer_more, int _mode,
 
 		random_x = diStrk_x(rand_x[astroke_depth]);
 		random_y = diStrk_y(rand_y[astroke_depth]);
-		fetch_color_Point.x = Strk_srtPoint.x + random_x;
-		fetch_color_Point.y = Strk_srtPoint.y + random_y;
+		fetch_color_Point.x = Region_srtPoint.x + random_x;
+		fetch_color_Point.y = Region_srtPoint.y + random_y;
 
 		if (layer_more == layer_more_1) {
 
