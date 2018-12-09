@@ -56,7 +56,9 @@ int render_::P_Rendering(Mat & _src_canvas_ROI,
 	unsigned char *_accu_canvas_ptr,
 	unsigned char * _ing_canvas_ptr,
 	int _mode,
-	int _tbrush_reset
+	int _tbrush_reset,
+	int ing_pmap_flag,
+	Mat & _ing_pmap_canvas
 ) {
 	static int tbrush_cnt = 0;
 	static int saved_depth = -1;
@@ -74,7 +76,7 @@ int render_::P_Rendering(Mat & _src_canvas_ROI,
 	int Alpha;
 
 	unsigned char * ing_ROI_canvas_data = _ing_canvas_ROI.data;
-
+	unsigned char * ing_pmap_canvas_data = _ing_pmap_canvas.data;
 	unsigned char * src_canvas_ROI_data = _src_canvas_ROI.data;
 
 	unsigned char *before_ROI_canvas_clone_data = _before_ROI_canvas_clone.data;
@@ -229,7 +231,8 @@ int render_::P_Rendering(Mat & _src_canvas_ROI,
 
 					Alpha = bestBrush_8UC1_resized_data[gray_bIndex_1c];
 					if (Alpha < g_alpha_TH) {
-						
+						if ( ing_pmap_flag == 1	)
+							p_poke(ing_pmap_canvas_data, canvas_Index_3c, color_BGR_B, color_BGR_G, color_BGR_R);
 						p_poke(_ing_canvas_ptr, canvas_Index_3c, color_BGR_B, color_BGR_G, color_BGR_R);
 						p_poke(_accu_canvas_ptr, canvas_Index_3c, color_BGR_B, color_BGR_G, color_BGR_R);
 						p_poke(paint_map_canvas_8UC1_data[astroke_depth], canvas_Index_1c,0);

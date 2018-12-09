@@ -127,7 +127,7 @@ int  set_global(string src_name,string deploy_name) {
 	
 	g_para = string("s") + to_string(g_QT_avgSThreshold) + "d" + to_string(g_depth_limit)
 		+ "g" + to_string(g_min_gridsize) + "_b" + to_string(g_BrushMinSize) +
-		"_N" + to_string(g_QT_method_N)+"_bn"+to_string(g_BrushNumber);
+		"_N" + to_string(g_QT_method_N)+"_bn"+to_string(g_BrushNumber)+"_pm"+to_string(g_pmap_do);
 	
 	g_unique_id = 0;//QT->no
 	g_debug_method = "";

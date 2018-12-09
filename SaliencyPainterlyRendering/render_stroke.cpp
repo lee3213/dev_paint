@@ -65,6 +65,10 @@ int render_::paint_a_stroke(partition_Node* region_p, int layer_more, int _mode,
 	random_device rand_y[MAX_DEPTH];
 	astroke_depth = region_p->depth;
 	render_stroke_no = (region_p)->no;
+	Mat ing_pmap;
+
+	Mat ing_pmap_canvas_ROI;
+
 	if (layer_more == 1) {
 		
 		if (layer_more_depth == -1) {//first time
@@ -134,6 +138,7 @@ int render_::paint_a_stroke(partition_Node* region_p, int layer_more, int _mode,
 	int extended_paint_area_brush_count = x_paint_area_brush_count;
 	int extend_retry = 0;
 	 mat_accu = accu_canvas[astroke_depth];
+	 ing_pmap = ing_canvas[astroke_depth];
 	 mat_ing = ing_canvas[astroke_depth];
 
 	 string f_name_btdt = "p" + to_string(astroke_depth) + "/" + m_t_ + to_string(astroke_depth) + "_t_" + to_string(0);
@@ -216,6 +221,7 @@ int render_::paint_a_stroke(partition_Node* region_p, int layer_more, int _mode,
 		changed_canvas_ROI_clone = mat_accu(centered_ROI_canvas_Rect).clone();
 
 		ing_ROI_canvas = mat_ing(centered_ROI_canvas_Rect);
+		ing_pmap_canvas_ROI=ing_pmap(centered_ROI_canvas_Rect);
 
 		//Mat ing_ROI_clone = ing_canvas[astroke_depth](centered_ROI_canvas_Rect).clone();
 
@@ -243,7 +249,9 @@ int render_::paint_a_stroke(partition_Node* region_p, int layer_more, int _mode,
 			accu_canvas_data[astroke_depth],
 			ing_canvas_data[astroke_depth],
 			1,//debug_image on
-			0
+			0,
+			0,
+			 ing_pmap_canvas_ROI
 		);
 		//r_cout << "i" << x_retry_map_1c.size().height << ", " << x_retry_map_1c.size().width << " " << render_try << endl;
 		//	current_fetched_map_data,fetched_color_data,r,g,b);

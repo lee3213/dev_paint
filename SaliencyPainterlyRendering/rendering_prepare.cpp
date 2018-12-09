@@ -20,7 +20,7 @@ using namespace saliency;
 
 #include "json_read.h"
 #include "saliency_main.h"
-#include "g_setup.h"
+
 
 #include "brush_adjust.h"
 #include "dir.h"
@@ -129,9 +129,7 @@ int   prepare_Rendering(char * src_name, char * deploy_name)
 	int saved_depth = -1;
 
 
-	int ret = set_global(string(src_name), string(deploy_name));
-	if (ret < 0)
-		return -7777;
+	int ret;
 //#define BRUSH_ADJUST
 #ifdef BRUSH_ADJUST
 	Brush_adjust(g_brush_vector_set);

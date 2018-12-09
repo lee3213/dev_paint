@@ -67,7 +67,7 @@ int  json_deployment(string path) {
 //	else
 	//	g_merge_method = DEF_MERGE;
 //
-	g_pmap_do = root.get("g_pmap_do", 1).asInt();
+//	g_pmap_do = root.get("g_pmap_do", 1).asInt();
 	g_BrushAttachSize = root.get("g_BrushAttachSize", 5).asInt();
 //	g_merge_skip_count = root.get("g_merge_skip_count", 1).asInt();
 	// And you can write to a stream, using the StyledWriter automatically.

@@ -39,7 +39,7 @@ int   render_::render_image()
 	int from_layer_0 = 0;
 	int pmap_SET0 = 0;
 	partition_Node* region_p;
-	
+	string pmap_path;
 
 	accu_canvas[0].create(x_canvas_size_height, x_canvas_size_width, CV_8UC3);
 	accu_canvas[0].setTo(255);
@@ -173,24 +173,29 @@ int   render_::render_image()
 		
 		}//end of it region
 
-		string pmap_path = "pmap/r" + to_string(render_method) + "/_" + m_tag_ + to_string(uu_depth)+"_";
-	//	int zero_cnt=pmap_count_zero(paint_map_canvas_8UC1[uu_depth], pmap_tag, x_src_canvas_Rect_full);
-		debug_image(pmap_path + "accu_" + "_" + to_string(uu_depth) + "_", accu_canvas[uu_depth]);
-		debug_image(pmap_path+ "pmap_a_" + to_string(uu_depth), paint_map_accu_canvas_8UC1[uu_depth]);
-		debug_image(pmap_path + "pmap_i_" + to_string(uu_depth), paint_map_canvas_8UC1[uu_depth]);
+		
 				//paint_map_canvas_8UC1[uu_depth].copyTo(paint_map_accu_canvas_8UC1[uu_depth]);
 	
 		int tot_cnt;
 		if (uu_depth == from_layer_0) {//apply paint map 
 			pmap_overlay_fill(x_changed_depth, paint_map_accu_canvas_8UC1[uu_depth], pmap_SET0);
 			//ret = pmap_count_zero(paint_map_canvas_8UC1[uu_depth], pmap_path, x_src_canvas_Rect_full);
-		
-			debug_image(pmap_path+ "_" + to_string(uu_depth), paint_map_accu_canvas_8UC1[uu_depth]);
-		
-			if ( g_pmap_do == 1)
-				tot_cnt=pad_p_map(paint_map_accu_canvas_8UC1[uu_depth], r_,pmap_path, uu_depth);
-				
-			//ret = pmap_count_zero(paint_map_canvas_8UC1[uu_depth], pmap_path, x_src_canvas_Rect_full);
+			 pmap_path = "pmap/r" + to_string(render_method) + "/_" + m_tag_ + to_string(uu_depth) + "_";
+			//	int zero_cnt=pmap_count_zero(paint_map_canvas_8UC1[uu_depth], pmap_tag, x_src_canvas_Rect_full);
+			
+			if (g_pmap_do == 1) {
+				debug_image("ing/_i_" + to_string(uu_depth) + m_t + "_pb", ing_canvas[uu_depth]);
+				debug_image("ing/_ac_" + to_string(uu_depth) + m_t + "_pb", accu_canvas[uu_depth]);
+				debug_image("ing/try_" + to_string(uu_depth) + m_t + "_pb", r_try_map_1c[uu_depth]);
+				tot_cnt = pad_p_map(paint_map_accu_canvas_8UC1[uu_depth], r_, pmap_path, uu_depth);
+				debug_image(pmap_path + "_pmap_a_a_" + to_string(uu_depth), paint_map_accu_canvas_8UC1[uu_depth]);
+				debug_image(pmap_path + "pmap_i_a_" + to_string(uu_depth), paint_map_canvas_8UC1[uu_depth]);
+				//ret = pmap_count_zero(paint_map_canvas_8UC1[uu_depth], pmap_path, x_src_canvas_Rect_full);
+				debug_image("ing/_i_" + to_string(uu_depth) + m_t + "_pa"
+					, ing_canvas[uu_depth]);
+				debug_image("ing/_ac_" + to_string(uu_depth) + m_t + "_pa", accu_canvas[uu_depth]);
+				debug_image("ing/try_" + to_string(uu_depth) + m_t + "_pa", r_try_map_1c[uu_depth]);
+			}
 			
 		}
 		debug_image("ing/_i_" + to_string(uu_depth) + m_t + to_string(g_paint_try_scale[uu_depth]), ing_canvas[uu_depth]);
@@ -250,6 +255,11 @@ int   render_::render_image()
 	r_cout << setw(15) << m_tag<<"-->"<<s_buff << " : "<<e_buff << endl;
 	csv_log << "R End, "<<m_tag << "," << s_buff << "," << e_buff << endl;
 		*/
+	if (g_pmap_do == 0) {
+		Mat a = 255 - paint_map_accu_canvas_8UC1[render_depth - 1].clone();
+		debug_image(pmap_path + "_pmap_0_a_" + to_string(render_depth-1), a);
+
+	}
 #ifdef DEPTH_MAP
 	double minval, maxval;
 //	int i_minloc, i_maxloc;

@@ -11,7 +11,7 @@
 
 #include "time.h"
 #include "define_local.h"
-int render_::func_render_a_pixel(int src_x, int src_y, int astroke_depth) {
+int render_::func_render_a_pixel(int src_x, int src_y, int astroke_depth, Mat & ing_pmap_canvas) {
 	Point centered_SrtPoint, centered_EndPoint;
 	Point centered_SrtPoint_canvas, centered_EndPoint_canvas;
 	int brush_area_h_size_half;
@@ -28,7 +28,7 @@ int render_::func_render_a_pixel(int src_x, int src_y, int astroke_depth) {
 
 	Mat changed_canvas_ROI;
 	Mat changed_canvas_ROI_clone;
-
+//	Mat ing_pmap_canvas_ROI;
 	Mat ing_ROI_canvas;
 
 	cv::Mat src_canvas_ROI;
@@ -90,6 +90,7 @@ int render_::func_render_a_pixel(int src_x, int src_y, int astroke_depth) {
 	changed_canvas_ROI_clone = mat_accu(centered_ROI_canvas_Rect).clone();
 
 	ing_ROI_canvas = mat_ing(centered_ROI_canvas_Rect);
+//	ing_pmap_canvas_ROI = ing_pmap_canvas(centered_ROI_canvas_Rect);
 	int result = P_Rendering(
 		src_canvas_ROI,
 		before_canvas_ROI_clone,
@@ -113,7 +114,9 @@ int render_::func_render_a_pixel(int src_x, int src_y, int astroke_depth) {
 		accu_canvas_data[astroke_depth],
 		ing_canvas_data[astroke_depth],
 		1,
-		0
+		0,
+		1,
+		ing_pmap_canvas
 	);
 	if (result == CHANGED_BETTER)
 		r_s_changed_count[astroke_depth]++;
@@ -147,7 +150,7 @@ int  render_::pad_p_map(Mat & a_pmap_accu_canvas_8UC1, Rect r_given_depth,string
 	Mat nonzero_ROI;
 	Rect r_canvas;
 
-	int k_skip = 300;
+	int k_skip = 5;
 	int tot_cnt = 0;
 	int effective_try = 0;
 //	int __saved_depth;
@@ -158,7 +161,11 @@ int  render_::pad_p_map(Mat & a_pmap_accu_canvas_8UC1, Rect r_given_depth,string
 	Mat diff;
 	int val;
 	unsigned char * pmap_accu_ptr = paint_map_accu_canvas_8UC1[astroke_depth].data;
-	Mat a_pmap_accu_canvas_8UC1_clone_inv = 255 - a_pmap_accu_canvas_8UC1.clone();
+	Mat ing_pmap;
+	ing_pmap.create(x_canvas_size_height, x_canvas_size_width, CV_8UC3);
+	ing_pmap.setTo(255);
+
+	Mat a_pmap_accu_canvas_8UC1_clone_inv;
 	int region_layer = x_changed_depth ;
 	int ssize;
 	do {
@@ -185,32 +192,50 @@ int  render_::pad_p_map(Mat & a_pmap_accu_canvas_8UC1, Rect r_given_depth,string
 	int y_remainder = x_src_image_size.height-(_r_height * y_divider);
 	int layer = _depth;
 
-	debug_image(_pmap_path + "_i_pmap_" + to_string(layer) + "_",
-		a_pmap_accu_canvas_8UC1_clone_inv);
-	rendered_accu_canvas_clone = accu_canvas[_depth].clone();//rendered image
-	debug_image(_pmap_path + "_r_ac_b_" + to_string(layer), rendered_accu_canvas_clone);
+	
+
 	random_device rand_x;
+	std::mt19937 gen(rand_x());
 	int random_x;
 	int rand_err = 0;
 	int turns = 0;
-	Mat before_pmap_accu;
+	Mat before_pmap_accu_clone;
 	int cnz;
-	Mat prev_pmap_accu;
+	Mat prev_pmap_accu_clone;
 	Mat diff2;
 	int cnz2;
-	before_pmap_accu = paint_map_accu_canvas_8UC1[layer].clone();
+
+	before_pmap_accu_clone = paint_map_accu_canvas_8UC1[layer].clone();
+	a_pmap_accu_canvas_8UC1_clone_inv = 255 - a_pmap_accu_canvas_8UC1.clone();
+	debug_image(_pmap_path + "_i_pmap_" + to_string(layer) + "_",
+		a_pmap_accu_canvas_8UC1_clone_inv);
+
+	rendered_accu_canvas_clone = accu_canvas[_depth].clone();//rendered image
+	debug_image(_pmap_path + "_ac_b_" + to_string(layer), rendered_accu_canvas_clone);
+	int limit;
+
+	if (r_.height < r_.width) {
+		
+		limit = (int)(r_.height - 1);
+	}
+	else {
+	
+		limit = (int)(r_.width - 1);
+	}
+	uniform_int_distribution<int> dist_x_pmap(0,limit);
+	uniform_int_distribution<int> *_uni_p;
+	_uni_p = new uniform_int_distribution<int>(0, limit);
 	do {
 		tot_cnt = 0;
-		for (_y = 0; _y < y_divider-1; _y++) {
-			rendered_accu_canvas_clone = accu_canvas[_depth].clone();
-
+		for (_y = 0; _y <= y_divider; _y++) {
+		
 			r_.y = _y*_r_height;
 		//	if (_y == (y_divider - 2)) {
 		//		r_.height += y_remainder;
 		//	}
 			
-			prev_pmap_accu = paint_map_accu_canvas_8UC1[layer].clone();
-			for (_x = 0; _x < x_divider-1; _x++) {
+			prev_pmap_accu_clone = paint_map_accu_canvas_8UC1[layer].clone();
+			for (_x = 0; _x <= x_divider; _x++) {
 				r_.x = _x*_r_width;
 		////		if (_x == (x_divider - 2)) {
 				//	r_.width += x_remainder;
@@ -220,8 +245,8 @@ int  render_::pad_p_map(Mat & a_pmap_accu_canvas_8UC1, Rect r_given_depth,string
 				r_canvas.x = r_.x + x_canvas_bezel_size;
 				r_canvas.y = r_.y + x_canvas_bezel_size;
 
-				rectangle(rendered_accu_canvas_clone, r_canvas, 0);
-				rectangle(a_pmap_accu_canvas_8UC1_clone_inv, r_canvas, 0);
+			//	rectangle(rendered_accu_canvas_clone, r_canvas, 0);
+			//	rectangle(a_pmap_accu_canvas_8UC1_clone_inv, r_canvas, 0);
 
 				nonzero_ROI = a_pmap_accu_canvas_8UC1(r_canvas);
 				//	debug_image(_pmap_path + "_nz_" + to_string(_y) + "_" + to_string(_x),nonzero_ROI);
@@ -235,10 +260,9 @@ int  render_::pad_p_map(Mat & a_pmap_accu_canvas_8UC1, Rect r_given_depth,string
 				//sum_x = 0; sum_y = 0;
 				saved_c = c;
 				if (c > k_skip) {
-					uniform_int_distribution<int> diStrk_x(0, (int)(c - 1));
-
+					
 					do {
-						random_x = diStrk_x(rand_x) % c;
+						random_x = dist_x_pmap(gen) % c;
 						if (random_x > c)
 							rand_err++;
 					} while (random_x > c);
@@ -251,11 +275,11 @@ int  render_::pad_p_map(Mat & a_pmap_accu_canvas_8UC1, Rect r_given_depth,string
 					src_x = r_.x + p_x;
 					src_y = r_.y + p_x;
 
-					rectangle(rendered_accu_canvas_clone, Rect(canvas_x, canvas_y, 2, 2), 0);
-
+					rectangle(rendered_accu_canvas_clone, Rect(canvas_x, canvas_y, r_.width, r_.height), 0);
+					rectangle(a_pmap_accu_canvas_8UC1_clone_inv , Rect(canvas_x, canvas_y, r_.width, r_.height), 0);
 
 					int index = x_canvas_size_width*canvas_y + canvas_x;
-					ret = func_render_a_pixel(r_.x, r_.y, astroke_depth);
+					ret = func_render_a_pixel(r_.x, r_.y, astroke_depth,ing_pmap);
 					effective_try++;
 					p_peek_1c(pmap_accu_ptr, index, val);
 					if (val != 0) {//skip when nothing changed 
@@ -266,12 +290,19 @@ int  render_::pad_p_map(Mat & a_pmap_accu_canvas_8UC1, Rect r_given_depth,string
 				}//if c > skip
 			}//x
 		}//y
-		turns++;
-		diff = abs(before_pmap_accu - paint_map_accu_canvas_8UC1[layer]);
-		diff2 = abs(prev_pmap_accu - paint_map_accu_canvas_8UC1[layer]);
+		
+		diff = abs(before_pmap_accu_clone - paint_map_accu_canvas_8UC1[layer]);
+		diff2 = abs(prev_pmap_accu_clone- paint_map_accu_canvas_8UC1[layer]);
 		 cnz = countNonZero(diff2);
-		debug_image(_pmap_path + "_diff_"  + "_" + to_string(layer) + "_" + to_string(turns), diff);
-		debug_image(_pmap_path + "_accu_" + "_" + to_string(_depth) + "_" + to_string(turns), accu_canvas[_depth]);
+			 debug_image(_pmap_path + "_i_pmap_" + to_string(layer) + "_tr" + to_string(turns),
+				 a_pmap_accu_canvas_8UC1_clone_inv);
+			 turns++;
+		 a_pmap_accu_canvas_8UC1_clone_inv = 255 - a_pmap_accu_canvas_8UC1;
+		 debug_image(_pmap_path + "_i_pmap_" + to_string(layer) + "_t" + to_string(turns),
+			 a_pmap_accu_canvas_8UC1_clone_inv);
+
+		debug_image(_pmap_path + "_diff_"  + "_" + to_string(layer) + "_t" + to_string(turns), diff);
+		debug_image(_pmap_path + "_accu_" + "_" + to_string(_depth) + "_t" + to_string(turns), accu_canvas[_depth]);
 	}
 	while (cnz > 100);
 	//	diff = abs(before_pmap_accu - paint_map_accu_canvas_8UC1[layer]);
@@ -282,7 +313,8 @@ int  render_::pad_p_map(Mat & a_pmap_accu_canvas_8UC1, Rect r_given_depth,string
 
 	
 //	debug_image(_pmap_path + "/_o_pmap_" + m_t + "_" + to_string(layer) + "_" , overlay_droppeda_pmap_accu_canvas_8UC1_clone_inv);
-	debug_image(_pmap_path + + "__r_ac_a_" + "_" + to_string(layer), rendered_accu_canvas_clone);
+	debug_image(_pmap_path + "__r_ac_a_" + to_string(layer), rendered_accu_canvas_clone);
+	debug_image(_pmap_path + "_ing_pmap_" + to_string(layer), ing_pmap);
 	//debug_image("pmap/r" + to_string(render_method) + "/_fd" + m_t, layer, overlay_dropped_map[layer]);
 		/*accu = accu_canvas[_depth].clone();
 		for (int mlayer = layer; mlayer == layer; mlayer++) {
@@ -353,6 +385,7 @@ void render_::pmap_overlay_fill(int from_uu_depth, Mat a_map_canvas_8UC1, int co
 	int Region_w_size, Region_h_size;
 	Point Strk_point_canvas;
 	partition_Node* region_p;
+	Mat pmap_overlay_inv = 255-a_map_canvas_8UC1.clone();
 	for (list<partition_Node*>::iterator partition_it = render_region_set[from_uu_depth].Region_list.begin();
 		partition_it != render_region_set[from_uu_depth].Region_list.end(); partition_it++) {
 
@@ -370,7 +403,9 @@ void render_::pmap_overlay_fill(int from_uu_depth, Mat a_map_canvas_8UC1, int co
 		Mat a_map_canvas_8UC1_ROI = a_map_canvas_8UC1(Strk_canvas_ROI_rect);
 
 		a_map_canvas_8UC1_ROI.setTo(color);
+		rectangle(pmap_overlay_inv, Strk_canvas_ROI_rect, 0);
 	}
+	debug_image("ing/pmap_overlay_"+m_t+"_", from_uu_depth,pmap_overlay_inv);
 }
 
 /*

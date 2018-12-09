@@ -93,6 +93,7 @@ int BrushInitialization(vector <Brush*> &_brush_set)
 		__brush = new Brush;
 		__brush->brush_thumbnail = temp_thumbnail.clone();
 		__brush->brush_8UC1 = mask_8UC1.clone();
+		__brush->brush_8UC1_Size = __brush->brush_8UC1.size();
 		__brush->brush_mask = temp_mask.clone();
 		__brush->brush_no = nth;
 

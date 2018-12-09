@@ -230,7 +230,7 @@ int render_::pad_p_map(Mat & a_pmap_canvas_8UC1, Rect r_,string tag, int _depth)
 		int c, string _tag);
 	int render_::calc_render_brush_size(int _BrushMaxSize, int _BrushMinSize, int  & _depth,
 		int _render_brush_size[], string tag);
-int render_::func_render_a_pixel(int x, int y, int astroke_depth);
+int render_::func_render_a_pixel(int x, int y, int astroke_depth,Mat &ing_pmap);
 	int render_::P_Rendering(Mat & _src_ROI_clone, Mat & _before_ROI_clone,
 		cv::Mat & _changed_ROI_clone,
 		cv::Mat & ing_ROI_clone, Mat &changed_canvas_ROI,
@@ -249,7 +249,9 @@ int render_::func_render_a_pixel(int x, int y, int astroke_depth);
 		unsigned char * _accu_ptr,
 		unsigned char * _ing_ptr,
 		int mode,
-		int _tbrush_reset
+		int _tbrush_reset,
+		int pmap_mode,
+		Mat &ing_pmap_ROI
 		);
 //int render_::pmap_count_zero(Mat & a_pmap_canvas_8UC1, string tag, Rect x_src_canvas_Rect_full, int _depth);
 	int render_::paint_a_stroke(partition_Node* region_p,int layer_more,int mode, Point p,int layer);

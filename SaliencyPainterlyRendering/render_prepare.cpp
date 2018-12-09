@@ -526,7 +526,7 @@ int render_::prepare() {
 	render_brush_size, m_tag);
 
 	
-	brush_resize( g_brush_vector_set);
+	//brush_resize( g_brush_vector_set);
 	brush_pgm_resize(g__brush_pgm_list);
 	////for (int i = 0; i < render_depth; i++) {
 	//	r_cout << "Brush "<<i << ", " << render_brush_size[i] << endl;
